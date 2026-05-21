@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'Sign In') — {{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { brand: { 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 950: '#1e1b4b' } }, fontFamily: { sans: ['Inter', 'sans-serif'] } } }
+        }
+    </script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="font-sans bg-gradient-to-br from-brand-950 via-brand-900 to-slate-900 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md">
+        {{-- Logo --}}
+        <div class="text-center mb-8">
+            <a href="{{ route('home') }}" class="inline-flex items-center gap-2">
+                <div class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center">
+                    <span class="text-white font-bold">ML</span>
+                </div>
+                <span class="text-white font-bold text-2xl">{{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}</span>
+            </a>
+        </div>
+
+        {{-- Card --}}
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            @yield('content')
+        </div>
+
+        {{-- Footer Link --}}
+        <p class="text-center text-brand-200 text-sm mt-6">
+            @yield('footer_link')
+        </p>
+    </div>
+</body>
+</html>
