@@ -9,7 +9,7 @@
     <script>
         tailwind.config = {
             theme: { extend: { colors: {
-                brand: { 50:'#eef2ff',100:'#e0e7ff',500:'#6366f1',600:'#4f46e5',700:'#4338ca',950:'#1e1b4b' }
+                brand: { 50:'#eef0f8',100:'#d4d9ef',200:'#a9b3df',300:'#7f8ecf',400:'#5468bf',500:'#2a42af',600:'#14215B',700:'#0f1a48',800:'#0b1335',900:'#070d22',950:'#040812' }
             }, fontFamily: { sans: ['Inter','sans-serif'] } } }
         }
     </script>

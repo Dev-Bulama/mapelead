@@ -27,6 +27,17 @@ use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\SupportController;
+use App\Http\Controllers\Admin\QuizController as AdminQuizController;
+use App\Http\Controllers\Admin\AssignmentController as AdminAssignmentController;
+use App\Http\Controllers\Admin\BatchController;
+use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
+use App\Http\Controllers\Admin\InstallmentController;
+use App\Http\Controllers\Admin\EmailTemplateController;
+use App\Http\Controllers\Admin\AdmissionNumberController;
+use App\Http\Controllers\Admin\CertificateSettingsController;
+use App\Http\Controllers\Student\QuizController as StudentQuizController;
+use App\Http\Controllers\Student\AssignmentController as StudentAssignmentController;
+use App\Http\Controllers\Student\AttendanceController as StudentAttendanceController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Public Website Routes ────────────────────────────────────────────────────
@@ -99,6 +110,20 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('student.')->
     Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
     Route::get('/tickets/{id}', [TicketController::class, 'show'])->name('tickets.show');
     Route::post('/tickets/{id}/reply', [TicketController::class, 'reply'])->name('tickets.reply');
+
+    // Quiz Routes
+    Route::get('/quiz/{quiz}', [StudentQuizController::class, 'show'])->name('quiz.show');
+    Route::post('/quiz/{quiz}/start', [StudentQuizController::class, 'start'])->name('quiz.start');
+    Route::post('/quiz-attempt/{attempt}/submit', [StudentQuizController::class, 'submit'])->name('quiz.submit');
+    Route::get('/quiz-attempt/{attempt}/result', [StudentQuizController::class, 'result'])->name('quiz.result');
+
+    // Assignment Routes
+    Route::get('/assignment/{assignment}', [StudentAssignmentController::class, 'show'])->name('assignment.show');
+    Route::post('/assignment/{assignment}/submit', [StudentAssignmentController::class, 'submit'])->name('assignment.submit');
+
+    // Attendance Routes
+    Route::get('/attendance', [StudentAttendanceController::class, 'index'])->name('attendance');
+    Route::get('/attendance/{course}', [StudentAttendanceController::class, 'show'])->name('attendance.show');
 });
 
 // ─── Enrollment & Payment ─────────────────────────────────────────────────────
@@ -168,6 +193,69 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('testimonials', TestimonialController::class);
     Route::resource('faqs', FaqController::class);
 
+    // ─── LMS Extension ────────────────────────────────────────────────────────
+    // Quizzes
+    Route::get('/courses/{course}/quizzes', [AdminQuizController::class, 'index'])->name('courses.quizzes.index');
+    Route::get('/courses/{course}/quizzes/create', [AdminQuizController::class, 'create'])->name('courses.quizzes.create');
+    Route::post('/courses/{course}/quizzes', [AdminQuizController::class, 'store'])->name('courses.quizzes.store');
+    Route::get('/quizzes/{quiz}/edit', [AdminQuizController::class, 'edit'])->name('quizzes.edit');
+    Route::put('/quizzes/{quiz}', [AdminQuizController::class, 'update'])->name('quizzes.update');
+    Route::delete('/quizzes/{quiz}', [AdminQuizController::class, 'destroy'])->name('quizzes.destroy');
+    Route::post('/quizzes/{quiz}/questions', [AdminQuizController::class, 'storeQuestion'])->name('quizzes.questions.store');
+    Route::delete('/quiz-questions/{question}', [AdminQuizController::class, 'destroyQuestion'])->name('quizzes.questions.destroy');
+    Route::post('/quizzes/{quiz}/reorder', [AdminQuizController::class, 'reorderQuestions'])->name('quizzes.questions.reorder');
+
+    // Assignments
+    Route::get('/courses/{course}/assignments', [AdminAssignmentController::class, 'index'])->name('courses.assignments.index');
+    Route::get('/courses/{course}/assignments/create', [AdminAssignmentController::class, 'create'])->name('courses.assignments.create');
+    Route::post('/courses/{course}/assignments', [AdminAssignmentController::class, 'store'])->name('courses.assignments.store');
+    Route::get('/assignments/{assignment}/edit', [AdminAssignmentController::class, 'edit'])->name('assignments.edit');
+    Route::put('/assignments/{assignment}', [AdminAssignmentController::class, 'update'])->name('assignments.update');
+    Route::delete('/assignments/{assignment}', [AdminAssignmentController::class, 'destroy'])->name('assignments.destroy');
+    Route::get('/assignments/{assignment}/submissions', [AdminAssignmentController::class, 'submissions'])->name('assignments.submissions');
+    Route::post('/submissions/{submission}/grade', [AdminAssignmentController::class, 'gradeSubmission'])->name('submissions.grade');
+
+    // Batches
+    Route::resource('batches', BatchController::class);
+    Route::get('/batches/{batch}/enrollments', [BatchController::class, 'enrollments'])->name('batches.enrollments');
+    Route::post('/batches/{batch}/students', [BatchController::class, 'addStudent'])->name('batches.students.add');
+    Route::delete('/batch-enrollments/{batchEnrollment}', [BatchController::class, 'removeStudent'])->name('batches.students.remove');
+
+    // Attendance
+    Route::get('/courses/{course}/attendance', [AdminAttendanceController::class, 'index'])->name('courses.attendance.index');
+    Route::get('/courses/{course}/attendance/session/create', [AdminAttendanceController::class, 'createSession'])->name('courses.attendance.session.create');
+    Route::post('/courses/{course}/attendance/session', [AdminAttendanceController::class, 'storeSession'])->name('courses.attendance.session.store');
+    Route::get('/attendance/{session}/mark', [AdminAttendanceController::class, 'markAttendance'])->name('attendance.mark');
+    Route::post('/attendance/{session}/save', [AdminAttendanceController::class, 'saveAttendance'])->name('attendance.save');
+    Route::get('/courses/{course}/attendance/report', [AdminAttendanceController::class, 'report'])->name('courses.attendance.report');
+    Route::get('/courses/{course}/attendance/settings', [AdminAttendanceController::class, 'settings'])->name('courses.attendance.settings');
+    Route::post('/courses/{course}/attendance/settings', [AdminAttendanceController::class, 'saveSettings'])->name('courses.attendance.settings.save');
+    Route::delete('/attendance-sessions/{session}', [AdminAttendanceController::class, 'destroy'])->name('attendance.sessions.destroy');
+
+    // Installments
+    Route::resource('installments', InstallmentController::class)->except(['edit', 'update']);
+    Route::post('/installments/{installmentPlan}/payment', [InstallmentController::class, 'recordPayment'])->name('installments.payment');
+    Route::post('/installments/{installmentPlan}/unlock', [InstallmentController::class, 'unlock'])->name('installments.unlock');
+
+    // Email Templates
+    Route::resource('email-templates', EmailTemplateController::class)->names('email-templates');
+    Route::get('/email-templates/{emailTemplate}/preview', [EmailTemplateController::class, 'preview'])->name('email-templates.preview');
+    Route::post('/email-templates/{emailTemplate}/toggle', [EmailTemplateController::class, 'toggleActive'])->name('email-templates.toggle');
+
+    // Admission Numbers
+    Route::get('/settings/admission-numbers', [AdmissionNumberController::class, 'settings'])->name('settings.admission-numbers');
+    Route::post('/settings/admission-numbers', [AdmissionNumberController::class, 'saveSettings'])->name('settings.admission-numbers.save');
+    Route::get('/settings/admission-numbers/list', [AdmissionNumberController::class, 'index'])->name('settings.admission-numbers.list');
+    Route::post('/settings/admission-numbers/assign', [AdmissionNumberController::class, 'assign'])->name('settings.admission-numbers.assign');
+    Route::post('/settings/admission-numbers/bulk-assign', [AdmissionNumberController::class, 'bulkAssign'])->name('settings.admission-numbers.bulk');
+
+    // Certificate Settings
+    Route::get('/certificates', [CertificateSettingsController::class, 'index'])->name('certificates.index');
+    Route::get('/certificates/settings', [CertificateSettingsController::class, 'settings'])->name('certificates.settings');
+    Route::post('/certificates/settings', [CertificateSettingsController::class, 'saveSettings'])->name('certificates.settings.save');
+    Route::post('/certificates/issue', [CertificateSettingsController::class, 'issue'])->name('certificates.issue');
+    Route::delete('/certificates/{certificate}', [CertificateSettingsController::class, 'revoke'])->name('certificates.revoke');
+
     // Support
     Route::resource('support', SupportController::class)->names('support');
     Route::post('/support/{id}/assign', [SupportController::class, 'assign'])->name('support.assign');
@@ -184,6 +272,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/settings/menus', [SettingsController::class, 'menus'])->name('settings.menus');
     Route::post('/settings/menus', [SettingsController::class, 'updateMenus'])->name('settings.menus.update');
 });
+
+// ─── Public Certificate Verification ──────────────────────────────────────────
+Route::get('/verify/{token}', [CertificateSettingsController::class, 'verify'])->name('certificate.verify');
 
 // ─── Dynamic CMS Pages (must be last) ─────────────────────────────────────────
 Route::get('/{slug}', [PageController::class, 'show'])->name('page.show');

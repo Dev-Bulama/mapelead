@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'google_id', 'google_token',
         'last_login_at', 'last_login_ip',
         'two_factor_enabled', 'two_factor_secret',
+        'admission_number', 'portal_locked', 'portal_locked_reason', 'portal_locked_at',
     ];
 
     protected $hidden = ['password', 'remember_token', 'two_factor_secret', 'google_token'];
@@ -30,11 +31,13 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'last_login_at'     => 'datetime',
-            'date_of_birth'     => 'date',
-            'password'          => 'hashed',
+            'email_verified_at'  => 'datetime',
+            'last_login_at'      => 'datetime',
+            'portal_locked_at'   => 'datetime',
+            'date_of_birth'      => 'date',
+            'password'           => 'hashed',
             'two_factor_enabled' => 'boolean',
+            'portal_locked'      => 'boolean',
         ];
     }
 
@@ -98,6 +101,26 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(NotificationLog::class);
     }
 
+    public function attendanceRecords()
+    {
+        return $this->hasMany(AttendanceRecord::class);
+    }
+
+    public function quizAttempts()
+    {
+        return $this->hasMany(QuizAttempt::class);
+    }
+
+    public function assignmentSubmissions()
+    {
+        return $this->hasMany(AssignmentSubmission::class);
+    }
+
+    public function installmentPlans()
+    {
+        return $this->hasMany(InstallmentPlan::class);
+    }
+
     // ─── Scopes ───────────────────────────────────────────────────────────────
 
     public function scopeActive($query)
@@ -140,5 +163,23 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isInstructor(): bool
     {
         return $this->hasRole('instructor');
+    }
+
+    public function isPortalLocked(): bool
+    {
+        return (bool) $this->portal_locked;
+    }
+
+    public function getAttendancePercentageForCourse(int $courseId): float
+    {
+        $sessions = AttendanceSession::where('course_id', $courseId)->count();
+        if ($sessions === 0) return 100.0;
+
+        $present = AttendanceRecord::where('user_id', $this->id)
+            ->whereHas('session', fn($q) => $q->where('course_id', $courseId))
+            ->whereIn('status', ['present', 'late'])
+            ->count();
+
+        return round(($present / $sessions) * 100, 2);
     }
 }

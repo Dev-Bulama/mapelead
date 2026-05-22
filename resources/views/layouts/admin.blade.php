@@ -15,22 +15,23 @@
                 extend: {
                     colors: {
                         admin: {
-                            sidebar: '#1f2937',
-                            'sidebar-hover': '#374151',
-                            'sidebar-active': '#4f46e5',
+                            sidebar: '#0f1a48',
+                            'sidebar-hover': '#14215B',
+                            'sidebar-active': '#2a42af',
                             header: '#ffffff',
                         },
                         brand: {
-                            50:  '#eef2ff',
-                            100: '#e0e7ff',
-                            200: '#c7d2fe',
-                            300: '#a5b4fc',
-                            400: '#818cf8',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            800: '#3730a3',
-                            900: '#312e81',
+                            50:  '#eef0f8',
+                            100: '#d4d9ef',
+                            200: '#a9b3df',
+                            300: '#7f8ecf',
+                            400: '#5468bf',
+                            500: '#2a42af',
+                            600: '#14215B',
+                            700: '#0f1a48',
+                            800: '#0b1335',
+                            900: '#070d22',
+                            950: '#040812',
                         }
                     },
                     fontFamily: {
