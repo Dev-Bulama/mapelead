@@ -1,2 +1,9 @@
 User-agent: *
-Disallow:
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /instructor/
+Disallow: /enroll/
+Disallow: /api/
+
+Sitemap: /sitemap.xml

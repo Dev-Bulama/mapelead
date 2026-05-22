@@ -34,8 +34,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
-Route::post('/newsletter/subscribe', [ContactController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:contact');
+Route::post('/newsletter/subscribe', [ContactController::class, 'subscribe'])->name('newsletter.subscribe')->middleware('throttle:newsletter');
 Route::get('/sitemap.xml', [HomeController::class, 'sitemap'])->name('sitemap');
 
 // Courses
@@ -43,7 +43,7 @@ Route::prefix('courses')->name('courses.')->group(function () {
     Route::get('/', [CourseController::class, 'index'])->name('index');
     Route::get('/category/{slug}', [CourseController::class, 'category'])->name('category');
     Route::get('/{slug}', [CourseController::class, 'show'])->name('show');
-    Route::post('/{slug}/review', [CourseController::class, 'review'])->name('review')->middleware('auth');
+    Route::post('/{slug}/review', [CourseController::class, 'review'])->name('review')->middleware(['auth', 'throttle:review']);
 });
 
 // Blog
@@ -52,22 +52,22 @@ Route::prefix('blog')->name('blog.')->group(function () {
     Route::get('/category/{slug}', [BlogController::class, 'category'])->name('category');
     Route::get('/tag/{slug}', [BlogController::class, 'tag'])->name('tag');
     Route::get('/{slug}', [BlogController::class, 'show'])->name('show');
-    Route::post('/{slug}/comment', [BlogController::class, 'comment'])->name('comment');
+    Route::post('/{slug}/comment', [BlogController::class, 'comment'])->name('comment')->middleware('throttle:comment');
 });
 
 // ─── Authentication Routes ─────────────────────────────────────────────────────
 
 Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('throttle:login');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post')->middleware('throttle:register');
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('forgot');
-    Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('forgot.post');
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('forgot.post')->middleware('throttle:password-reset');
     Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('reset');
-    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('reset.post');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('reset.post')->middleware('throttle:password-reset');
     Route::get('/verify-otp', [AuthController::class, 'showOtp'])->name('otp');
-    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('otp.post');
+    Route::post('/verify-otp', [AuthController::class, 'verifyOtp'])->name('otp.post')->middleware('throttle:otp');
 
     // Social Auth
     Route::get('/google', [SocialAuthController::class, 'redirectToGoogle'])->name('google');
@@ -93,6 +93,7 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('student.')->
     Route::get('/profile', [StudentProfileController::class, 'index'])->name('profile');
     Route::post('/profile', [StudentProfileController::class, 'update'])->name('profile.update');
     Route::get('/notifications', [StudentDashboardController::class, 'notifications'])->name('notifications');
+    Route::post('/notifications/read-all', [StudentDashboardController::class, 'markAllNotificationsRead'])->name('notifications.read-all');
     Route::post('/notifications/{id}/read', [StudentDashboardController::class, 'markNotificationRead'])->name('notification.read');
     Route::get('/tickets', [TicketController::class, 'index'])->name('tickets');
     Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');

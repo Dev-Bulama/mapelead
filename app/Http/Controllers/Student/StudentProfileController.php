@@ -25,7 +25,7 @@ class StudentProfileController extends Controller
             'city'       => 'nullable|string|max:100',
             'linkedin_url' => 'nullable|url|max:255',
             'twitter_url'  => 'nullable|url|max:255',
-            'avatar'       => 'nullable|image|max:2048',
+            'avatar'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         if ($request->hasFile('avatar')) {

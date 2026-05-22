@@ -8,6 +8,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\Rules\Password as PasswordRules;
 
 class AuthController extends Controller
 {
@@ -46,7 +47,7 @@ class AuthController extends Controller
             'last_name'  => 'required|string|max:100',
             'email'      => 'required|email|unique:users,email',
             'phone'      => 'nullable|string|max:20',
-            'password'   => 'required|string|min:8|confirmed',
+            'password'   => ['required', 'confirmed', PasswordRules::min(8)->mixedCase()->numbers()],
         ]);
 
         $user = User::create(array_merge($data, ['status' => 'active']));
@@ -79,7 +80,7 @@ class AuthController extends Controller
         $request->validate([
             'token'    => 'required',
             'email'    => 'required|email',
-            'password' => 'required|min:8|confirmed',
+            'password' => ['required', 'confirmed', PasswordRules::min(8)->mixedCase()->numbers()],
         ]);
 
         $status = Password::reset(

@@ -69,6 +69,12 @@ class StudentDashboardController extends Controller
         return view('student.notifications', compact('notifications'));
     }
 
+    public function markAllNotificationsRead()
+    {
+        NotificationLog::where('user_id', auth()->id())->where('is_read', false)->update(['is_read' => true, 'read_at' => now()]);
+        return back()->with('success', 'All notifications marked as read.');
+    }
+
     public function markNotificationRead(int $id)
     {
         NotificationLog::where('user_id', auth()->id())->where('id', $id)->update(['is_read' => true, 'read_at' => now()]);
