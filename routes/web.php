@@ -93,7 +93,7 @@ Route::middleware('auth')->group(function () {
 
 // ─── Student Dashboard Routes ──────────────────────────────────────────────────
 
-Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('student.')->group(function () {
+Route::middleware(['auth'])->prefix('dashboard')->name('student.')->group(function () {
     Route::get('/', [StudentDashboardController::class, 'index'])->name('dashboard');
     Route::get('/courses', [StudentCourseController::class, 'index'])->name('courses');
     Route::get('/courses/{slug}/learn', [StudentCourseController::class, 'learn'])->name('learn');
@@ -132,7 +132,7 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('student.')->
 
 // ─── Enrollment & Payment ─────────────────────────────────────────────────────
 
-Route::middleware(['auth', 'verified'])->prefix('enroll')->name('enroll.')->group(function () {
+Route::middleware(['auth'])->prefix('enroll')->name('enroll.')->group(function () {
     Route::get('/{slug}', [StudentCourseController::class, 'checkout'])->name('checkout');
     Route::post('/{slug}', [StudentCourseController::class, 'initPayment'])->name('payment.init');
     Route::get('/callback/{reference}', [StudentCourseController::class, 'paymentCallback'])->name('payment.callback');

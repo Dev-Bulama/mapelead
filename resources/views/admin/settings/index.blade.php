@@ -4,18 +4,8 @@
 
 @section('content')
 
-{{-- Alpine.js component wrapping the entire page for tab switching --}}
-<div x-data="{
-        activeTab: '{{ old('_tab', request('tab', $groups[0] ?? 'general')) }}',
-        tabs: @json($groups),
-        setTab(tab) {
-            this.activeTab = tab;
-            const url = new URL(window.location.href);
-            url.searchParams.set('tab', tab);
-            window.history.replaceState({}, '', url);
-        }
-     }"
-     class="space-y-5">
+@php $activeTab = old('_tab', request('tab', $groups[0] ?? 'general')); @endphp
+<div class="space-y-5">
 
     {{-- ═══════════════════════════════════════════════════════════════
          PAGE HEADER
@@ -53,12 +43,10 @@
 
                 @foreach($groups as $group)
                     <button type="button"
-                            @click="setTab('{{ $group }}')"
-                            :class="activeTab === '{{ $group }}'
-                                ? 'border-brand-600 text-brand-600 bg-brand-50'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                            class="inline-flex items-center gap-1.5 px-4 py-2.5 border-b-2 text-sm font-medium
-                                   whitespace-nowrap transition-colors rounded-t-lg -mb-px">
+                            id="settings-tab-btn-{{ $group }}"
+                            onclick="settingsSwitchTab('{{ $group }}')"
+                            class="inline-flex items-center gap-1.5 px-4 py-2.5 border-b-2 text-sm font-medium whitespace-nowrap transition-colors rounded-t-lg -mb-px
+                                   {{ $activeTab === $group ? 'border-[#14215B] text-[#14215B] bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700' }}">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {!! $tabIcons[$group] ?? $tabIcons['general'] !!}
                         </svg>
@@ -73,7 +61,7 @@
         ═══════════════════════════════════════════════════════════ --}}
 
         {{-- ─── GENERAL ─────────────────────────────────────────── --}}
-        <div x-show="activeTab === 'general'" x-cloak>
+        <div id="settings-panel-general" style="{{ $activeTab === 'general' ? 'display:block' : 'display:none' }}">
             <form method="POST"
                   action="{{ route('admin.settings.update', 'general') }}"
                   enctype="multipart/form-data"
@@ -252,7 +240,7 @@
         </div>
 
         {{-- ─── HOMEPAGE ────────────────────────────────────────── --}}
-        <div x-show="activeTab === 'homepage'" x-cloak>
+        <div id="settings-panel-homepage" style="{{ $activeTab === 'homepage' ? 'display:block' : 'display:none' }}">
             <form method="POST"
                   action="{{ route('admin.settings.update', 'homepage') }}"
                   class="p-6 space-y-6">
@@ -345,7 +333,7 @@
         </div>
 
         {{-- ─── SOCIAL ──────────────────────────────────────────── --}}
-        <div x-show="activeTab === 'social'" x-cloak>
+        <div id="settings-panel-social" style="{{ $activeTab === 'social' ? 'display:block' : 'display:none' }}">
             <form method="POST"
                   action="{{ route('admin.settings.update', 'social') }}"
                   class="p-6 space-y-6">
@@ -398,7 +386,7 @@
         </div>
 
         {{-- ─── SEO ─────────────────────────────────────────────── --}}
-        <div x-show="activeTab === 'seo'" x-cloak>
+        <div id="settings-panel-seo" style="{{ $activeTab === 'seo' ? 'display:block' : 'display:none' }}">
             <form method="POST"
                   action="{{ route('admin.settings.update', 'seo') }}"
                   class="p-6 space-y-6">
@@ -501,7 +489,7 @@
         </div>
 
         {{-- ─── FOOTER ──────────────────────────────────────────── --}}
-        <div x-show="activeTab === 'footer'" x-cloak>
+        <div id="settings-panel-footer" style="{{ $activeTab === 'footer' ? 'display:block' : 'display:none' }}">
             <form method="POST"
                   action="{{ route('admin.settings.update', 'footer') }}"
                   class="p-6 space-y-6">
@@ -571,7 +559,7 @@
         </div>
 
         {{-- ─── INTEGRATIONS ────────────────────────────────────── --}}
-        <div x-show="activeTab === 'integrations'" x-cloak>
+        <div id="settings-panel-integrations" style="{{ $activeTab === 'integrations' ? 'display:block' : 'display:none' }}">
             <form method="POST"
                   action="{{ route('admin.settings.integrations') }}"
                   class="p-6 space-y-8">
@@ -742,7 +730,7 @@
         {{-- ─── ANY EXTRA GROUPS (dynamic fallback) ─────────────── --}}
         @foreach($groups as $group)
             @if(!in_array($group, ['general','homepage','social','seo','footer','integrations']))
-                <div x-show="activeTab === '{{ $group }}'" x-cloak>
+                <div id="settings-panel-{{ $group }}" style="{{ $activeTab === $group ? 'display:block' : 'display:none' }}">
                     <form method="POST"
                           action="{{ route('admin.settings.update', $group) }}"
                           class="p-6 space-y-6">
@@ -836,10 +824,29 @@
 
 @push('scripts')
 <script>
-    /**
-     * Alpine.js component for image upload previews.
-     * Usage: x-data="imagePreview('existing-path')"
-     */
+    // Settings tab switcher — no Alpine dependency needed
+    function settingsSwitchTab(tab) {
+        document.querySelectorAll('[id^="settings-panel-"]').forEach(function(el) {
+            el.style.display = 'none';
+        });
+        var panel = document.getElementById('settings-panel-' + tab);
+        if (panel) panel.style.display = 'block';
+
+        document.querySelectorAll('[id^="settings-tab-btn-"]').forEach(function(btn) {
+            btn.classList.remove('border-[#14215B]', 'text-[#14215B]', 'bg-blue-50');
+            btn.classList.add('border-transparent', 'text-gray-500');
+        });
+        var btn = document.getElementById('settings-tab-btn-' + tab);
+        if (btn) {
+            btn.classList.remove('border-transparent', 'text-gray-500');
+            btn.classList.add('border-[#14215B]', 'text-[#14215B]', 'bg-blue-50');
+        }
+        var url = new URL(window.location.href);
+        url.searchParams.set('tab', tab);
+        window.history.replaceState({}, '', url);
+    }
+
+    // Image upload preview (Alpine component)
     function imagePreview(existingPath) {
         return {
             preview: existingPath ? `/storage/${existingPath}` : null,
