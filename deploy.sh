@@ -1,57 +1,59 @@
 #!/bin/bash
-# ═══════════════════════════════════════════════════════════════════════
-#  MapeLearn — Deployment Script (run from project root)
-#  Usage: bash deploy.sh
-# ═══════════════════════════════════════════════════════════════════════
+# Mapelead Production Deployment Script
+# Run from project root: bash deploy.sh
 
-set -e  # Exit on any error
+set -e
 
-echo "🚀 MapeLearn Deployment Script"
-echo "==============================="
+echo "=== Mapelead Deployment ==="
 
-# 1. Pull latest code
-echo "📥 Pulling latest code..."
-git pull origin main
+# Backup .env if it exists
+if [ -f ".env" ]; then
+    cp .env .env.backup
+    echo "✓ .env backed up"
+fi
 
-# 2. Install/update PHP dependencies (no dev packages in production)
-echo "📦 Installing PHP dependencies..."
-composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+# Pull latest code
+git fetch origin
+git reset --hard origin/$(git rev-parse --abbrev-ref HEAD)
+echo "✓ Code updated"
 
-# 3. Clear all caches
-echo "🧹 Clearing caches..."
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
+# Restore .env (git reset may have removed it if somehow tracked)
+if [ -f ".env.backup" ] && [ ! -f ".env" ]; then
+    cp .env.backup .env
+    echo "✓ .env restored"
+fi
 
-# 4. Run database migrations
-echo "🗄️  Running migrations..."
-php artisan migrate --force
+# Install/update composer dependencies (preserve vendor if network fails)
+if command -v composer &> /dev/null; then
+    composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+    echo "✓ Composer dependencies updated"
+elif [ -d "vendor" ]; then
+    echo "⚠ Composer not found, using existing vendor/"
+else
+    echo "✗ ERROR: No composer and no vendor directory. Deployment cannot proceed."
+    exit 1
+fi
 
-# 5. Rebuild caches for production performance
-echo "⚡ Building production caches..."
+# Clear and rebuild caches
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 php artisan event:cache
+echo "✓ Caches rebuilt"
 
-# 6. Create storage symlink (if not exists)
-echo "🔗 Linking storage..."
+# Run migrations (safe - only runs new ones)
+php artisan migrate --force
+echo "✓ Migrations ran"
+
+# Create storage symlink (if not exists)
 php artisan storage:link 2>/dev/null || true
+echo "✓ Storage linked"
 
-# 7. Set correct file permissions
-echo "🔐 Setting permissions..."
-find storage bootstrap/cache -type d -exec chmod 775 {} \;
-find storage bootstrap/cache -type f -exec chmod 664 {} \;
+# Restart queue workers (if supervisor is set up)
+php artisan queue:restart 2>/dev/null || true
 
-# 8. Restart queue workers (if supervisor/cron is set up)
-echo "⚙️  Restarting queue..."
-php artisan queue:restart
+# Set proper permissions
+chmod -R 755 storage bootstrap/cache
+echo "✓ Permissions set"
 
-echo ""
-echo "✅ Deployment complete!"
-echo ""
-echo "Next steps if this is a fresh deployment:"
-echo "  1. php artisan key:generate      (if no APP_KEY in .env)"
-echo "  2. php artisan db:seed           (if you want seed data)"
-echo "  3. Set up cron job (see DEPLOYMENT.md)"
+echo "=== Deployment Complete ==="
