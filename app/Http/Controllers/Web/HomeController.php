@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseCategory;
+use App\Models\HeroBanner;
 use App\Models\Testimonial;
 use App\Models\Faq;
 use App\Models\BlogPost;
@@ -19,6 +20,7 @@ class HomeController extends Controller
         $data = [
             'settings'     => $this->settings->group('homepage'),
             'generalSettings' => $this->settings->group('general'),
+            'heroBanners'  => HeroBanner::where('is_active', true)->orderBy('sort_order')->get(),
             'featuredCourses' => Course::published()->featured()->with(['instructor.user', 'category'])->limit(6)->get(),
             'categories'   => CourseCategory::active()->featured()->withCount(['courses' => fn($q) => $q->published()])->orderBy('sort_order')->limit(8)->get(),
             'testimonials' => Testimonial::active()->featured()->orderBy('sort_order')->limit(6)->get(),

@@ -41,7 +41,14 @@ class StudentDashboardController extends Controller
             ->with('course')
             ->orderByDesc('issued_at')
             ->get();
-        return view('student.certificates', compact('certificates'));
+
+        $lockedEnrollments = \App\Models\Enrollment::where('user_id', auth()->id())
+            ->whereIn('status', ['active'])
+            ->whereDoesntHave('certificate')
+            ->with('course')
+            ->get();
+
+        return view('student.certificates', compact('certificates', 'lockedEnrollments'));
     }
 
     public function downloadCertificate(int $id)

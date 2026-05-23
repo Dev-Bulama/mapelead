@@ -570,9 +570,178 @@
             </form>
         </div>
 
+        {{-- ─── INTEGRATIONS ────────────────────────────────────── --}}
+        <div x-show="activeTab === 'integrations'" x-cloak>
+            <form method="POST"
+                  action="{{ route('admin.settings.integrations') }}"
+                  class="p-6 space-y-8">
+                @csrf
+                <input type="hidden" name="_tab" value="integrations">
+
+                {{-- Warning Banner --}}
+                <div class="flex items-start gap-3 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                    <svg class="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <p class="text-sm text-yellow-700">
+                        <span class="font-semibold">Warning:</span> These settings write directly to your <code class="font-mono bg-yellow-100 px-1 rounded">.env</code> file. Changes take effect immediately. Keep a backup before editing.
+                    </p>
+                </div>
+
+                {{-- ── Paystack Section ────────────────────────────────── --}}
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-md bg-[#14215B] flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M2 6h20v4H2zm0 6h20v6H2z"/></svg>
+                        </span>
+                        Paystack Payments
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Public Key</label>
+                            <input type="text"
+                                   name="paystack_public_key"
+                                   value="{{ old('paystack_public_key', env('PAYSTACK_PUBLIC_KEY', '')) }}"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="pk_live_... or pk_test_...">
+                            <p class="text-xs text-gray-400 mt-1">Your Paystack public key (safe to expose in frontend).</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Secret Key</label>
+                            <input type="password"
+                                   name="paystack_secret_key"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="sk_live_... or sk_test_...">
+                            <p class="text-xs text-gray-400 mt-1">Leave blank to keep current value unchanged.</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Webhook Secret</label>
+                            <input type="text"
+                                   name="paystack_webhook_secret"
+                                   value="{{ old('paystack_webhook_secret', env('PAYSTACK_WEBHOOK_SECRET', '')) }}"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="Paystack webhook secret">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100"></div>
+
+                {{-- ── Email / SMTP Section ────────────────────────────── --}}
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-md bg-[#14215B] flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </span>
+                        Email / SMTP
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Mail Driver</label>
+                            <select name="mail_mailer"
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white">
+                                @foreach(['log' => 'Log (local dev)', 'smtp' => 'SMTP', 'mailgun' => 'Mailgun', 'ses' => 'Amazon SES'] as $val => $label)
+                                    <option value="{{ $val }}" {{ env('MAIL_MAILER') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">SMTP Host</label>
+                            <input type="text"
+                                   name="mail_host"
+                                   value="{{ old('mail_host', env('MAIL_HOST', '')) }}"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="smtp.mailgun.org">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">SMTP Port</label>
+                            <input type="number"
+                                   name="mail_port"
+                                   value="{{ old('mail_port', env('MAIL_PORT', '587')) }}"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="587">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Encryption</label>
+                            <select name="mail_encryption"
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white">
+                                @foreach(['null' => 'None', 'tls' => 'TLS', 'ssl' => 'SSL'] as $val => $label)
+                                    <option value="{{ $val }}" {{ env('MAIL_ENCRYPTION') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">SMTP Username</label>
+                            <input type="text"
+                                   name="mail_username"
+                                   value="{{ old('mail_username', env('MAIL_USERNAME', '')) }}"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="SMTP username or API key">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">SMTP Password</label>
+                            <input type="password"
+                                   name="mail_password"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="Leave blank to keep current value">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">From Address</label>
+                            <input type="email"
+                                   name="mail_from_address"
+                                   value="{{ old('mail_from_address', env('MAIL_FROM_ADDRESS', '')) }}"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="noreply@mapelead.org">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">From Name</label>
+                            <input type="text"
+                                   name="mail_from_name"
+                                   value="{{ old('mail_from_name', env('MAIL_FROM_NAME', '')) }}"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="MapeLearn">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-2 border-t border-gray-100">
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white
+                                   text-sm font-medium px-5 py-2 rounded-lg transition-colors shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Save Integration Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+
         {{-- ─── ANY EXTRA GROUPS (dynamic fallback) ─────────────── --}}
         @foreach($groups as $group)
-            @if(!in_array($group, ['general','homepage','social','seo','footer']))
+            @if(!in_array($group, ['general','homepage','social','seo','footer','integrations']))
                 <div x-show="activeTab === '{{ $group }}'" x-cloak>
                     <form method="POST"
                           action="{{ route('admin.settings.update', $group) }}"

@@ -6,8 +6,161 @@
 @section('content')
 
 {{-- ═══════════════════════════════════════════════════════════════════
-     HERO SECTION
+     HERO SECTION — Alpine.js Slider
 ═══════════════════════════════════════════════════════════════════ --}}
+@php $bannerCount = isset($heroBanners) && $heroBanners->isNotEmpty() ? $heroBanners->count() : 0; @endphp
+
+@if($bannerCount > 0)
+{{-- ── Dynamic Banner Slider ── --}}
+<section
+    class="relative overflow-hidden min-h-[92vh] flex flex-col"
+    x-data="{ current: 0, total: {{ $bannerCount }}, autoplay: true }"
+    x-init="setInterval(() => { if(autoplay) current = (current + 1) % total }, 5000)"
+    @mouseenter="autoplay = false"
+    @mouseleave="autoplay = true"
+>
+    {{-- Slides --}}
+    @foreach($heroBanners as $index => $banner)
+    <div
+        class="absolute inset-0 transition-all duration-700 ease-in-out"
+        :class="{{ $index }} === current ? 'opacity-100 z-10' : 'opacity-0 z-0'"
+        x-show="{{ $index }} === current || true"
+        style="display: block;"
+    >
+        {{-- Background: image or gradient --}}
+        @if($banner->image)
+        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+             style="background-image: url('{{ asset('storage/' . $banner->image) }}');">
+            <div class="absolute inset-0 bg-[#14215B] bg-opacity-70"></div>
+        </div>
+        @else
+        <div class="absolute inset-0 bg-gradient-to-br from-[#14215B] to-blue-900">
+            {{-- Decorative blobs --}}
+            <div class="absolute -top-40 -right-40 w-96 h-96 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
+            <div class="absolute top-1/2 -left-32 w-80 h-80 bg-purple-500 rounded-full opacity-10 blur-3xl"></div>
+            <div class="absolute bottom-0 right-1/3 w-64 h-64 bg-cyan-500 rounded-full opacity-10 blur-3xl"></div>
+            <div class="absolute inset-0 opacity-5" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+        </div>
+        @endif
+    </div>
+    @endforeach
+
+    {{-- Slide Content --}}
+    <div class="relative z-20 flex-1 flex items-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 w-full">
+            @foreach($heroBanners as $index => $banner)
+            <div
+                class="max-w-3xl transition-all duration-700 ease-in-out"
+                :class="{{ $index }} === current ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none absolute'"
+                x-show="{{ $index }} === current || true"
+                style="display: block;"
+            >
+                {{-- Badge --}}
+                @if($banner->badge_text)
+                <div class="inline-flex items-center gap-2 bg-white bg-opacity-10 border border-white border-opacity-25 rounded-full px-4 py-1.5 mb-6">
+                    <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    <span class="text-blue-100 text-sm font-medium">{{ $banner->badge_text }}</span>
+                </div>
+                @endif
+
+                {{-- Title --}}
+                <h1 class="font-display text-5xl sm:text-6xl font-bold text-white leading-tight mb-5">
+                    {!! nl2br(e($banner->title)) !!}
+                </h1>
+
+                {{-- Subtitle --}}
+                @if($banner->subtitle)
+                <p class="text-xl text-blue-200 font-medium mb-4 max-w-2xl">{{ $banner->subtitle }}</p>
+                @endif
+
+                {{-- Description --}}
+                @if($banner->description)
+                <p class="text-blue-100 leading-relaxed mb-10 max-w-2xl">{{ $banner->description }}</p>
+                @endif
+
+                {{-- CTA Buttons --}}
+                <div class="flex flex-wrap gap-4">
+                    @if($banner->primary_btn_text && $banner->primary_btn_url)
+                    <a href="{{ $banner->primary_btn_url }}"
+                       class="inline-flex items-center gap-2 bg-white text-[#14215B] hover:bg-blue-50 font-bold px-8 py-4 rounded-2xl transition-all duration-200 shadow-lg hover:-translate-y-0.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        {{ $banner->primary_btn_text }}
+                    </a>
+                    @endif
+                    @if($banner->secondary_btn_text && $banner->secondary_btn_url)
+                    <a href="{{ $banner->secondary_btn_url }}"
+                       class="inline-flex items-center gap-2 bg-transparent border-2 border-white text-white hover:bg-white hover:text-[#14215B] font-semibold px-8 py-4 rounded-2xl transition-all duration-200">
+                        {{ $banner->secondary_btn_text }}
+                    </a>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Left / Right Arrow Navigation --}}
+    @if($bannerCount > 1)
+    <button
+        @click="current = (current - 1 + total) % total; autoplay = false"
+        class="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white bg-opacity-20 hover:bg-opacity-40 border border-white border-opacity-30 rounded-full flex items-center justify-center text-white transition-all duration-200 backdrop-blur-sm"
+        aria-label="Previous slide"
+    >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <button
+        @click="current = (current + 1) % total; autoplay = false"
+        class="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white bg-opacity-20 hover:bg-opacity-40 border border-white border-opacity-30 rounded-full flex items-center justify-center text-white transition-all duration-200 backdrop-blur-sm"
+        aria-label="Next slide"
+    >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </button>
+    @endif
+
+    {{-- Dot Indicators --}}
+    @if($bannerCount > 1)
+    <div class="relative z-30 flex justify-center gap-2 pb-20">
+        @foreach($heroBanners as $index => $banner)
+        <button
+            @click="current = {{ $index }}"
+            :class="{{ $index }} === current ? 'bg-white w-7' : 'bg-white bg-opacity-40 w-2.5'"
+            class="h-2.5 rounded-full transition-all duration-300"
+            aria-label="Go to slide {{ $index + 1 }}"
+        ></button>
+        @endforeach
+    </div>
+    @endif
+
+    {{-- Stats Bar --}}
+    <div class="absolute bottom-0 left-0 right-0 z-30 bg-black bg-opacity-30 backdrop-blur-sm border-t border-white border-opacity-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-white divide-opacity-10">
+                @php
+                    $heroStats = [
+                        ['value' => $stats['students'] ?? '10,000+', 'label' => 'Active Students', 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'],
+                        ['value' => $stats['courses'] ?? '150+', 'label' => 'Expert Courses', 'icon' => 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'],
+                        ['value' => $stats['instructors'] ?? '50+', 'label' => 'Industry Instructors', 'icon' => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z'],
+                        ['value' => $stats['placement'] ?? '92%', 'label' => 'Placement Rate', 'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
+                    ];
+                @endphp
+                @foreach($heroStats as $stat)
+                <div class="py-5 px-6 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white bg-opacity-10 rounded-xl flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $stat['icon'] }}"/></svg>
+                    </div>
+                    <div>
+                        <div class="text-white font-bold text-lg leading-none">{{ $stat['value'] }}</div>
+                        <div class="text-blue-300 text-xs mt-0.5">{{ $stat['label'] }}</div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</section>
+
+@else
+{{-- ── Static Fallback Hero (no active banners) ── --}}
 <section class="hero-gradient relative overflow-hidden min-h-[92vh] flex items-center">
     {{-- Background decorative blobs --}}
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
@@ -111,6 +264,7 @@
         </div>
     </div>
 </section>
+@endif
 
 {{-- ═══════════════════════════════════════════════════════════════════
      CATEGORIES SECTION

@@ -44,6 +44,21 @@
         @endforeach
     </div>
 
+    {{-- Admission Number Banner --}}
+    @if(auth()->user()->admission_number)
+    <div class="bg-gradient-to-r from-[#14215B] to-blue-800 rounded-2xl p-5 text-white flex items-center justify-between">
+        <div>
+            <p class="text-blue-200 text-xs font-semibold uppercase tracking-widest">Your Admission Number</p>
+            <p class="text-3xl font-bold font-mono mt-1">{{ auth()->user()->admission_number }}</p>
+            <p class="text-blue-300 text-xs mt-1">Keep this number for reference</p>
+        </div>
+        <a href="{{ route('student.admission') }}"
+           class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
+            View Admission
+        </a>
+    </div>
+    @endif
+
     {{-- My Courses --}}
     <div class="bg-white rounded-2xl border border-gray-100">
         <div class="p-5 border-b border-gray-100 flex items-center justify-between">
