@@ -124,6 +124,10 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('student.')->
     // Attendance Routes
     Route::get('/attendance', [StudentAttendanceController::class, 'index'])->name('attendance');
     Route::get('/attendance/{course}', [StudentAttendanceController::class, 'show'])->name('attendance.show');
+
+    // Admission Routes
+    Route::get('/admission', [\App\Http\Controllers\Student\AdmissionController::class, 'index'])->name('admission');
+    Route::get('/admission/download', [\App\Http\Controllers\Student\AdmissionController::class, 'downloadSlip'])->name('admission.download');
 });
 
 // ─── Enrollment & Payment ─────────────────────────────────────────────────────
@@ -133,6 +137,11 @@ Route::middleware(['auth', 'verified'])->prefix('enroll')->name('enroll.')->grou
     Route::post('/{slug}', [StudentCourseController::class, 'initPayment'])->name('payment.init');
     Route::get('/callback/{reference}', [StudentCourseController::class, 'paymentCallback'])->name('payment.callback');
 });
+
+// ─── Paystack Webhook (no auth, no CSRF) ──────────────────────────────────────
+Route::post('/webhooks/paystack', [StudentCourseController::class, 'paystackWebhook'])
+    ->name('webhooks.paystack')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 // ─── Instructor Dashboard Routes ───────────────────────────────────────────────
 
@@ -162,8 +171,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('courses.modules', \App\Http\Controllers\Admin\ModuleController::class)->shallow();
     Route::resource('modules.lessons', \App\Http\Controllers\Admin\LessonController::class)->shallow();
 
-    // Enrollments & Payments
+    // Enrollments & Admission Management
     Route::resource('enrollments', EnrollmentController::class)->only(['index', 'show', 'edit', 'update', 'destroy']);
+    Route::post('/enrollments/{enrollment}/approve', [EnrollmentController::class, 'approve'])->name('enrollments.approve');
+    Route::post('/enrollments/{enrollment}/reject', [EnrollmentController::class, 'reject'])->name('enrollments.reject');
+    Route::post('/enrollments/{enrollment}/suspend', [EnrollmentController::class, 'suspend'])->name('enrollments.suspend');
+    Route::post('/enrollments/{enrollment}/unlock', [EnrollmentController::class, 'unlock'])->name('enrollments.unlock');
+    Route::post('/enrollments/{enrollment}/reassign-batch', [EnrollmentController::class, 'reassignBatch'])->name('enrollments.reassign-batch');
     Route::resource('payments', PaymentController::class)->only(['index', 'show']);
     Route::post('/payments/{id}/refund', [PaymentController::class, 'refund'])->name('payments.refund');
 
@@ -275,6 +289,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 // ─── Public Certificate Verification ──────────────────────────────────────────
 Route::get('/verify/{token}', [CertificateSettingsController::class, 'verify'])->name('certificate.verify');
+
+// ─── Public Admission Verification ────────────────────────────────────────────
+Route::get('/admission/verify/{number}', [\App\Http\Controllers\Web\AdmissionVerificationController::class, 'verify'])->name('admission.verify.public');
 
 // ─── Dynamic CMS Pages (must be last) ─────────────────────────────────────────
 Route::get('/{slug}', [PageController::class, 'show'])->name('page.show');

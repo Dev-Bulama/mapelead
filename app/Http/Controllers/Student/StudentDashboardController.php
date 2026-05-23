@@ -46,9 +46,18 @@ class StudentDashboardController extends Controller
 
     public function downloadCertificate(int $id)
     {
-        $certificate = Certificate::where('user_id', auth()->id())->findOrFail($id);
-        // PDF generation would happen here via DomPDF
-        return back()->with('info', 'Certificate download coming soon!');
+        $certificate = Certificate::where('user_id', auth()->id())
+            ->with(['user', 'course'])
+            ->findOrFail($id);
+
+        $settings = \App\Models\CertificateSetting::instance();
+        $verificationUrl = route('certificate.verify', $certificate->verification_token ?? '');
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.certificate', compact('certificate', 'settings', 'verificationUrl'));
+        $pdf->setPaper('A4', 'landscape');
+
+        $filename = 'Certificate-' . str_replace('/', '-', $certificate->certificate_number) . '.pdf';
+        return $pdf->download($filename);
     }
 
     public function payments()

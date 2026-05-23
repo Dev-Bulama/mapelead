@@ -2,19 +2,22 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Batch;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\StudentProgress;
-use App\Services\Student\EnrollmentService;
+use App\Services\Payment\InstallmentService;
 use App\Services\Payment\PaymentService;
+use App\Services\Student\EnrollmentService;
 use Illuminate\Http\Request;
 
 class StudentCourseController extends Controller
 {
     public function __construct(
         private EnrollmentService $enrollmentService,
-        private PaymentService $paymentService
+        private PaymentService    $paymentService,
+        private InstallmentService $installmentService,
     ) {}
 
     public function index()
@@ -29,8 +32,18 @@ class StudentCourseController extends Controller
         $enrollment = Enrollment::where('user_id', auth()->id())
             ->where('course_id', $course->id)
             ->whereIn('status', ['active', 'completed'])
-            ->where('payment_status', 'paid')
             ->firstOrFail();
+
+        // Check access lock
+        if ($enrollment->access_locked) {
+            return view('student.access-locked', compact('enrollment', 'course'));
+        }
+
+        // Payment must be paid or part_paid to access
+        if (!in_array($enrollment->payment_status, ['paid', 'part_paid'])) {
+            return redirect()->route('enroll.checkout', $slug)
+                ->with('error', 'Please complete payment to access this course.');
+        }
 
         $completedLessons = StudentProgress::where('user_id', auth()->id())
             ->where('course_id', $course->id)
@@ -58,57 +71,135 @@ class StudentCourseController extends Controller
     public function markComplete(string $slug, int $lessonId, Request $request)
     {
         $course = Course::where('slug', $slug)->firstOrFail();
-        $lesson = Lesson::where('id', $lessonId)->where('course_id', $course->id)->firstOrFail();
+        Lesson::where('id', $lessonId)->where('course_id', $course->id)->firstOrFail();
 
         StudentProgress::updateOrCreate(
             ['user_id' => auth()->id(), 'lesson_id' => $lessonId],
             [
-                'course_id'         => $course->id,
-                'is_completed'      => true,
-                'watch_time_seconds'=> $request->watch_time ?? 0,
-                'last_watched_at'   => now(),
-                'completed_at'      => now(),
+                'course_id'          => $course->id,
+                'is_completed'       => true,
+                'watch_time_seconds' => $request->watch_time ?? 0,
+                'last_watched_at'    => now(),
+                'completed_at'       => now(),
             ]
         );
 
         $this->enrollmentService->updateProgress(auth()->user(), $course->id);
-
         return response()->json(['success' => true, 'message' => 'Lesson marked as complete!']);
     }
 
     public function checkout(string $slug)
     {
-        $course = Course::published()->where('slug', $slug)->with('instructor.user')->firstOrFail();
+        $course = Course::published()->where('slug', $slug)->with(['instructor.user', 'category'])->firstOrFail();
+
         $existingEnrollment = $this->enrollmentService->checkEnrollment(auth()->user(), $course);
-        if ($existingEnrollment) return redirect()->route('student.learn', $slug);
-        return view('student.checkout', compact('course'));
+        if ($existingEnrollment && in_array($existingEnrollment->status, ['active', 'completed'])) {
+            return redirect()->route('student.learn', $slug);
+        }
+
+        // Load available batches for this course
+        $batches = Batch::where('course_id', $course->id)
+            ->where('status', 'active')
+            ->get();
+
+        return view('student.checkout', compact('course', 'batches'));
     }
 
     public function initPayment(string $slug, Request $request)
     {
+        $request->validate([
+            'payment_type'    => 'required|in:full,installment',
+            'training_type'   => 'required|in:online,physical,hybrid',
+            'batch_id'        => 'nullable|exists:batches,id',
+            'down_payment'    => 'required_if:payment_type,installment|nullable|numeric|min:1000',
+            'installment_count' => 'required_if:payment_type,installment|nullable|integer|min:2|max:12',
+            'first_due_date'  => 'required_if:payment_type,installment|nullable|date|after:today',
+        ]);
+
         $course = Course::published()->where('slug', $slug)->firstOrFail();
 
         if ($course->is_free) {
-            $enrollment = $this->enrollmentService->enroll(auth()->user(), $course);
+            $enrollment = $this->enrollmentService->enroll(auth()->user(), $course, [
+                'training_type' => $request->training_type,
+            ]);
+            if ($request->batch_id) {
+                \App\Models\BatchEnrollment::firstOrCreate([
+                    'batch_id' => $request->batch_id, 'enrollment_id' => $enrollment->id
+                ]);
+            }
             return redirect()->route('student.learn', $slug)->with('success', 'Enrolled successfully!');
         }
 
         $enrollment = $this->enrollmentService->enroll(auth()->user(), $course, [
-            'amount' => $course->effective_price,
+            'payment_type'  => $request->payment_type,
+            'training_type' => $request->training_type,
+            'amount'        => $course->effective_price,
         ]);
 
-        $payment = $this->paymentService->initiate($enrollment, $request->gateway ?? 'paystack');
+        if ($request->batch_id) {
+            \App\Models\BatchEnrollment::firstOrCreate([
+                'batch_id' => $request->batch_id, 'enrollment_id' => $enrollment->id
+            ]);
+        }
 
-        return view('student.payment', compact('course', 'enrollment', 'payment'));
+        // For installment, create plan first then pay down payment
+        if ($request->payment_type === 'installment') {
+            $this->installmentService->createPlan($enrollment, [
+                'total_amount'      => $course->effective_price,
+                'down_payment'      => $request->down_payment,
+                'installment_count' => $request->installment_count,
+                'first_due_date'    => $request->first_due_date,
+                'grace_period_days' => 3,
+            ]);
+
+            $paymentAmount = $request->down_payment;
+        } else {
+            $paymentAmount = $course->effective_price;
+        }
+
+        try {
+            $payment = $this->paymentService->initiate($enrollment, 'paystack', [
+                'amount'       => $paymentAmount,
+                'payment_type' => $request->payment_type,
+            ]);
+
+            // If Paystack is configured, redirect to payment page
+            if (isset($payment['authorization_url']) && str_contains($payment['authorization_url'], 'paystack.co')) {
+                return redirect($payment['authorization_url']);
+            }
+
+            // Dev mode: show payment page
+            return view('student.payment', compact('course', 'enrollment', 'payment'));
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Payment initialization failed: ' . $e->getMessage());
+        }
     }
 
     public function paymentCallback(string $reference)
     {
         try {
             $this->paymentService->verify($reference, 'paystack');
-            return redirect()->route('student.dashboard')->with('success', 'Payment successful! You are now enrolled.');
+            return redirect()->route('student.dashboard')
+                ->with('success', 'Payment successful! You are now enrolled. Check your dashboard for your admission number.');
         } catch (\Exception $e) {
-            return redirect()->route('student.dashboard')->withErrors(['payment' => 'Payment verification failed.']);
+            return redirect()->route('courses.index')
+                ->with('error', 'Payment verification failed. Contact support with reference: ' . $reference);
         }
+    }
+
+    public function paystackWebhook(Request $request)
+    {
+        $signature = $request->header('x-paystack-signature');
+        $payload   = $request->getContent();
+
+        $paystack = app(\App\Services\Payment\PaystackService::class);
+
+        if (!$paystack->verifyWebhookSignature($payload, $signature ?? '')) {
+            return response('Unauthorized', 401);
+        }
+
+        $this->paymentService->handleWebhook($request->all());
+        return response('OK', 200);
     }
 }
