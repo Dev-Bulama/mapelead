@@ -75,4 +75,10 @@ class CmsController extends Controller
         Faq::create($data);
         return back()->with('success', 'FAQ added!');
     }
+
+    public function destroyHeroBanner(int $id)
+    {
+        HeroBanner::findOrFail($id)->delete();
+        return back()->with('success', 'Banner deleted!');
+    }
 }

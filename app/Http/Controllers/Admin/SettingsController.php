@@ -12,7 +12,7 @@ class SettingsController extends Controller
 
     public function index()
     {
-        $groups = ['general', 'homepage', 'social', 'seo', 'footer'];
+        $groups = ['general', 'homepage', 'social', 'seo', 'footer', 'integrations'];
         $all = [];
         foreach ($groups as $group) {
             $all[$group] = $this->settings->group($group);
@@ -74,5 +74,44 @@ class SettingsController extends Controller
     {
         // Menu update logic handled via AJAX in the view
         return response()->json(['success' => true]);
+    }
+
+    public function updateIntegrations(Request $request)
+    {
+        $fields = [
+            'PAYSTACK_PUBLIC_KEY'  => $request->paystack_public_key,
+            'PAYSTACK_SECRET_KEY'  => $request->paystack_secret_key,
+            'MAIL_MAILER'          => $request->mail_mailer,
+            'MAIL_HOST'            => $request->mail_host,
+            'MAIL_PORT'            => $request->mail_port,
+            'MAIL_USERNAME'        => $request->mail_username,
+            'MAIL_PASSWORD'        => $request->mail_password,
+            'MAIL_ENCRYPTION'      => $request->mail_encryption,
+            'MAIL_FROM_ADDRESS'    => $request->mail_from_address,
+            'MAIL_FROM_NAME'       => $request->mail_from_name,
+        ];
+
+        foreach ($fields as $key => $value) {
+            if (!is_null($value) && $value !== '') {
+                $this->setEnvValue($key, $value);
+            }
+        }
+
+        return back()->with('success', 'Integration settings saved! Restart the server if needed.');
+    }
+
+    private function setEnvValue(string $key, string $value): void
+    {
+        $path = base_path('.env');
+        $content = file_get_contents($path);
+        $value = str_contains($value, ' ') ? '"' . $value . '"' : $value;
+
+        if (strpos($content, "{$key}=") !== false) {
+            $content = preg_replace("/^{$key}=.*/m", "{$key}={$value}", $content);
+        } else {
+            $content .= "\n{$key}={$value}";
+        }
+
+        file_put_contents($path, $content);
     }
 }

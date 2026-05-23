@@ -189,7 +189,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // CMS
     Route::get('/cms', [CmsController::class, 'index'])->name('cms.index');
     Route::resource('cms/pages', \App\Http\Controllers\Admin\PageBuilderController::class)->names('cms.pages');
-    Route::post('/cms/hero-banners', [CmsController::class, 'updateHeroBanner'])->name('cms.hero');
+    Route::post('/cms/hero-banners', [CmsController::class, 'updateHeroBanner'])->name('cms.hero.update');
+    Route::delete('/cms/hero-banners/{id}', [CmsController::class, 'destroyHeroBanner'])->name('cms.hero.destroy');
     Route::post('/cms/testimonials', [CmsController::class, 'storeTestimonial'])->name('cms.testimonials.store');
     Route::post('/cms/faqs', [CmsController::class, 'storeFaq'])->name('cms.faqs.store');
 
@@ -274,6 +275,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('support', SupportController::class)->names('support');
     Route::post('/support/{id}/assign', [SupportController::class, 'assign'])->name('support.assign');
     Route::post('/support/{id}/close', [SupportController::class, 'close'])->name('support.close');
+    Route::post('/support/{support}/reply', [SupportController::class, 'reply'])->name('support.reply');
 
     // Settings
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
@@ -285,6 +287,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/settings/seo', [SettingsController::class, 'updateSeo'])->name('settings.seo.update');
     Route::get('/settings/menus', [SettingsController::class, 'menus'])->name('settings.menus');
     Route::post('/settings/menus', [SettingsController::class, 'updateMenus'])->name('settings.menus.update');
+    Route::post('/settings/integrations', [SettingsController::class, 'updateIntegrations'])->name('settings.integrations');
 });
 
 // ─── Public Certificate Verification ──────────────────────────────────────────

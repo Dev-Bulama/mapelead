@@ -52,7 +52,11 @@ class AuthController extends Controller
 
         $user = User::create(array_merge($data, ['status' => 'active']));
         $user->assignRole('student');
-        event(new Registered($user));
+        try {
+            event(new Registered($user));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Registration email failed: ' . $e->getMessage());
+        }
         Auth::login($user);
 
         return redirect()->route('student.dashboard')->with('success', 'Welcome to MapeLearn!');
@@ -105,7 +109,11 @@ class AuthController extends Controller
 
     public function resendVerification(Request $request)
     {
-        $request->user()->sendEmailVerificationNotification();
+        try {
+            $request->user()->sendEmailVerificationNotification();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Resend verification email failed: ' . $e->getMessage());
+        }
         return back()->with('success', 'Verification email resent!');
     }
 
