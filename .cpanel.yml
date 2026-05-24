@@ -1,23 +1,46 @@
 ---
 deployment:
   tasks:
-    # ── Restore .env from safe backup (stored one level up, outside git) ──────
+    # ── 1. Detect PHP binary ──────────────────────────────────────────────────
+    - |
+      PHP_BIN="/opt/alt/php84/usr/bin/php"
+      [ -f "$PHP_BIN" ] || PHP_BIN=$(which php 2>/dev/null || echo "php")
+      echo "[deploy] PHP: $("$PHP_BIN" -r 'echo PHP_VERSION;' 2>/dev/null)"
+
+    # ── 2. Save .env before git reset ────────────────────────────────────────
+    - |
+      if [ -f "$PWD/.env" ]; then
+        cp "$PWD/.env" "$PWD/../.env.mapelead"
+        echo "[deploy] .env saved"
+      fi
+
+    # ── 3. Clear ALL caches BEFORE code lands (prevents stale-cache 500s) ────
+    - |
+      PHP_BIN="/opt/alt/php84/usr/bin/php"
+      [ -f "$PHP_BIN" ] || PHP_BIN=$(which php 2>/dev/null || echo "php")
+      "$PHP_BIN" "$PWD/artisan" optimize:clear 2>/dev/null || {
+        rm -f "$PWD/bootstrap/cache"/*.php 2>/dev/null || true
+        find "$PWD/storage/framework/views" -name "*.php" -delete 2>/dev/null || true
+        echo "[deploy] Caches cleared manually"
+      }
+
+    # ── 4. Restore .env after git reset ──────────────────────────────────────
     - |
       if [ ! -f "$PWD/.env" ] && [ -f "$PWD/../.env.mapelead" ]; then
         cp "$PWD/../.env.mapelead" "$PWD/.env"
-        echo "[deploy] .env restored from backup"
+        echo "[deploy] .env restored"
       fi
 
-    # ── Install/update Composer dependencies ──────────────────────────────────
+    # ── 5. Composer install ───────────────────────────────────────────────────
     - |
       PHP_BIN="/opt/alt/php84/usr/bin/php"
-      if [ ! -f "$PHP_BIN" ]; then PHP_BIN=$(which php 2>/dev/null || echo "php"); fi
-
-      COMPOSER_BIN="$HOME/composer.phar"
-      if [ ! -f "$COMPOSER_BIN" ]; then COMPOSER_BIN=$(which composer 2>/dev/null || echo ""); fi
-
-      if [ -n "$COMPOSER_BIN" ] && [ -f "$PHP_BIN" ]; then
-        "$PHP_BIN" "$COMPOSER_BIN" install --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-scripts 2>&1
+      [ -f "$PHP_BIN" ] || PHP_BIN=$(which php 2>/dev/null || echo "php")
+      COMPOSER=""
+      for c in "$HOME/composer.phar" "$HOME/bin/composer" "$(which composer 2>/dev/null)"; do
+        [ -f "$c" ] && COMPOSER="$c" && break
+      done
+      if [ -n "$COMPOSER" ] && [ -f "$PHP_BIN" ]; then
+        "$PHP_BIN" "$COMPOSER" install --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-scripts 2>&1 | tail -3
         echo "[deploy] Composer install complete"
       elif [ -d "$PWD/vendor" ]; then
         echo "[deploy] WARNING: Composer not found, using existing vendor/"
@@ -25,39 +48,32 @@ deployment:
         echo "[deploy] ERROR: No composer and no vendor/. Deployment may be broken."
       fi
 
-    # ── Backup .env after git pull (so next deploy can restore it) ────────────
-    - |
-      if [ -f "$PWD/.env" ]; then
-        cp "$PWD/.env" "$PWD/../.env.mapelead"
-        echo "[deploy] .env backed up to parent directory"
-      fi
-
-    # ── Set storage/cache permissions ─────────────────────────────────────────
-    - chmod -R 755 "$PWD/storage" "$PWD/bootstrap/cache" 2>/dev/null || true
-
-    # ── Create storage symlink ─────────────────────────────────────────────────
+    # ── 6. Storage & permissions ──────────────────────────────────────────────
     - |
       PHP_BIN="/opt/alt/php84/usr/bin/php"
-      if [ ! -f "$PHP_BIN" ]; then PHP_BIN=$(which php 2>/dev/null || echo "php"); fi
+      [ -f "$PHP_BIN" ] || PHP_BIN=$(which php 2>/dev/null || echo "php")
+      chmod -R 755 "$PWD/storage" "$PWD/bootstrap/cache" 2>/dev/null || true
       "$PHP_BIN" "$PWD/artisan" storage:link --force 2>/dev/null || true
 
-    # ── Run migrations (only new ones — safe) ─────────────────────────────────
+    # ── 7. Migrate ────────────────────────────────────────────────────────────
     - |
       PHP_BIN="/opt/alt/php84/usr/bin/php"
-      if [ ! -f "$PHP_BIN" ]; then PHP_BIN=$(which php 2>/dev/null || echo "php"); fi
+      [ -f "$PHP_BIN" ] || PHP_BIN=$(which php 2>/dev/null || echo "php")
+      [ -f "$PWD/.env" ] && "$PHP_BIN" "$PWD/artisan" migrate --force 2>&1 || echo "[deploy] Skipped migrations (no .env)"
+
+    # ── 8. Rebuild caches AFTER new code ─────────────────────────────────────
+    - |
+      PHP_BIN="/opt/alt/php84/usr/bin/php"
+      [ -f "$PHP_BIN" ] || PHP_BIN=$(which php 2>/dev/null || echo "php")
       if [ -f "$PWD/.env" ]; then
-        "$PHP_BIN" "$PWD/artisan" migrate --force 2>&1 || echo "[deploy] Migration warning (may be ok)"
-      else
-        echo "[deploy] Skipping migrations — no .env found"
+        "$PHP_BIN" "$PWD/artisan" config:cache 2>&1
+        "$PHP_BIN" "$PWD/artisan" route:cache  2>&1
+        "$PHP_BIN" "$PWD/artisan" view:cache   2>&1
+        echo "[deploy] All caches rebuilt"
       fi
 
-    # ── Clear old caches, rebuild ──────────────────────────────────────────────
+    # ── 9. Health check ───────────────────────────────────────────────────────
     - |
       PHP_BIN="/opt/alt/php84/usr/bin/php"
-      if [ ! -f "$PHP_BIN" ]; then PHP_BIN=$(which php 2>/dev/null || echo "php"); fi
-      if [ -f "$PWD/.env" ]; then
-        "$PHP_BIN" "$PWD/artisan" config:cache  2>&1 || true
-        "$PHP_BIN" "$PWD/artisan" route:cache   2>&1 || true
-        "$PHP_BIN" "$PWD/artisan" view:cache    2>&1 || true
-        echo "[deploy] Caches rebuilt"
-      fi
+      [ -f "$PHP_BIN" ] || PHP_BIN=$(which php 2>/dev/null || echo "php")
+      "$PHP_BIN" "$PWD/artisan" app:health 2>&1 || echo "[deploy] WARNING: health check failed — review logs"

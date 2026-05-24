@@ -1,106 +1,127 @@
 #!/bin/bash
 # =============================================================================
-# Mapelead — cPanel Deployment Script
-# Run from inside the project directory:  bash deploy.sh
+# Mapelead — Production Deployment Script
+# Usage:  bash deploy.sh
 # =============================================================================
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
 
-# Detect PHP binary
-PHP_BIN="/opt/alt/php84/usr/bin/php"
-[ -f "$PHP_BIN" ] || PHP_BIN=$(which php 2>/dev/null || echo "php")
-echo "[deploy] Using PHP: $PHP_BIN ($("$PHP_BIN" -r 'echo PHP_VERSION;' 2>/dev/null || echo 'unknown'))"
+# ── Detect PHP ──────────────────────────────────────────────────────────────
+PHP=""
+for p in "/opt/alt/php84/usr/bin/php" "/opt/alt/php83/usr/bin/php" "$(which php 2>/dev/null)"; do
+    [ -f "$p" ] || [ -x "$p" ] && PHP="$p" && break
+done
+[ -z "$PHP" ] && { echo "✗ PHP not found"; exit 1; }
+PHP_VER=$("$PHP" -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;' 2>/dev/null)
+echo "→ PHP $PHP_VER at $PHP"
+
+# ── Detect Composer ─────────────────────────────────────────────────────────
+COMPOSER=""
+for c in "$HOME/composer.phar" "$HOME/bin/composer" "$(which composer 2>/dev/null)" "/usr/local/bin/composer"; do
+    [ -f "$c" ] && COMPOSER="$c" && break
+done
+
+PARENT="$(dirname "$SCRIPT_DIR")"
 
 echo ""
 echo "════════════════════════════════════════════"
-echo "  Mapelead Deployment"
+echo "  Mapelead Deployment  ·  branch: $BRANCH"
 echo "════════════════════════════════════════════"
 
-# ── Step 1: Save .env and vendor BEFORE any git operations ───────────────────
-PARENT_DIR="$(dirname "$SCRIPT_DIR")"
-ENV_BACKUP="$PARENT_DIR/.env.mapelead"
-VENDOR_BACKUP_FLAG="$PARENT_DIR/.vendor_ok"
-
+# ── Step 1: Save .env before any git operation ───────────────────────────────
 if [ -f ".env" ]; then
-    cp .env "$ENV_BACKUP"
-    echo "✓ .env saved to $ENV_BACKUP"
+    cp .env "$PARENT/.env.mapelead"
+    echo "✓ .env saved"
 fi
 
-# ── Step 2: Pull latest code ──────────────────────────────────────────────────
-BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
-echo "→ Pulling branch: $BRANCH"
+# ── Step 2: Maintenance mode ON ──────────────────────────────────────────────
+"$PHP" artisan down --retry=10 2>/dev/null && echo "✓ Maintenance mode ON" || true
+
+# ── Step 3: CLEAR ALL CACHES before pulling (prevents stale-cache 500s) ─────
+"$PHP" artisan optimize:clear 2>/dev/null && echo "✓ All caches cleared" || {
+    # If artisan itself is broken, clear manually
+    rm -f bootstrap/cache/*.php
+    rm -f storage/framework/cache/data/*.php 2>/dev/null || true
+    find storage/framework/views -name "*.php" -delete 2>/dev/null || true
+    echo "✓ Caches cleared manually"
+}
+
+# ── Step 4: Pull latest code ──────────────────────────────────────────────────
+echo "→ Pulling $BRANCH..."
 git fetch origin
 git reset --hard "origin/$BRANCH"
-echo "✓ Code updated to $(git rev-parse --short HEAD)"
+echo "✓ Code at $(git rev-parse --short HEAD)"
 
-# ── Step 3: Restore .env ──────────────────────────────────────────────────────
+# ── Step 5: Restore .env ─────────────────────────────────────────────────────
 if [ ! -f ".env" ]; then
-    if [ -f "$ENV_BACKUP" ]; then
-        cp "$ENV_BACKUP" .env
-        echo "✓ .env restored from backup"
+    if [ -f "$PARENT/.env.mapelead" ]; then
+        cp "$PARENT/.env.mapelead" .env
+        echo "✓ .env restored"
     else
-        echo ""
-        echo "════════════════════════════════════════════"
-        echo "  ERROR: .env not found!"
-        echo "  Copy your .env.example to .env and fill"
-        echo "  in the production values, then re-run."
-        echo "════════════════════════════════════════════"
+        "$PHP" artisan up 2>/dev/null || true
+        echo "✗ ERROR: No .env found. Copy .env.example to .env and configure it."
         exit 1
     fi
 fi
 
-# ── Step 4: Composer install ──────────────────────────────────────────────────
-COMPOSER_BIN=""
-for candidate in "$HOME/composer.phar" "$(which composer 2>/dev/null)" "/usr/local/bin/composer"; do
-    [ -f "$candidate" ] && COMPOSER_BIN="$candidate" && break
-done
-
-if [ -n "$COMPOSER_BIN" ]; then
-    echo "→ Running composer install..."
-    "$PHP_BIN" "$COMPOSER_BIN" install \
+# ── Step 6: Install/update Composer dependencies ─────────────────────────────
+if [ -n "$COMPOSER" ]; then
+    echo "→ composer install..."
+    "$PHP" "$COMPOSER" install \
         --no-interaction --prefer-dist \
-        --optimize-autoloader --no-dev \
-        2>&1
-    echo "✓ Vendor dependencies installed"
+        --optimize-autoloader --no-dev 2>&1 | tail -3
+    echo "✓ Vendor dependencies up to date"
 elif [ -d "vendor" ]; then
     echo "⚠ Composer not found — using existing vendor/ (may be outdated)"
 else
-    echo ""
-    echo "════════════════════════════════════════════"
-    echo "  ERROR: No composer binary and no vendor/"
-    echo "  Upload vendor/ manually or install composer"
-    echo "  from https://getcomposer.org/download/"
-    echo "════════════════════════════════════════════"
+    "$PHP" artisan up 2>/dev/null || true
+    echo "✗ ERROR: No composer and no vendor/. Upload vendor/ or install composer."
     exit 1
 fi
 
-# ── Step 5: Storage symlink ───────────────────────────────────────────────────
-"$PHP_BIN" artisan storage:link --force 2>/dev/null && echo "✓ Storage linked" || true
+# ── Step 7: Storage symlink ───────────────────────────────────────────────────
+"$PHP" artisan storage:link --force 2>/dev/null && echo "✓ Storage symlink OK" || true
 
-# ── Step 6: Permissions ───────────────────────────────────────────────────────
-chmod -R 755 storage bootstrap/cache
-echo "✓ Permissions set (755 on storage + bootstrap/cache)"
+# ── Step 8: Permissions ───────────────────────────────────────────────────────
+chmod -R 755 storage bootstrap/cache 2>/dev/null && echo "✓ Permissions set" || true
 
-# ── Step 7: Run migrations ────────────────────────────────────────────────────
+# ── Step 9: Run migrations ────────────────────────────────────────────────────
 echo "→ Running migrations..."
-"$PHP_BIN" artisan migrate --force 2>&1
+"$PHP" artisan migrate --force 2>&1
 echo "✓ Migrations complete"
 
-# ── Step 8: Rebuild caches ────────────────────────────────────────────────────
+# ── Step 10: Rebuild all caches ──────────────────────────────────────────────
 echo "→ Rebuilding caches..."
-"$PHP_BIN" artisan config:cache
-"$PHP_BIN" artisan route:cache
-"$PHP_BIN" artisan view:cache
-echo "✓ All caches rebuilt"
+"$PHP" artisan config:cache
+"$PHP" artisan route:cache
+"$PHP" artisan view:cache
+"$PHP" artisan event:cache 2>/dev/null || true
+echo "✓ Caches rebuilt"
 
-# ── Step 9: Restart queue workers (if any) ───────────────────────────────────
-"$PHP_BIN" artisan queue:restart 2>/dev/null || true
+# ── Step 11: Queue restart ───────────────────────────────────────────────────
+"$PHP" artisan queue:restart 2>/dev/null || true
 
+# ── Step 12: Health check ────────────────────────────────────────────────────
+echo ""
+echo "→ Running health check..."
+if "$PHP" artisan app:health 2>/dev/null; then
+    HEALTH_OK=true
+else
+    HEALTH_OK=false
+    echo "⚠ Health check warnings — review above before taking app live"
+fi
+
+# ── Step 13: Maintenance mode OFF ────────────────────────────────────────────
+"$PHP" artisan up && echo "✓ App is live"
+
+# ── Done ─────────────────────────────────────────────────────────────────────
 echo ""
 echo "════════════════════════════════════════════"
-echo "  ✓ Deployment complete!"
-echo "  Branch : $BRANCH"
+echo "  ✓ Deployed: $(git log -1 --format='%s')"
 echo "  Commit : $(git rev-parse --short HEAD)"
+echo "  Branch : $BRANCH"
+[ "$HEALTH_OK" = false ] && echo "  ⚠ Review health check warnings above"
 echo "════════════════════════════════════════════"

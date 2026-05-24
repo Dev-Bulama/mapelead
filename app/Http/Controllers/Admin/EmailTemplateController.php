@@ -12,7 +12,7 @@ class EmailTemplateController extends \App\Http\Controllers\Controller
     {
         $templates = EmailTemplate::paginate(20);
 
-        return view('admin.cms.email-templates.index', compact('templates'));
+        return view('admin.email-templates.index', compact('templates'));
     }
 
     public function create()
@@ -35,7 +35,7 @@ class EmailTemplateController extends \App\Http\Controllers\Controller
             'is_active' => true,
         ]));
 
-        return redirect()->route('admin.cms.email-templates.index')
+        return redirect()->route('admin.email-templates.index')
             ->with('success', 'Email template created successfully.');
     }
 
