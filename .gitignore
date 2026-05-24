@@ -20,7 +20,8 @@
 /public/storage
 /storage/*.key
 /storage/pail
-/vendor
+# vendor is committed so cPanel deployments work without composer
+# /vendor
 _ide_helper.php
 Homestead.json
 Homestead.yaml
