@@ -109,7 +109,7 @@ class StudentCourseController extends Controller
     {
         $request->validate([
             'payment_type'    => 'required|in:full,installment',
-            'training_type'   => 'required|in:online,physical,hybrid',
+            'training_type'   => 'required|in:online,physical_monthly,physical_quarterly',
             'batch_id'        => 'nullable|exists:batches,id',
             'down_payment'    => 'required_if:payment_type,installment|nullable|numeric|min:1000',
             'installment_count' => 'required_if:payment_type,installment|nullable|integer|min:2|max:12',

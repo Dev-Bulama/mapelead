@@ -25,19 +25,70 @@
                         <span class="w-6 h-6 bg-brand-600 text-white rounded-full text-xs font-bold flex items-center justify-center">1</span>
                         Training Mode
                     </h3>
-                    <div class="grid grid-cols-3 gap-3">
-                        @foreach(['online' => ['Online', 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'], 'physical' => ['Physical', 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z'], 'hybrid' => ['Hybrid', 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9']] as $type => [$label, $icon])
-                        <label class="cursor-pointer">
-                            <input type="radio" name="training_type" value="{{ $type }}" x-model="trainingType" class="sr-only">
-                            <div :class="trainingType === '{{ $type }}' ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-200 text-gray-600'"
-                                class="border-2 rounded-xl p-3 text-center transition-all hover:border-brand-300">
-                                <svg class="w-5 h-5 mx-auto mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $icon }}"/>
-                                </svg>
-                                <span class="text-xs font-semibold block">{{ $label }}</span>
+                    <div class="space-y-3">
+                        {{-- Online --}}
+                        <label class="cursor-pointer block">
+                            <input type="radio" name="training_type" value="online" x-model="trainingType" class="sr-only">
+                            <div :class="trainingType === 'online' ? 'border-brand-600 bg-brand-50' : 'border-gray-200 hover:border-brand-300'"
+                                class="border-2 rounded-xl p-4 transition-all flex items-start gap-3">
+                                <div class="mt-0.5 w-9 h-9 flex-shrink-0 rounded-lg bg-blue-100 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 text-sm">Online</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">Self-paced learning from anywhere · Video lectures, assignments & live sessions</p>
+                                </div>
+                                <div :class="trainingType === 'online' ? 'border-brand-600 bg-brand-600' : 'border-gray-300'"
+                                    class="w-4 h-4 rounded-full border-2 flex-shrink-0 mt-1 flex items-center justify-center">
+                                    <div x-show="trainingType === 'online'" class="w-2 h-2 rounded-full bg-white"></div>
+                                </div>
                             </div>
                         </label>
-                        @endforeach
+
+                        {{-- Physical: 1-month intensive --}}
+                        <label class="cursor-pointer block">
+                            <input type="radio" name="training_type" value="physical_monthly" x-model="trainingType" class="sr-only">
+                            <div :class="trainingType === 'physical_monthly' ? 'border-brand-600 bg-brand-50' : 'border-gray-200 hover:border-brand-300'"
+                                class="border-2 rounded-xl p-4 transition-all flex items-start gap-3">
+                                <div class="mt-0.5 w-9 h-9 flex-shrink-0 rounded-lg bg-orange-100 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 text-sm">Physical — 1 Month Intensive</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">In-person daily sessions · <strong class="text-orange-600">3 sessions per day</strong> · 4-week immersive programme</p>
+                                </div>
+                                <div :class="trainingType === 'physical_monthly' ? 'border-brand-600 bg-brand-600' : 'border-gray-300'"
+                                    class="w-4 h-4 rounded-full border-2 flex-shrink-0 mt-1 flex items-center justify-center">
+                                    <div x-show="trainingType === 'physical_monthly'" class="w-2 h-2 rounded-full bg-white"></div>
+                                </div>
+                            </div>
+                        </label>
+
+                        {{-- Physical: 3-month programme --}}
+                        <label class="cursor-pointer block">
+                            <input type="radio" name="training_type" value="physical_quarterly" x-model="trainingType" class="sr-only">
+                            <div :class="trainingType === 'physical_quarterly' ? 'border-brand-600 bg-brand-50' : 'border-gray-200 hover:border-brand-300'"
+                                class="border-2 rounded-xl p-4 transition-all flex items-start gap-3">
+                                <div class="mt-0.5 w-9 h-9 flex-shrink-0 rounded-lg bg-green-100 flex items-center justify-center">
+                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-semibold text-gray-900 text-sm">Physical — 3 Month Programme</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">In-person classroom sessions · Weekly schedule · 12-week comprehensive curriculum</p>
+                                </div>
+                                <div :class="trainingType === 'physical_quarterly' ? 'border-brand-600 bg-brand-600' : 'border-gray-300'"
+                                    class="w-4 h-4 rounded-full border-2 flex-shrink-0 mt-1 flex items-center justify-center">
+                                    <div x-show="trainingType === 'physical_quarterly'" class="w-2 h-2 rounded-full bg-white"></div>
+                                </div>
+                            </div>
+                        </label>
                     </div>
                 </div>
 
@@ -200,7 +251,7 @@
 <script>
 function checkout() {
     return {
-        trainingType: '{{ old('training_type', 'online') }}',
+        trainingType: '{{ old('training_type', 'online') }}',  // online | physical_monthly | physical_quarterly
         paymentType: '{{ old('payment_type', 'full') }}',
         selectedBatch: null,
         downPayment: 0,

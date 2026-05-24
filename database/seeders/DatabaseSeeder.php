@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             LmsContentSeeder::class,
             EmailTemplatesSeeder::class,
             CmsContentSeeder::class,
+            ComprehensiveDataSeeder::class,
         ]);
     }
 }

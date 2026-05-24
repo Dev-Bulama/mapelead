@@ -25,6 +25,8 @@ class EnrollmentService
                 'course_id'      => $course->id,
                 'status'         => $course->is_free ? 'active' : 'pending',
                 'payment_status' => $course->is_free ? 'paid' : 'unpaid',
+                'payment_type'   => $options['payment_type'] ?? 'full',
+                'training_type'  => $options['training_type'] ?? 'online',
                 'amount_paid'    => $options['amount'] ?? 0,
                 'coupon_id'      => $options['coupon_id'] ?? null,
                 'discount_amount'=> $options['discount'] ?? 0,

@@ -10,10 +10,19 @@ class Enrollment extends Model
 
     protected $fillable = [
         'user_id', 'course_id', 'status', 'payment_status', 'payment_type',
-        'amount_paid', 'currency', 'coupon_id', 'discount_amount',
+        'training_type', 'amount_paid', 'currency', 'coupon_id', 'discount_amount',
         'progress_percent', 'enrolled_at', 'completed_at', 'expires_at',
         'access_locked', 'access_locked_at', 'access_locked_reason',
     ];
+
+    public function getTrainingTypeLabelAttribute(): string
+    {
+        return match($this->training_type) {
+            'physical_monthly'   => 'Physical (1 Month · 3×/Day)',
+            'physical_quarterly' => 'Physical (3 Months)',
+            default              => 'Online',
+        };
+    }
 
     protected $casts = [
         'enrolled_at'     => 'datetime',
