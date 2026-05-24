@@ -91,6 +91,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/email/resend', [AuthController::class, 'resendVerification'])->name('verification.resend');
 });
 
+// Laravel's Authenticate middleware redirects to route named 'login' — alias it here
+Route::get('/auth/login', [AuthController::class, 'showLogin'])->name('login');
+
 // ─── Student Dashboard Routes ──────────────────────────────────────────────────
 
 Route::middleware(['auth'])->prefix('dashboard')->name('student.')->group(function () {
