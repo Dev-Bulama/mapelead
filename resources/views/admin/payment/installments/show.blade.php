@@ -8,7 +8,7 @@
     <div class="flex items-center gap-2 text-sm text-gray-500">
         <a href="{{ route('admin.installments.index') }}" class="hover:text-brand-600">Installment Plans</a>
         <span>/</span>
-        <span class="text-gray-900 font-medium">{{ $installmentPlan->enrollment->user->full_name ?? 'Plan #'.$installmentPlan->id }}</span>
+        <span class="text-gray-900 font-medium">{{ $installmentPlan->enrollment?->user?->full_name ?? 'Plan #'.$installmentPlan->id }}</span>
     </div>
 
     @if(session('success'))
@@ -17,6 +17,7 @@
 
     {{-- Top Overview Cards --}}
     @php
+        $enrollment = $installmentPlan->enrollment;
         $paidCount  = $installmentPlan->schedule->where('status', 'paid')->count();
         $totalCount = $installmentPlan->schedule->count();
         $paidPct    = $installmentPlan->total_amount > 0
@@ -32,14 +33,14 @@
             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Student</h3>
             <div class="flex items-start gap-3">
                 <div class="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                    {{ strtoupper(substr($installmentPlan->enrollment->user->first_name ?? 'U', 0, 1)) }}
+                    {{ strtoupper(substr($enrollment?->user?->first_name ?? 'U', 0, 1)) }}
                 </div>
                 <div>
-                    <p class="font-semibold text-gray-900">{{ $installmentPlan->enrollment->user->full_name ?? '—' }}</p>
-                    <p class="text-sm text-gray-500">{{ $installmentPlan->enrollment->user->email ?? '—' }}</p>
-                    @if($installmentPlan->enrollment->user->admission_number ?? null)
+                    <p class="font-semibold text-gray-900">{{ $enrollment?->user?->full_name ?? '—' }}</p>
+                    <p class="text-sm text-gray-500">{{ $enrollment?->user?->email ?? '—' }}</p>
+                    @if($enrollment?->user?->admission_number ?? null)
                         <span class="inline-block mt-1 font-mono text-xs bg-brand-50 text-brand-700 border border-brand-200 px-2 py-0.5 rounded">
-                            {{ $installmentPlan->enrollment->user->admission_number }}
+                            {{ $enrollment->user->admission_number }}
                         </span>
                     @endif
                 </div>
@@ -47,12 +48,12 @@
             <div class="mt-4 pt-4 border-t text-sm">
                 <div class="flex justify-between py-1">
                     <span class="text-gray-500">Course</span>
-                    <span class="font-medium text-gray-800 text-right max-w-[60%] truncate">{{ $installmentPlan->enrollment->course->title ?? '—' }}</span>
+                    <span class="font-medium text-gray-800 text-right max-w-[60%] truncate">{{ $enrollment?->course?->title ?? '—' }}</span>
                 </div>
                 <div class="flex justify-between py-1">
                     <span class="text-gray-500">Access</span>
                     <span>
-                        @if($installmentPlan->enrollment->access_locked)
+                        @if($enrollment?->access_locked)
                             <span class="text-red-600 font-semibold">Locked</span>
                         @else
                             <span class="text-green-600 font-semibold">Active</span>
@@ -61,7 +62,7 @@
                 </div>
                 <div class="flex justify-between py-1">
                     <span class="text-gray-500">Enrolled</span>
-                    <span class="text-gray-700">{{ $installmentPlan->enrollment->enrolled_at?->format('M d, Y') ?? '—' }}</span>
+                    <span class="text-gray-700">{{ $enrollment?->enrolled_at?->format('M d, Y') ?? '—' }}</span>
                 </div>
             </div>
         </div>
@@ -122,13 +123,13 @@
     </div>
 
     {{-- Access lock alert --}}
-    @if($installmentPlan->enrollment->access_locked)
+    @if($enrollment?->access_locked)
     <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
         <div>
             <p class="font-semibold text-red-800 text-sm">Student's course access is locked</p>
-            <p class="text-red-600 text-xs mt-1">{{ $installmentPlan->enrollment->access_locked_reason }}</p>
+            <p class="text-red-600 text-xs mt-1">{{ $enrollment?->access_locked_reason }}</p>
             <p class="text-red-500 text-xs mt-0.5">
-                Locked {{ $installmentPlan->enrollment->access_locked_at?->format('M d, Y g:i A') }}
+                Locked {{ $enrollment?->access_locked_at?->format('M d, Y g:i A') }}
             </p>
         </div>
         <form action="{{ route('admin.installments.unlock', $installmentPlan) }}" method="POST">
