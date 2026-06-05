@@ -55,7 +55,7 @@
                     <select name="instructor_id" required class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
                         @foreach($instructors as $instructor)
                             <option value="{{ $instructor->id }}" {{ old('instructor_id', $course->instructor_id) == $instructor->id ? 'selected' : '' }}>
-                                {{ $instructor->user->full_name }}
+                                {{ $instructor->user?->full_name ?? '(No user — ID '.$instructor->id.')' }}
                             </option>
                         @endforeach
                     </select>

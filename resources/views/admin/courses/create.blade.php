@@ -63,7 +63,7 @@
                         <option value="">Select instructor</option>
                         @foreach($instructors as $instructor)
                             <option value="{{ $instructor->id }}" {{ old('instructor_id') == $instructor->id ? 'selected' : '' }}>
-                                {{ $instructor->user->full_name }}
+                                {{ $instructor->user?->full_name ?? '(No user — ID '.$instructor->id.')' }}
                             </option>
                         @endforeach
                     </select>
