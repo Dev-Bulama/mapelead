@@ -85,6 +85,38 @@
                     </select>
                 </div>
             </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Language</label>
+                    <input type="text" name="language" value="{{ old('language', 'English') }}"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                           placeholder="e.g. English">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Duration (hours)</label>
+                    <input type="number" name="duration_hours" value="{{ old('duration_hours') }}" min="1"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Duration (weeks)</label>
+                    <input type="number" name="duration_weeks" value="{{ old('duration_weeks') }}" min="1"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-6">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="is_featured" value="1" {{ old('is_featured') ? 'checked' : '' }}
+                           class="w-4 h-4 rounded text-brand-600 border-gray-300 focus:ring-brand-500">
+                    <span class="text-sm font-medium text-gray-700">Featured course</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="certificate_enabled" value="1" checked
+                           class="w-4 h-4 rounded text-brand-600 border-gray-300 focus:ring-brand-500">
+                    <span class="text-sm font-medium text-gray-700">Certificate enabled</span>
+                </label>
+            </div>
         </div>
 
         {{-- Pricing --}}
@@ -117,7 +149,7 @@
 
         {{-- Media --}}
         <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-5">
-            <h3 class="font-semibold text-gray-900 text-sm uppercase tracking-wide border-b border-gray-100 pb-3">Thumbnail</h3>
+            <h3 class="font-semibold text-gray-900 text-sm uppercase tracking-wide border-b border-gray-100 pb-3">Media</h3>
             <div class="flex items-start gap-6">
                 <div class="w-40 h-28 bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center border border-gray-200 shrink-0">
                     <img x-show="preview" :src="preview" class="w-full h-full object-cover" x-cloak>
@@ -132,6 +164,13 @@
                            class="block text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
                     <p class="text-xs text-gray-400 mt-2">JPG, PNG or WebP. Max 4MB. Recommended: 1280×720px</p>
                 </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Promo Video URL</label>
+                <input type="url" name="promo_video" value="{{ old('promo_video') }}"
+                       class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                       placeholder="https://youtube.com/watch?v=... or https://vimeo.com/...">
+                <p class="text-xs text-gray-400 mt-1">Paste a YouTube, Vimeo, or direct video URL. Shown as a preview on the course page.</p>
             </div>
         </div>
 

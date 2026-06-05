@@ -40,7 +40,7 @@ class BatchController extends Controller
             'start_date'   => 'required|date',
             'end_date'     => 'nullable|date|after:start_date',
             'max_students' => 'nullable|integer|min:1',
-            'status'       => 'required|in:active,upcoming,inactive,completed',
+            'status'       => 'required|in:upcoming,active,completed,cancelled',
         ], [
             'name.regex'  => 'Batch name must follow the format "Cohort N" (e.g. "Cohort 1", "Cohort 12"). No duplicates or random strings allowed.',
             'name.unique' => 'This cohort name already exists. Each cohort must have a unique number.',
@@ -80,7 +80,7 @@ class BatchController extends Controller
             'start_date'   => 'required|date',
             'end_date'     => 'nullable|date|after:start_date',
             'max_students' => 'nullable|integer|min:1',
-            'status'       => 'required|in:active,upcoming,inactive,completed',
+            'status'       => 'required|in:upcoming,active,completed,cancelled',
         ], [
             'name.regex'  => 'Batch name must follow the format "Cohort N" (e.g. "Cohort 1", "Cohort 12").',
             'name.unique' => 'This cohort name already exists.',

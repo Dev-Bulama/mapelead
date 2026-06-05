@@ -46,9 +46,9 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                     <select name="status" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
-                        <option value="active" {{ old('status','active') === 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                        <option value="completed" {{ old('status') === 'completed' ? 'selected' : '' }}>Completed</option>
+                        @foreach(['upcoming' => 'Upcoming', 'active' => 'Active', 'completed' => 'Completed', 'cancelled' => 'Cancelled'] as $val => $label)
+                            <option value="{{ $val }}" {{ old('status', 'upcoming') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
