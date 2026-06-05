@@ -49,6 +49,13 @@ class BlogManagementController extends Controller
         $data['allow_comments'] = $request->boolean('allow_comments', true);
         $data['read_time_minutes'] = max(1, (int) (str_word_count(strip_tags($data['content'])) / 200));
 
+        if (empty($data['category_id'])) {
+            $data['category_id'] = BlogCategory::firstOrCreate(
+                ['slug' => 'uncategorized'],
+                ['name' => 'Uncategorized', 'is_active' => true, 'sort_order' => 999]
+            )->id;
+        }
+
         if ($data['status'] === 'published' && empty($data['published_at'])) {
             $data['published_at'] = now();
         }
@@ -90,6 +97,13 @@ class BlogManagementController extends Controller
         $data['is_featured']    = $request->boolean('is_featured');
         $data['allow_comments'] = $request->boolean('allow_comments');
         $data['read_time_minutes'] = max(1, (int) (str_word_count(strip_tags($data['content'])) / 200));
+
+        if (empty($data['category_id'])) {
+            $data['category_id'] = BlogCategory::firstOrCreate(
+                ['slug' => 'uncategorized'],
+                ['name' => 'Uncategorized', 'is_active' => true, 'sort_order' => 999]
+            )->id;
+        }
 
         if ($data['status'] === 'published' && ! $post->published_at) {
             $data['published_at'] = now();
