@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseCategory;
 use App\Models\Instructor;
+use App\Models\User;
 use App\Services\Course\CourseService;
 use Illuminate\Http\Request;
 
@@ -29,7 +30,7 @@ class CourseManagementController extends Controller
     public function create()
     {
         $categories  = CourseCategory::active()->get();
-        $instructors = Instructor::with('user')->get();
+        $instructors = $this->resolvedInstructors();
         return view('admin.courses.create', compact('categories', 'instructors'));
     }
 
@@ -67,7 +68,7 @@ class CourseManagementController extends Controller
     public function edit(Course $course)
     {
         $categories  = CourseCategory::active()->get();
-        $instructors = Instructor::with('user')->get();
+        $instructors = $this->resolvedInstructors();
         return view('admin.courses.edit', compact('course', 'categories', 'instructors'));
     }
 
@@ -110,5 +111,15 @@ class CourseManagementController extends Controller
     {
         Course::findOrFail($id)->update(['status' => 'draft', 'is_published' => false]);
         return back()->with('success', 'Course unpublished!');
+    }
+
+    private function resolvedInstructors()
+    {
+        // Ensure every user with an instructor/admin role has an Instructor profile row.
+        User::role(['instructor', 'admin', 'super_admin'])
+            ->get()
+            ->each(fn($u) => Instructor::firstOrCreate(['user_id' => $u->id]));
+
+        return Instructor::with('user')->whereHas('user')->get();
     }
 }
