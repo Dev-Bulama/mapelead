@@ -16,7 +16,7 @@
     </div>
     @endif
 
-    <form action="{{ route('admin.courses.modules.update', [$module->course_id, $module]) }}" method="POST" class="bg-white rounded-2xl border p-6 space-y-4">
+    <form action="{{ route('admin.modules.update', $module) }}" method="POST" class="bg-white rounded-2xl border p-6 space-y-4">
         @csrf @method('PUT')
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Module Title <span class="text-red-500">*</span></label>

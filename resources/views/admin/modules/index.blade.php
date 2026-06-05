@@ -71,9 +71,9 @@
                         <div class="flex items-center justify-end gap-2">
                             <a href="{{ route('admin.modules.lessons.index', $module) }}"
                                 class="text-xs text-blue-600 hover:underline">Lessons</a>
-                            <a href="{{ route('admin.courses.modules.edit', [$course, $module]) }}"
+                            <a href="{{ route('admin.modules.edit', $module) }}"
                                 class="text-xs text-gray-600 hover:underline">Edit</a>
-                            <form action="{{ route('admin.courses.modules.destroy', [$course, $module]) }}" method="POST"
+                            <form action="{{ route('admin.modules.destroy', $module) }}" method="POST"
                                 onsubmit="return confirm('Delete this module and all its lessons?')">
                                 @csrf @method('DELETE')
                                 <button class="text-xs text-red-500 hover:underline">Delete</button>

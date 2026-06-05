@@ -69,9 +69,9 @@
                     </td>
                     <td class="px-4 py-3">
                         <div class="flex items-center justify-end gap-2">
-                            <a href="{{ route('admin.modules.lessons.edit', [$module, $lesson]) }}"
+                            <a href="{{ route('admin.lessons.edit', $lesson) }}"
                                 class="text-xs text-gray-600 hover:underline">Edit</a>
-                            <form action="{{ route('admin.modules.lessons.destroy', [$module, $lesson]) }}" method="POST"
+                            <form action="{{ route('admin.lessons.destroy', $lesson) }}" method="POST"
                                 onsubmit="return confirm('Delete this lesson?')">
                                 @csrf @method('DELETE')
                                 <button class="text-xs text-red-500 hover:underline">Delete</button>
