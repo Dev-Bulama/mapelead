@@ -26,8 +26,15 @@ class SettingsService
     public function updateGroup(string $group, array $data): void
     {
         foreach ($data as $key => $value) {
+            if (str_starts_with($key, '_') || $key === 'group') continue;
             SiteSetting::set($key, $value);
         }
-        Cache::tags(['settings'])->flush();
+        // Clear individual and group caches without tags (compatible with database cache driver)
+        Cache::forget("settings_group_{$group}");
+        // Also bust all known setting keys in this group
+        $keys = SiteSetting::where('group', $group)->pluck('key');
+        foreach ($keys as $key) {
+            Cache::forget("setting_{$key}");
+        }
     }
 }

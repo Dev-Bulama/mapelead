@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class UserController extends Controller
 {
@@ -84,5 +85,31 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $user->update(['status' => $user->status === 'active' ? 'suspended' : 'active']);
         return response()->json(['status' => $user->status]);
+    }
+
+    public function export(Request $request): StreamedResponse
+    {
+        $query = User::with('roles')
+            ->when($request->role, fn($q, $r) => $q->whereHas('roles', fn($q) => $q->where('name', $r)))
+            ->when($request->status, fn($q, $st) => $q->where('status', $st))
+            ->orderByDesc('created_at');
+
+        return response()->stream(function () use ($query) {
+            echo implode(',', ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Role', 'Status', 'Admission No', 'Country', 'Registered At']) . "\n";
+            $query->chunk(500, function ($users) {
+                foreach ($users as $user) {
+                    echo implode(',', array_map(fn($v) => '"' . str_replace('"', '""', $v ?? '') . '"', [
+                        $user->id, $user->first_name, $user->last_name, $user->email,
+                        $user->phone ?? '', $user->roles->pluck('name')->join(', '),
+                        $user->status, $user->admission_number ?? '',
+                        $user->country ?? '', $user->created_at->format('Y-m-d H:i:s'),
+                    ])) . "\n";
+                }
+            });
+        }, 200, [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="users_export_' . now()->format('Y-m-d') . '.csv"',
+            'Cache-Control'       => 'no-cache',
+        ]);
     }
 }

@@ -78,50 +78,77 @@
         @drop.prevent="handleDrop($event)"
         :class="dragging ? 'border-indigo-400 bg-indigo-50' : 'border-dashed border-gray-300'"
         style="border-style: dashed; border-width: 2px;">
-        <form action="{{ route('admin.media.upload') }}" method="POST" enctype="multipart/form-data" x-ref="uploadForm">
-            @csrf
-            <input type="file" name="files[]" multiple x-ref="fileInput"
-                @change="files = [...$event.target.files]"
-                class="hidden" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.txt">
 
-            <div class="text-center py-6" @click="$refs.fileInput.click()" :class="files.length === 0 ? 'cursor-pointer' : ''">
-                <div class="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-colors" :class="dragging ? 'bg-indigo-100' : 'bg-gray-100'">
-                    <svg class="w-7 h-7 transition-colors" :class="dragging ? 'text-indigo-500' : 'text-gray-400'" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
-                </div>
-                <p class="text-sm font-semibold text-gray-700" x-show="!dragging">Click to upload or drag and drop files here</p>
-                <p class="text-sm font-semibold text-indigo-600" x-show="dragging">Drop files to upload</p>
-                <p class="text-xs text-gray-400 mt-1">Images, PDFs, documents, videos supported</p>
+        <input type="file" name="files[]" multiple x-ref="fileInput"
+            @change="setFiles([...$event.target.files])"
+            class="hidden" accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.txt">
+
+        <div class="text-center py-6" @click="$refs.fileInput.click()" :class="files.length === 0 ? 'cursor-pointer' : ''">
+            <div class="mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-colors" :class="dragging ? 'bg-indigo-100' : 'bg-gray-100'">
+                <svg class="w-7 h-7 transition-colors" :class="dragging ? 'text-indigo-500' : 'text-gray-400'" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
             </div>
+            <p class="text-sm font-semibold text-gray-700" x-show="!dragging">Click to upload or drag and drop files here</p>
+            <p class="text-sm font-semibold text-indigo-600" x-show="dragging">Drop files to upload</p>
+            <p class="text-xs text-gray-400 mt-1">Images, PDFs, documents, videos supported</p>
+        </div>
 
-            <div x-show="files.length > 0" x-transition class="mt-4 border-t border-gray-100 pt-4">
-                <p class="text-xs font-semibold text-gray-600 mb-3" x-text="files.length + ' file(s) selected'"></p>
-                <div class="space-y-2 max-h-48 overflow-y-auto">
-                    <template x-for="(file, index) in files" :key="index">
-                        <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg border border-gray-200">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
-                                <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-800 truncate" x-text="file.name"></p>
-                                <p class="text-xs text-gray-400" x-text="(file.size / 1024).toFixed(1) + ' KB'"></p>
-                            </div>
-                            <button type="button" @click="removeFile(index)" class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded hover:bg-red-50">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                            </button>
+        <div x-show="files.length > 0" x-transition class="mt-4 border-t border-gray-100 pt-4">
+            <p class="text-xs font-semibold text-gray-600 mb-3" x-text="files.length + ' file(s) selected'"></p>
+            <div class="space-y-2 max-h-48 overflow-y-auto">
+                <template x-for="(file, index) in files" :key="index">
+                    <div class="flex items-center gap-3 p-2.5 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0 overflow-hidden">
+                            <template x-if="file.type.startsWith('image/')">
+                                <img :src="previewUrls[index]" class="w-full h-full object-cover rounded-lg" alt="">
+                            </template>
+                            <template x-if="!file.type.startsWith('image/')">
+                                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                            </template>
                         </div>
-                    </template>
-                </div>
-                <div class="flex gap-3 mt-4">
-                    <button type="submit" class="inline-flex items-center gap-2 text-white text-sm font-medium px-5 py-2 rounded-xl transition-colors" style="background-color: #4f46e5;">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
-                        Upload <span x-text="files.length"></span> File(s)
-                    </button>
-                    <button type="button" @click="files = []" class="bg-white border border-gray-300 text-gray-700 text-sm font-medium px-4 py-2 rounded-xl hover:bg-gray-50 transition-colors">
-                        Clear
-                    </button>
-                </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-800 truncate" x-text="file.name"></p>
+                            <p class="text-xs text-gray-400" x-text="(file.size / 1024).toFixed(1) + ' KB'"></p>
+                        </div>
+                        <button type="button" @click="removeFile(index)" class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded hover:bg-red-50">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </template>
             </div>
-        </form>
+            <div x-show="uploading" class="mt-3">
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-indigo-500 h-2 rounded-full transition-all duration-300" :style="'width:' + uploadProgress + '%'"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-1" x-text="'Uploading... ' + uploadProgress + '%'"></p>
+            </div>
+            <div class="flex gap-3 mt-4">
+                <button type="button" @click="uploadFiles()" :disabled="uploading"
+                    class="inline-flex items-center gap-2 text-white text-sm font-medium px-5 py-2 rounded-xl transition-colors disabled:opacity-50"
+                    style="background-color: #4f46e5;">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                    <span x-show="!uploading">Upload <span x-text="files.length"></span> File(s)</span>
+                    <span x-show="uploading">Uploading...</span>
+                </button>
+                <button type="button" @click="files = []; previewUrls = []" :disabled="uploading" class="bg-white border border-gray-300 text-gray-700 text-sm font-medium px-4 py-2 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50">
+                    Clear
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- Newly uploaded thumbnails (appear immediately after AJAX upload) --}}
+    <div x-show="newlyUploaded.length > 0" x-transition class="bg-white rounded-2xl border border-gray-200 p-4">
+        <h3 class="text-sm font-semibold text-gray-700 mb-3">Just Uploaded</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+            <template x-for="item in newlyUploaded" :key="item.id">
+                <div class="relative border border-green-200 rounded-xl overflow-hidden bg-green-50 aspect-square">
+                    <img :src="item.url" :alt="item.name" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-green-500/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <svg class="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                </div>
+            </template>
+        </div>
     </div>
 
     @if($media->isEmpty())
@@ -235,13 +262,78 @@
 function mediaUploader() {
     return {
         files: [],
+        previewUrls: [],
         dragging: false,
+        uploading: false,
+        uploadProgress: 0,
+        newlyUploaded: [],
+
         handleDrop(e) {
             this.dragging = false;
-            this.files = [...e.dataTransfer.files];
+            this.setFiles([...e.dataTransfer.files]);
         },
+
+        setFiles(fileList) {
+            this.files = fileList;
+            this.previewUrls = [];
+            fileList.forEach((f, i) => {
+                if (f.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => { this.previewUrls[i] = ev.target.result; };
+                    reader.readAsDataURL(f);
+                } else {
+                    this.previewUrls[i] = null;
+                }
+            });
+        },
+
         removeFile(i) {
             this.files.splice(i, 1);
+            this.previewUrls.splice(i, 1);
+        },
+
+        async uploadFiles() {
+            if (!this.files.length) return;
+            this.uploading = true;
+            this.uploadProgress = 0;
+
+            const formData = new FormData();
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+            this.files.forEach(f => formData.append('files[]', f));
+
+            try {
+                await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.upload.addEventListener('progress', (e) => {
+                        if (e.lengthComputable) {
+                            this.uploadProgress = Math.round((e.loaded / e.total) * 100);
+                        }
+                    });
+                    xhr.addEventListener('load', () => {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            const data = JSON.parse(xhr.responseText);
+                            if (data.success) {
+                                this.newlyUploaded = [...this.newlyUploaded, ...data.files];
+                                this.files = [];
+                                this.previewUrls = [];
+                                resolve(data);
+                            } else {
+                                reject(new Error('Upload failed'));
+                            }
+                        } else {
+                            reject(new Error('Server error: ' + xhr.status));
+                        }
+                    });
+                    xhr.addEventListener('error', () => reject(new Error('Network error')));
+                    xhr.open('POST', '{{ route('admin.media.upload') }}');
+                    xhr.send(formData);
+                });
+            } catch (err) {
+                alert('Upload failed: ' + err.message);
+            } finally {
+                this.uploading = false;
+                this.uploadProgress = 0;
+            }
         }
     }
 }

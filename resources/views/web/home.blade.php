@@ -267,6 +267,65 @@
 @endif
 
 {{-- ═══════════════════════════════════════════════════════════════════
+     NEWS TICKER / ANNOUNCEMENTS
+═══════════════════════════════════════════════════════════════════ --}}
+@if(isset($newsTickers) && $newsTickers->isNotEmpty())
+<div class="bg-[#14215B] text-white py-2 overflow-hidden relative" x-data="newsTicker()">
+    <div class="flex items-center">
+        <div class="shrink-0 bg-yellow-400 text-[#14215B] font-bold text-xs px-3 py-1 mr-4 uppercase tracking-wide z-10 relative">
+            LIVE
+        </div>
+        <div class="flex-1 overflow-hidden">
+            <div class="flex whitespace-nowrap" :style="'transform: translateX(-' + offset + 'px); transition: none;'" x-ref="ticker">
+                @foreach($newsTickers as $ticker)
+                <span class="inline-flex items-center gap-3 mr-16 text-sm font-medium">
+                    <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full shrink-0"></span>
+                    {{ $ticker->message }}
+                    @if($ticker->url)
+                    <a href="{{ $ticker->url }}" class="underline text-yellow-300 hover:text-yellow-200 text-xs">{{ $ticker->url_text ?? 'Learn More' }}</a>
+                    @endif
+                </span>
+                @endforeach
+                {{-- Duplicate for seamless loop --}}
+                @foreach($newsTickers as $ticker)
+                <span class="inline-flex items-center gap-3 mr-16 text-sm font-medium">
+                    <span class="w-1.5 h-1.5 bg-yellow-400 rounded-full shrink-0"></span>
+                    {{ $ticker->message }}
+                    @if($ticker->url)
+                    <a href="{{ $ticker->url }}" class="underline text-yellow-300 hover:text-yellow-200 text-xs">{{ $ticker->url_text ?? 'Learn More' }}</a>
+                    @endif
+                </span>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function newsTicker() {
+    return {
+        offset: 0,
+        speed: 0.5,
+        animFrame: null,
+        init() {
+            this.$nextTick(() => {
+                const el = this.$refs.ticker;
+                const halfWidth = el.scrollWidth / 2;
+                const step = () => {
+                    this.offset += this.speed;
+                    if (this.offset >= halfWidth) this.offset = 0;
+                    el.style.transform = 'translateX(-' + this.offset + 'px)';
+                    this.animFrame = requestAnimationFrame(step);
+                };
+                this.animFrame = requestAnimationFrame(step);
+            });
+        },
+        destroy() { cancelAnimationFrame(this.animFrame); }
+    }
+}
+</script>
+@endif
+
+{{-- ═══════════════════════════════════════════════════════════════════
      CATEGORIES SECTION
 ═══════════════════════════════════════════════════════════════════ --}}
 <section class="py-20 bg-white">
@@ -339,7 +398,21 @@
                 <div class="relative overflow-hidden aspect-video bg-gray-200">
                     <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}"
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    @if($course->is_free)
+                    @php
+                        $hasActiveBatch = isset($activeBatches) && $activeBatches->where('course_id', $course->id)->isNotEmpty();
+                        $hasUpcomingBatch = !$hasActiveBatch && isset($upcomingBatches) && $upcomingBatches->where('course_id', $course->id)->isNotEmpty();
+                    @endphp
+                    @if($hasActiveBatch)
+                    <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
+                        <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                        Class Active
+                    </span>
+                    @elseif($hasUpcomingBatch)
+                    <span class="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-lg">
+                        <span class="w-1.5 h-1.5 bg-white rounded-full"></span>
+                        Starting Soon
+                    </span>
+                    @elseif($course->is_free)
                     <span class="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">FREE</span>
                     @elseif($course->discount_price && $course->discount_price < $course->price)
                     @php $discount = round((($course->price - $course->discount_price) / $course->price) * 100); @endphp
@@ -504,6 +577,43 @@
         </div>
     </div>
 </section>
+
+{{-- ═══════════════════════════════════════════════════════════════════
+     SERVICES SECTION
+═══════════════════════════════════════════════════════════════════ --}}
+@if(isset($services) && $services->count())
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-14">
+            <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">What We Offer</span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Our Services</h2>
+            <p class="text-gray-500 text-lg max-w-xl mx-auto">Practical hands-on training and career services designed to transform your professional trajectory.</p>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($services as $service)
+            <div class="group bg-white border border-gray-200 hover:border-brand-200 rounded-2xl p-7 transition-all duration-200 hover:shadow-lg card-hover">
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 text-white text-2xl font-bold"
+                     style="background-color: {{ $service->color ?? '#14215B' }}">
+                    @if($service->image_url)
+                    <img src="{{ $service->image_url }}" alt="{{ $service->title }}" class="w-10 h-10 object-cover rounded-lg">
+                    @else
+                    {{ mb_substr($service->title, 0, 1) }}
+                    @endif
+                </div>
+                <h3 class="font-display font-bold text-gray-900 text-lg mb-2 group-hover:text-brand-700 transition-colors">{{ $service->title }}</h3>
+                <p class="text-gray-500 text-sm leading-relaxed mb-4">{{ $service->description }}</p>
+                @if($service->link_url)
+                <a href="{{ $service->link_url }}" class="inline-flex items-center gap-1.5 text-brand-600 hover:text-brand-700 text-sm font-semibold transition-colors">
+                    {{ $service->link_text ?? 'Learn More' }}
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+                @endif
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
 
 {{-- ═══════════════════════════════════════════════════════════════════
      STATS COUNTER SECTION
@@ -809,6 +919,137 @@
                     </a>
                 </div>
             </article>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+{{-- ═══════════════════════════════════════════════════════════════════
+     GALLERY SECTION
+═══════════════════════════════════════════════════════════════════ --}}
+@if(isset($galleryItems) && $galleryItems->count())
+<section class="py-20 bg-white" x-data="galleryLightbox()">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-14">
+            <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Gallery</span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Life at MapeLearn</h2>
+            <p class="text-gray-500 text-lg max-w-xl mx-auto">Glimpses of our campus, training sessions, and the vibrant community you'll be part of.</p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            @foreach($galleryItems->take(12) as $index => $item)
+            <button @click="open({{ $index }}, '{{ addslashes($item->image_url) }}', '{{ addslashes($item->caption ?? $item->title ?? '') }}')"
+                class="relative group overflow-hidden rounded-2xl aspect-square bg-gray-100 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                <img src="{{ $item->image_url }}" alt="{{ $item->alt_text ?? $item->title ?? 'Gallery' }}"
+                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                @if($item->caption || $item->title)
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                    <p class="text-white text-xs font-medium line-clamp-2">{{ $item->caption ?? $item->title }}</p>
+                </div>
+                @else
+                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <svg class="w-8 h-8 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                </div>
+                @endif
+            </button>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- Lightbox --}}
+    <div x-show="isOpen" x-cloak x-transition:enter="transition duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+         class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+         @click.self="isOpen = false"
+         @keydown.escape.window="isOpen = false"
+         @keydown.arrow-left.window="prev()"
+         @keydown.arrow-right.window="next()">
+        <button @click="isOpen = false" class="absolute top-4 right-4 text-white/70 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <div class="max-w-4xl w-full">
+            <img :src="currentSrc" :alt="currentCaption" class="max-h-[80vh] w-full object-contain rounded-xl">
+            <p x-show="currentCaption" class="text-white/70 text-sm text-center mt-3" x-text="currentCaption"></p>
+        </div>
+    </div>
+</section>
+
+@push('scripts')
+<script>
+function galleryLightbox() {
+    const images = @json($galleryItems->take(12)->map(fn($i) => ['src' => $i->image_url, 'caption' => $i->caption ?? $i->title ?? ''])->values());
+    return {
+        isOpen: false,
+        currentIndex: 0,
+        currentSrc: '',
+        currentCaption: '',
+        open(index, src, caption) {
+            this.currentIndex = index;
+            this.currentSrc = src;
+            this.currentCaption = caption;
+            this.isOpen = true;
+        },
+        prev() {
+            this.currentIndex = (this.currentIndex - 1 + images.length) % images.length;
+            this.currentSrc = images[this.currentIndex].src;
+            this.currentCaption = images[this.currentIndex].caption;
+        },
+        next() {
+            this.currentIndex = (this.currentIndex + 1) % images.length;
+            this.currentSrc = images[this.currentIndex].src;
+            this.currentCaption = images[this.currentIndex].caption;
+        }
+    }
+}
+</script>
+@endpush
+@endif
+
+{{-- ═══════════════════════════════════════════════════════════════════
+     TEAM SECTION
+═══════════════════════════════════════════════════════════════════ --}}
+@if(isset($teamMembers) && $teamMembers->count())
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-14">
+            <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Our People</span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Meet the Team</h2>
+            <p class="text-gray-500 text-lg max-w-xl mx-auto">Industry practitioners and career coaches dedicated to your success.</p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            @foreach($teamMembers as $member)
+            <div class="group text-center">
+                <div class="relative mb-4 overflow-hidden rounded-2xl aspect-square bg-gray-200">
+                    <img src="{{ $member->photo_url }}" alt="{{ $member->name }}"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    @if($member->linkedin_url || $member->twitter_url)
+                    <div class="absolute inset-0 bg-[#14215B]/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                        @if($member->linkedin_url)
+                        <a href="{{ $member->linkedin_url }}" target="_blank" rel="noopener"
+                           class="w-10 h-10 bg-white rounded-xl flex items-center justify-center hover:bg-blue-50 transition-colors">
+                            <svg class="w-5 h-5 text-blue-700 fill-current" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                        </a>
+                        @endif
+                        @if($member->twitter_url)
+                        <a href="{{ $member->twitter_url }}" target="_blank" rel="noopener"
+                           class="w-10 h-10 bg-white rounded-xl flex items-center justify-center hover:bg-sky-50 transition-colors">
+                            <svg class="w-5 h-5 text-sky-500 fill-current" viewBox="0 0 24 24"><path d="M23.954 4.569a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.691 8.094 4.066 6.13 1.64 3.161a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.061a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.937 4.937 0 004.604 3.417 9.868 9.868 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63a9.936 9.936 0 002.46-2.548l-.047-.02z"/></svg>
+                        </a>
+                        @endif
+                    </div>
+                    @endif
+                </div>
+                <h3 class="font-display font-bold text-gray-900 text-sm mb-0.5">{{ $member->name }}</h3>
+                <p class="text-brand-600 text-xs font-medium">{{ $member->position }}</p>
+                @if($member->department)
+                <p class="text-gray-400 text-xs mt-0.5">{{ $member->department }}</p>
+                @endif
+            </div>
             @endforeach
         </div>
     </div>

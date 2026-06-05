@@ -2,13 +2,18 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Models\Announcement;
+use App\Models\Batch;
+use App\Models\BlogPost;
 use App\Models\Course;
 use App\Models\CourseCategory;
-use App\Models\HeroBanner;
-use App\Models\Testimonial;
 use App\Models\Faq;
-use App\Models\BlogPost;
+use App\Models\GalleryItem;
+use App\Models\HeroBanner;
+use App\Models\Service;
 use App\Models\SiteSetting;
+use App\Models\TeamMember;
+use App\Models\Testimonial;
 use App\Services\CMS\SettingsService;
 
 class HomeController extends Controller
@@ -18,15 +23,71 @@ class HomeController extends Controller
     public function index()
     {
         $data = [
-            'settings'     => $this->settings->group('homepage'),
+            'settings'        => $this->settings->group('homepage'),
             'generalSettings' => $this->settings->group('general'),
-            'heroBanners'  => HeroBanner::where('is_active', true)->orderBy('sort_order')->get(),
-            'featuredCourses' => Course::published()->featured()->with(['instructor.user', 'category'])->limit(6)->get(),
-            'categories'   => CourseCategory::active()->featured()->withCount(['courses' => fn($q) => $q->published()])->orderBy('sort_order')->limit(8)->get(),
-            'testimonials' => Testimonial::active()->featured()->orderBy('sort_order')->limit(6)->get(),
-            'faqs'         => Faq::active()->limit(8)->get(),
-            'blogPosts'    => BlogPost::published()->with('author', 'category')->latest('published_at')->limit(3)->get(),
-            'stats'        => [
+            'heroBanners'     => HeroBanner::where('is_active', true)->orderBy('sort_order')->get(),
+
+            'featuredCourses' => Course::published()
+                ->featured()
+                ->with(['instructor.user', 'category'])
+                ->limit(6)
+                ->get(),
+
+            'categories' => CourseCategory::where('is_active', true)
+                ->withCount(['courses' => fn($q) => $q->published()])
+                ->orderBy('sort_order')
+                ->limit(8)
+                ->get(),
+
+            // All active testimonials (featured first) — removed false ->featured() requirement
+            'testimonials' => Testimonial::where('is_active', true)
+                ->orderByDesc('is_featured')
+                ->orderBy('sort_order')
+                ->limit(6)
+                ->get(),
+
+            'faqs' => Faq::where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->limit(10)
+                ->get(),
+
+            'blogPosts' => BlogPost::where('status', 'published')
+                ->with('author', 'category')
+                ->latest('published_at')
+                ->limit(3)
+                ->get(),
+
+            'teamMembers' => TeamMember::where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->limit(8)
+                ->get(),
+
+            'galleryItems' => GalleryItem::where('is_active', true)
+                ->orderBy('sort_order')
+                ->limit(12)
+                ->get(),
+
+            'services' => Service::where('is_active', true)
+                ->orderBy('sort_order')
+                ->limit(8)
+                ->get(),
+
+            // Active & upcoming batches for class-status indicators
+            'activeBatches'   => Batch::where('status', 'active')->with('course')->get(),
+            'upcomingBatches' => Batch::where('status', 'upcoming')->with('course')->limit(5)->get(),
+
+            // News ticker (type=ticker announcements)
+            'newsTickers' => Announcement::where('is_active', true)
+                ->where('type', 'ticker')
+                ->where(fn($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>', now()))
+                ->where(fn($q) => $q->whereNull('starts_at')->orWhere('starts_at', '<=', now()))
+                ->orderByDesc('created_at')
+                ->limit(5)
+                ->get(),
+
+            'stats' => [
                 'students'    => SiteSetting::get('stat_students', '10,000+'),
                 'courses'     => SiteSetting::get('stat_courses', '50+'),
                 'instructors' => SiteSetting::get('stat_instructors', '25+'),
@@ -40,15 +101,16 @@ class HomeController extends Controller
     public function about()
     {
         return view('web.about', [
-            'settings' => $this->settings->group('general'),
-            'testimonials' => Testimonial::active()->featured()->limit(4)->get(),
+            'settings'    => $this->settings->group('general'),
+            'testimonials'=> Testimonial::where('is_active', true)->orderByDesc('is_featured')->limit(4)->get(),
+            'teamMembers' => TeamMember::where('is_active', true)->orderBy('sort_order')->get(),
         ]);
     }
 
     public function sitemap()
     {
         $courses = Course::published()->select('slug', 'updated_at')->get();
-        $posts   = BlogPost::published()->select('slug', 'updated_at')->get();
+        $posts   = BlogPost::where('status', 'published')->select('slug', 'updated_at')->get();
         return response()->view('web.sitemap', compact('courses', 'posts'))
             ->header('Content-Type', 'text/xml');
     }

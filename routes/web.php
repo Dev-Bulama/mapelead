@@ -35,6 +35,10 @@ use App\Http\Controllers\Admin\InstallmentController;
 use App\Http\Controllers\Admin\EmailTemplateController;
 use App\Http\Controllers\Admin\AdmissionNumberController;
 use App\Http\Controllers\Admin\CertificateSettingsController;
+use App\Http\Controllers\Admin\TeamController;
+use App\Http\Controllers\Admin\GalleryController;
+use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Student\QuizController as StudentQuizController;
 use App\Http\Controllers\Student\AssignmentController as StudentAssignmentController;
 use App\Http\Controllers\Student\AttendanceController as StudentAttendanceController;
@@ -198,7 +202,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/cms/hero-banners', [CmsController::class, 'updateHeroBanner'])->name('cms.hero.update');
     Route::delete('/cms/hero-banners/{id}', [CmsController::class, 'destroyHeroBanner'])->name('cms.hero.destroy');
     Route::post('/cms/testimonials', [CmsController::class, 'storeTestimonial'])->name('cms.testimonials.store');
+    Route::delete('/cms/testimonials/{id}', [CmsController::class, 'destroyTestimonial'])->name('cms.testimonials.destroy');
     Route::post('/cms/faqs', [CmsController::class, 'storeFaq'])->name('cms.faqs.store');
+    Route::delete('/cms/faqs/{id}', [CmsController::class, 'destroyFaq'])->name('cms.faqs.destroy');
 
     // Media
     Route::get('/media', [MediaController::class, 'index'])->name('media.index');
@@ -209,10 +215,23 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('leads', LeadController::class);
     Route::get('/newsletter', [LeadController::class, 'newsletter'])->name('newsletter');
     Route::get('/contact-submissions', [LeadController::class, 'contacts'])->name('contacts');
+    Route::get('/leads/export', [LeadController::class, 'exportLeads'])->name('leads.export');
+    Route::get('/contacts/export', [LeadController::class, 'exportContacts'])->name('contacts.export');
+    Route::get('/newsletter/export', [LeadController::class, 'exportNewsletter'])->name('newsletter.export');
 
     // Testimonials & FAQs
     Route::resource('testimonials', TestimonialController::class);
+    Route::post('/testimonials/{testimonial}/toggle-featured', [TestimonialController::class, 'toggleFeatured'])->name('testimonials.toggle-featured');
     Route::resource('faqs', FaqController::class);
+
+    // Team / Gallery / Services / Announcements CMS
+    Route::resource('team', \App\Http\Controllers\Admin\TeamController::class)->except(['create', 'show', 'edit']);
+    Route::resource('gallery', \App\Http\Controllers\Admin\GalleryController::class)->except(['create', 'show', 'edit']);
+    Route::resource('services', \App\Http\Controllers\Admin\ServiceController::class)->except(['create', 'show', 'edit']);
+    Route::resource('announcements', AnnouncementController::class)->except(['create', 'show', 'edit']);
+
+    // Users export
+    Route::get('/users/export', [UserController::class, 'export'])->name('users.export');
 
     // ─── LMS Extension ────────────────────────────────────────────────────────
     // Quizzes
