@@ -199,7 +199,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // CMS
     Route::get('/cms', [CmsController::class, 'index'])->name('cms.index');
     Route::resource('cms/pages', \App\Http\Controllers\Admin\PageBuilderController::class)->names('cms.pages');
-    Route::post('/cms/hero-banners', [CmsController::class, 'updateHeroBanner'])->name('cms.hero.update');
+    Route::match(['POST', 'PUT', 'PATCH'], '/cms/hero-banners', [CmsController::class, 'updateHeroBanner'])->name('cms.hero.update');
     Route::delete('/cms/hero-banners/{id}', [CmsController::class, 'destroyHeroBanner'])->name('cms.hero.destroy');
     Route::post('/cms/testimonials', [CmsController::class, 'storeTestimonial'])->name('cms.testimonials.store');
     Route::delete('/cms/testimonials/{id}', [CmsController::class, 'destroyTestimonial'])->name('cms.testimonials.destroy');
