@@ -52,6 +52,7 @@ class CourseManagementController extends Controller
             'duration_weeks'      => 'nullable|integer',
             'language'            => 'nullable|string|max:50',
             'promo_video'         => 'nullable|url|max:500',
+            'promo_video_file'    => 'nullable|file|mimetypes:video/mp4,video/webm,video/ogg|max:204800',
             'requirements'        => 'nullable|string',
             'what_you_learn'      => 'nullable|string',
             'who_is_this_for'     => 'nullable|string',
@@ -67,6 +68,10 @@ class CourseManagementController extends Controller
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
         }
+        if ($request->hasFile('promo_video_file')) {
+            $data['promo_video'] = $request->file('promo_video_file')->store('courses/promo', 'public');
+        }
+        unset($data['promo_video_file']);
 
         $course = $this->courseService->create($data);
         return redirect()->route('admin.courses.show', $course->id)->with('success', 'Course created!');
@@ -103,6 +108,7 @@ class CourseManagementController extends Controller
             'duration_weeks'      => 'nullable|integer',
             'language'            => 'nullable|string|max:50',
             'promo_video'         => 'nullable|url|max:500',
+            'promo_video_file'    => 'nullable|file|mimetypes:video/mp4,video/webm,video/ogg|max:204800',
             'requirements'        => 'nullable|string',
             'what_you_learn'      => 'nullable|string',
             'who_is_this_for'     => 'nullable|string',
@@ -118,6 +124,10 @@ class CourseManagementController extends Controller
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
         }
+        if ($request->hasFile('promo_video_file')) {
+            $data['promo_video'] = $request->file('promo_video_file')->store('courses/promo', 'public');
+        }
+        unset($data['promo_video_file']);
 
         $this->courseService->update($course, $data);
         return back()->with('success', 'Course updated!');

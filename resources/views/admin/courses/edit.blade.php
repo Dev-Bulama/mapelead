@@ -176,16 +176,35 @@
                 </div>
             </div>
 
-            {{-- Promo Video --}}
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">Promo Video URL</label>
-                <input type="url" name="promo_video" value="{{ old('promo_video', $course->promo_video) }}"
-                       class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                       placeholder="https://youtube.com/watch?v=... or https://vimeo.com/...">
-                <p class="text-xs text-gray-400 mt-1">Paste a YouTube, Vimeo, or direct video URL. Shown on the course page as a preview.</p>
-                @if($course->promo_video)
-                    <p class="text-xs text-brand-600 mt-1">Current: <a href="{{ $course->promo_video }}" target="_blank" class="underline">{{ $course->promo_video }}</a></p>
-                @endif
+            {{-- Promo Video: URL or Upload --}}
+            <div x-data="{ videoMode: '{{ $course->promo_video ? 'url' : 'url' }}' }">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Promo Video</label>
+                <div class="flex gap-2 mb-3">
+                    <button type="button" @click="videoMode='url'"
+                            :class="videoMode==='url' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                            class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-colors">
+                        Paste URL
+                    </button>
+                    <button type="button" @click="videoMode='upload'"
+                            :class="videoMode==='upload' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                            class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-colors">
+                        Upload Video
+                    </button>
+                </div>
+                <div x-show="videoMode==='url'">
+                    <input type="url" name="promo_video" value="{{ old('promo_video', $course->promo_video) }}"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                           placeholder="https://youtube.com/watch?v=... or https://vimeo.com/...">
+                    <p class="text-xs text-gray-400 mt-1">YouTube, Vimeo, or any direct video link.</p>
+                    @if($course->promo_video)
+                        <p class="text-xs text-brand-600 mt-1">Current: <a href="{{ $course->promo_video }}" target="_blank" class="underline break-all">{{ $course->promo_video }}</a></p>
+                    @endif
+                </div>
+                <div x-show="videoMode==='upload'">
+                    <input type="file" name="promo_video_file" accept="video/mp4,video/webm,video/ogg"
+                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                    <p class="text-xs text-gray-400 mt-1">MP4, WebM or OGG. Max 200MB. Replaces current video if one exists.</p>
+                </div>
             </div>
         </div>
 

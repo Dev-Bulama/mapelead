@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Instructor;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseCategory;
+use App\Models\Instructor;
 use App\Services\Course\CourseService;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,7 @@ class InstructorCourseController extends Controller
 
     public function index()
     {
-        $instructor = auth()->user()->instructor;
+        $instructor = $this->resolvedInstructor();
         $courses = Course::where('instructor_id', $instructor->id)
             ->with('category')
             ->withCount('enrollments')
@@ -31,26 +32,42 @@ class InstructorCourseController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title'             => 'required|string|max:255',
-            'short_description' => 'required|string|max:500',
-            'description'       => 'required|string',
-            'category_id'       => 'required|exists:course_categories,id',
-            'type'              => 'required|in:online,physical,hybrid',
-            'level'             => 'required|in:beginner,intermediate,advanced,all_levels',
-            'price'             => 'required|numeric|min:0',
-            'discount_price'    => 'nullable|numeric|lt:price',
-            'duration_hours'    => 'nullable|integer|min:1',
-            'thumbnail'         => 'nullable|image|max:2048',
+            'title'               => 'required|string|max:255',
+            'short_description'   => 'required|string|max:500',
+            'description'         => 'required|string',
+            'category_id'         => 'required|exists:course_categories,id',
+            'type'                => 'required|in:online,physical,hybrid',
+            'level'               => 'required|in:beginner,intermediate,advanced,all_levels',
+            'price'               => 'required|numeric|min:0',
+            'discount_price'      => 'nullable|numeric',
+            'is_free'             => 'boolean',
+            'thumbnail'           => 'nullable|image|max:4096',
+            'duration_hours'      => 'nullable|integer|min:1',
+            'duration_weeks'      => 'nullable|integer|min:1',
+            'language'            => 'nullable|string|max:50',
+            'promo_video'         => 'nullable|url|max:500',
+            'promo_video_file'    => 'nullable|file|mimetypes:video/mp4,video/webm,video/ogg|max:204800',
+            'requirements'        => 'nullable|string',
+            'what_you_learn'      => 'nullable|string',
+            'who_is_this_for'     => 'nullable|string',
+            'certificate_enabled' => 'boolean',
         ]);
 
-        $data['instructor_id'] = auth()->user()->instructor->id;
+        $data['instructor_id']      = $this->resolvedInstructor()->id;
+        $data['is_free']            = $request->boolean('is_free');
+        $data['certificate_enabled']= $request->boolean('certificate_enabled');
+        $data = $this->convertTextareaToArrays($data);
 
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
         }
+        if ($request->hasFile('promo_video_file')) {
+            $data['promo_video'] = $request->file('promo_video_file')->store('courses/promo', 'public');
+        }
+        unset($data['promo_video_file']);
 
         $course = $this->courseService->create($data);
-        return redirect()->route('instructor.courses.show', $course->id)->with('success', 'Course created!');
+        return redirect()->route('instructor.courses.show', $course->id)->with('success', 'Course created! You can now add modules and lessons.');
     }
 
     public function show(Course $course)
@@ -69,21 +86,40 @@ class InstructorCourseController extends Controller
     public function update(Request $request, Course $course)
     {
         $this->authorizeInstructor($course);
+
         $data = $request->validate([
-            'title'             => 'required|string|max:255',
-            'short_description' => 'required|string|max:500',
-            'description'       => 'required|string',
-            'category_id'       => 'required|exists:course_categories,id',
-            'type'              => 'required|in:online,physical,hybrid',
-            'level'             => 'required|in:beginner,intermediate,advanced,all_levels',
-            'price'             => 'required|numeric|min:0',
-            'discount_price'    => 'nullable|numeric',
-            'thumbnail'         => 'nullable|image|max:2048',
+            'title'               => 'required|string|max:255',
+            'short_description'   => 'required|string|max:500',
+            'description'         => 'required|string',
+            'category_id'         => 'required|exists:course_categories,id',
+            'type'                => 'required|in:online,physical,hybrid',
+            'level'               => 'required|in:beginner,intermediate,advanced,all_levels',
+            'price'               => 'required|numeric|min:0',
+            'discount_price'      => 'nullable|numeric',
+            'is_free'             => 'boolean',
+            'thumbnail'           => 'nullable|image|max:4096',
+            'duration_hours'      => 'nullable|integer|min:1',
+            'duration_weeks'      => 'nullable|integer|min:1',
+            'language'            => 'nullable|string|max:50',
+            'promo_video'         => 'nullable|url|max:500',
+            'promo_video_file'    => 'nullable|file|mimetypes:video/mp4,video/webm,video/ogg|max:204800',
+            'requirements'        => 'nullable|string',
+            'what_you_learn'      => 'nullable|string',
+            'who_is_this_for'     => 'nullable|string',
+            'certificate_enabled' => 'boolean',
         ]);
+
+        $data['is_free']            = $request->boolean('is_free');
+        $data['certificate_enabled']= $request->boolean('certificate_enabled');
+        $data = $this->convertTextareaToArrays($data);
 
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
         }
+        if ($request->hasFile('promo_video_file')) {
+            $data['promo_video'] = $request->file('promo_video_file')->store('courses/promo', 'public');
+        }
+        unset($data['promo_video_file']);
 
         $this->courseService->update($course, $data);
         return back()->with('success', 'Course updated!');
@@ -96,10 +132,28 @@ class InstructorCourseController extends Controller
         return redirect()->route('instructor.courses.index')->with('success', 'Course deleted!');
     }
 
+    private function resolvedInstructor(): Instructor
+    {
+        return Instructor::firstOrCreate(['user_id' => auth()->id()]);
+    }
+
     private function authorizeInstructor(Course $course): void
     {
-        if ($course->instructor->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+        if ($course->instructor_id !== $this->resolvedInstructor()->id && !auth()->user()->isAdmin()) {
             abort(403);
         }
+    }
+
+    private function convertTextareaToArrays(array $data): array
+    {
+        foreach (['requirements', 'what_you_learn', 'who_is_this_for'] as $field) {
+            if (isset($data[$field]) && is_string($data[$field])) {
+                $lines = array_values(array_filter(
+                    array_map('trim', explode("\n", $data[$field]))
+                ));
+                $data[$field] = $lines ?: null;
+            }
+        }
+        return $data;
     }
 }
