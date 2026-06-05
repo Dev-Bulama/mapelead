@@ -45,7 +45,7 @@ class InstallmentController extends Controller
 
     public function create()
     {
-        $courses = Course::where('status', 'active')->get();
+        $courses = Course::whereIn('status', ['active', 'published'])->get();
 
         return view('admin.payment.installments.create', compact('courses'));
     }

@@ -21,7 +21,7 @@ class BatchController extends Controller
 
     public function create()
     {
-        $courses = Course::where('status', 'active')->get();
+        $courses = Course::whereIn('status', ['active', 'published'])->get();
 
         return view('admin.lms.batches.create', compact('courses'));
     }
@@ -61,7 +61,7 @@ class BatchController extends Controller
 
     public function edit(Batch $batch)
     {
-        $courses = Course::where('status', 'active')->get();
+        $courses = Course::whereIn('status', ['active', 'published'])->get();
 
         return view('admin.lms.batches.edit', compact('batch', 'courses'));
     }
