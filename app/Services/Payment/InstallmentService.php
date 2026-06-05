@@ -18,6 +18,15 @@ class InstallmentService
             $remaining       = $totalAmount - $downPayment;
             $installmentAmt  = round($remaining / $installments, 2);
 
+            // Remove any unpaid/pending plan so the user can re-submit with different terms
+            $existing = InstallmentPlan::where('enrollment_id', $enrollment->id)
+                ->whereIn('status', ['active', 'pending'])
+                ->first();
+            if ($existing) {
+                InstallmentSchedule::where('plan_id', $existing->id)->delete();
+                $existing->delete();
+            }
+
             $plan = InstallmentPlan::create([
                 'enrollment_id'       => $enrollment->id,
                 'user_id'             => $enrollment->user_id,
@@ -47,7 +56,7 @@ class InstallmentService
 
             $enrollment->update([
                 'payment_type'   => 'installment',
-                'payment_status' => 'part_paid',
+                'payment_status' => 'partial',
             ]);
 
             return $plan;
@@ -98,7 +107,7 @@ class InstallmentService
                 ]);
             } else {
                 $plan->enrollment->update([
-                    'payment_status' => 'part_paid',
+                    'payment_status' => 'partial',
                     'access_locked'  => false,
                     'access_locked_reason' => null,
                 ]);
@@ -132,7 +141,7 @@ class InstallmentService
                 'access_locked'        => true,
                 'access_locked_at'     => now(),
                 'access_locked_reason' => 'Payment overdue. Complete your installment payment to regain access.',
-                'payment_status'       => 'overdue',
+                'payment_status'       => 'partial',
             ]);
 
             NotificationLog::create([

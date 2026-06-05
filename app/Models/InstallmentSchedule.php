@@ -5,6 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class InstallmentSchedule extends Model
 {
+    protected $table = 'installment_schedule';
+
     protected $fillable = [
         'plan_id', 'installment_number', 'amount', 'due_date',
         'amount_paid', 'paid_at', 'payment_id', 'status', 'reminder_sent',

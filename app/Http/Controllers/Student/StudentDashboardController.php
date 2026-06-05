@@ -73,7 +73,14 @@ class StudentDashboardController extends Controller
             ->with(['enrollment.course'])
             ->orderByDesc('created_at')
             ->paginate(10);
-        return view('student.payments', compact('payments'));
+
+        $installmentPlans = \App\Models\InstallmentPlan::where('user_id', auth()->id())
+            ->with(['course', 'schedule', 'enrollment'])
+            ->whereIn('status', ['active', 'overdue'])
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('student.payments', compact('payments', 'installmentPlans'));
     }
 
     public function notifications()

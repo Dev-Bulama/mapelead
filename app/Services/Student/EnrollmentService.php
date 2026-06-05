@@ -20,6 +20,23 @@ class EnrollmentService
     public function enroll(User $user, Course $course, array $options = []): Enrollment
     {
         return DB::transaction(function () use ($user, $course, $options) {
+            // Reuse an existing pending enrollment rather than hitting the unique constraint
+            $enrollment = Enrollment::where('user_id', $user->id)
+                ->where('course_id', $course->id)
+                ->where('status', 'pending')
+                ->first();
+
+            if ($enrollment) {
+                $enrollment->update([
+                    'payment_type'   => $options['payment_type'] ?? $enrollment->payment_type,
+                    'training_type'  => $options['training_type'] ?? $enrollment->training_type,
+                    'amount_paid'    => $options['amount'] ?? $enrollment->amount_paid,
+                    'coupon_id'      => $options['coupon_id'] ?? $enrollment->coupon_id,
+                    'discount_amount'=> $options['discount'] ?? $enrollment->discount_amount,
+                ]);
+                return $enrollment->fresh();
+            }
+
             $enrollment = Enrollment::create([
                 'user_id'        => $user->id,
                 'course_id'      => $course->id,
