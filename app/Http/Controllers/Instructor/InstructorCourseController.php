@@ -67,6 +67,8 @@ class InstructorCourseController extends Controller
         unset($data['promo_video_file']);
 
         $course = $this->courseService->create($data);
+        $this->saveCurriculum($course, $request->input('modules', []));
+
         return redirect()->route('instructor.courses.show', $course->id)->with('success', 'Course created! You can now add modules and lessons.');
     }
 
@@ -141,6 +143,32 @@ class InstructorCourseController extends Controller
     {
         if ($course->instructor_id !== $this->resolvedInstructor()->id && !auth()->user()->isAdmin()) {
             abort(403);
+        }
+    }
+
+    private function saveCurriculum(\App\Models\Course $course, array $modules): void
+    {
+        foreach ($modules as $i => $moduleData) {
+            $moduleTitle = trim($moduleData['title'] ?? '');
+            if ($moduleTitle === '') continue;
+
+            $module = $course->modules()->create([
+                'title'           => $moduleTitle,
+                'sort_order'      => $i + 1,
+                'is_free_preview' => !empty($moduleData['is_free_preview']),
+            ]);
+
+            foreach ($moduleData['lessons'] ?? [] as $j => $lessonData) {
+                $lessonTitle = trim($lessonData['title'] ?? '');
+                if ($lessonTitle === '') continue;
+
+                $module->lessons()->create([
+                    'course_id'  => $course->id,
+                    'title'      => $lessonTitle,
+                    'type'       => $lessonData['type'] ?? 'video',
+                    'sort_order' => $j + 1,
+                ]);
+            }
         }
     }
 

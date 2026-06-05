@@ -74,6 +74,8 @@ class CourseManagementController extends Controller
         unset($data['promo_video_file']);
 
         $course = $this->courseService->create($data);
+        $this->saveCurriculum($course, $request->input('modules', []));
+
         return redirect()->route('admin.courses.show', $course->id)->with('success', 'Course created!');
     }
 
@@ -150,6 +152,32 @@ class CourseManagementController extends Controller
     {
         Course::findOrFail($id)->update(['status' => 'draft', 'is_published' => false]);
         return back()->with('success', 'Course unpublished!');
+    }
+
+    private function saveCurriculum(\App\Models\Course $course, array $modules): void
+    {
+        foreach ($modules as $i => $moduleData) {
+            $moduleTitle = trim($moduleData['title'] ?? '');
+            if ($moduleTitle === '') continue;
+
+            $module = $course->modules()->create([
+                'title'           => $moduleTitle,
+                'sort_order'      => $i + 1,
+                'is_free_preview' => !empty($moduleData['is_free_preview']),
+            ]);
+
+            foreach ($moduleData['lessons'] ?? [] as $j => $lessonData) {
+                $lessonTitle = trim($lessonData['title'] ?? '');
+                if ($lessonTitle === '') continue;
+
+                $module->lessons()->create([
+                    'course_id'  => $course->id,
+                    'title'      => $lessonTitle,
+                    'type'       => $lessonData['type'] ?? 'video',
+                    'sort_order' => $j + 1,
+                ]);
+            }
+        }
     }
 
     private function convertTextareaToArrays(array $data): array

@@ -214,6 +214,95 @@
             </div>
         </div>
 
+        {{-- Curriculum Builder --}}
+        <div class="bg-white rounded-2xl border border-gray-200 p-6"
+             x-data="{
+                modules: [],
+                addModule() {
+                    this.modules.push({ title: '', is_free_preview: false, lessons: [] });
+                },
+                removeModule(i) {
+                    this.modules.splice(i, 1);
+                },
+                addLesson(mi) {
+                    this.modules[mi].lessons.push({ title: '', type: 'video' });
+                },
+                removeLesson(mi, li) {
+                    this.modules[mi].lessons.splice(li, 1);
+                }
+             }">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
+                <div>
+                    <h3 class="font-semibold text-gray-900 text-sm uppercase tracking-wide">Course Curriculum</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Add modules (sections) and lessons now, or skip and add later from the course page.</p>
+                </div>
+                <button type="button" @click="addModule()"
+                    class="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Add Module
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <template x-for="(mod, mi) in modules" :key="mi">
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        {{-- Module header --}}
+                        <div class="flex items-center gap-3 bg-gray-50 px-4 py-3">
+                            <span class="text-xs font-bold text-gray-400 w-5" x-text="'M'+(mi+1)"></span>
+                            <input type="text" :name="`modules[${mi}][title]`" x-model="mod.title"
+                                placeholder="Module title (e.g. Introduction, Getting Started…)"
+                                class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <label class="flex items-center gap-1.5 text-xs text-gray-500 cursor-pointer shrink-0">
+                                <input type="checkbox" :name="`modules[${mi}][is_free_preview]`" value="1" x-model="mod.is_free_preview"
+                                    class="w-3.5 h-3.5 rounded border-gray-300 text-brand-600">
+                                Free preview
+                            </label>
+                            <button type="button" @click="removeModule(mi)"
+                                class="text-red-400 hover:text-red-600 transition-colors shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        {{-- Lessons --}}
+                        <div class="px-4 py-2 space-y-2">
+                            <template x-for="(lesson, li) in mod.lessons" :key="li">
+                                <div class="flex items-center gap-2 pl-6">
+                                    <span class="text-xs text-gray-300 w-5" x-text="(li+1)+'.'"></span>
+                                    <select :name="`modules[${mi}][lessons][${li}][type]`" x-model="lesson.type"
+                                        class="border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 shrink-0">
+                                        <option value="video">Video</option>
+                                        <option value="text">Text / Article</option>
+                                        <option value="quiz">Quiz</option>
+                                        <option value="assignment">Assignment</option>
+                                        <option value="live">Live Session</option>
+                                        <option value="download">Download</option>
+                                    </select>
+                                    <input type="text" :name="`modules[${mi}][lessons][${li}][title]`" x-model="lesson.title"
+                                        placeholder="Lesson title…"
+                                        class="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                    <button type="button" @click="removeLesson(mi, li)"
+                                        class="text-red-400 hover:text-red-600 transition-colors shrink-0">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </div>
+                            </template>
+
+                            <button type="button" @click="addLesson(mi)"
+                                class="ml-11 flex items-center gap-1 text-xs text-brand-600 hover:text-brand-800 font-medium py-1.5 transition-colors">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                Add Lesson
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="modules.length === 0"
+                     class="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl text-gray-400 text-sm">
+                    No modules yet. Click <strong>Add Module</strong> above to start building your curriculum.
+                </div>
+            </div>
+        </div>
+
         <div class="flex items-center gap-3">
             <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors">
                 Create Course
