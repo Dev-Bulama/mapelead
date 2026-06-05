@@ -98,17 +98,21 @@ class InstallmentService
             $newBalance = max(0, $plan->outstanding_balance - $amount);
             $plan->update(['outstanding_balance' => $newBalance]);
 
+            $totalPaid = $plan->fresh()->amount_paid;
+
             if ($newBalance <= 0) {
                 $plan->update(['status' => 'completed', 'outstanding_balance' => 0]);
                 $plan->enrollment->update([
                     'payment_status'       => 'paid',
+                    'amount_paid'          => $plan->total_amount,
                     'access_locked'        => false,
                     'access_locked_reason' => null,
                 ]);
             } else {
                 $plan->enrollment->update([
-                    'payment_status' => 'partial',
-                    'access_locked'  => false,
+                    'payment_status'       => 'partial',
+                    'amount_paid'          => $totalPaid,
+                    'access_locked'        => false,
                     'access_locked_reason' => null,
                 ]);
             }

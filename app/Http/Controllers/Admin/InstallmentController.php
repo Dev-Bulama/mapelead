@@ -17,16 +17,30 @@ class InstallmentController extends Controller
         $installmentPlans = InstallmentPlan::with([
             'enrollment.user',
             'enrollment.course',
-        ])->paginate(20);
+        ])->withCount([
+            'schedule as paid_count'    => fn($q) => $q->where('status', 'paid'),
+            'schedule as total_count',
+        ])->latest()->paginate(20);
 
-        return view('admin.payment.installments.index', compact('installmentPlans'));
+        $globalStats = [
+            'total'     => InstallmentPlan::count(),
+            'active'    => InstallmentPlan::where('status', 'active')->count(),
+            'overdue'   => InstallmentPlan::where('status', 'overdue')->count(),
+            'completed' => InstallmentPlan::where('status', 'completed')->count(),
+            'revenue'   => InstallmentPlan::sum('amount_paid'),
+            'outstanding'=> InstallmentPlan::sum('outstanding_balance'),
+        ];
+
+        return view('admin.payment.installments.index', compact('installmentPlans', 'globalStats'));
     }
 
     public function show(InstallmentPlan $installmentPlan)
     {
-        $installmentPlan->load('enrollment.user', 'schedule');
+        $installmentPlan->load('enrollment.user', 'enrollment.course', 'schedule');
+        $payments = \App\Models\Payment::where('enrollment_id', $installmentPlan->enrollment_id)
+            ->orderByDesc('created_at')->get();
 
-        return view('admin.payment.installments.show', compact('installmentPlan'));
+        return view('admin.payment.installments.show', compact('installmentPlan', 'payments'));
     }
 
     public function create()
@@ -57,13 +71,31 @@ class InstallmentController extends Controller
 
     public function recordPayment(Request $request, InstallmentPlan $installmentPlan)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:1',
+        $validated = $request->validate([
+            'amount'  => 'required|numeric|min:1',
+            'notes'   => 'nullable|string|max:255',
+            'gateway' => 'nullable|string|max:50',
         ]);
 
-        app(InstallmentService::class)->recordPayment($installmentPlan, $request->amount);
+        $enrollment = $installmentPlan->enrollment;
 
-        return redirect()->back()->with('success', 'Payment recorded successfully.');
+        // Create a payment ledger record so it appears in Payments and student history
+        \App\Models\Payment::create([
+            'user_id'       => $enrollment->user_id,
+            'enrollment_id' => $enrollment->id,
+            'reference'     => 'INST-' . strtoupper(\Illuminate\Support\Str::random(10)),
+            'gateway'       => $validated['gateway'] ?? 'manual',
+            'amount'        => $validated['amount'],
+            'currency'      => 'NGN',
+            'status'        => 'success',
+            'payment_method'=> 'manual',
+            'notes'         => $validated['notes'] ?: 'Installment payment (admin recorded)',
+            'paid_at'       => now(),
+        ]);
+
+        app(InstallmentService::class)->recordPayment($installmentPlan, (float) $validated['amount']);
+
+        return redirect()->back()->with('success', 'Payment of ₦' . number_format($validated['amount']) . ' recorded successfully.');
     }
 
     public function unlock(InstallmentPlan $installmentPlan)

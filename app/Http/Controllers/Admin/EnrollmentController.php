@@ -15,7 +15,12 @@ class EnrollmentController extends Controller
 
     public function index(Request $request)
     {
-        $query = Enrollment::with(['user', 'course', 'batch.batch', 'installmentPlan'])
+        $query = Enrollment::with([
+                'user', 'course', 'batch.batch',
+                'installmentPlan' => fn($q) => $q->withCount([
+                    'schedule as paid_installments' => fn($q) => $q->where('status', 'paid'),
+                ]),
+            ])
             ->orderByDesc('enrolled_at');
 
         if ($search = $request->search) {

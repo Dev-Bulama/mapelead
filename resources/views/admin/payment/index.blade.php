@@ -79,8 +79,8 @@
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Reference</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Student</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Course</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Type</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Amount</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Gateway</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Status</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Date</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Actions</th>
@@ -101,11 +101,28 @@
                         <td class="px-4 py-3 text-sm text-gray-700">
                             {{ $payment->enrollment?->course?->title ?? '—' }}
                         </td>
+                        <td class="px-4 py-3">
+                            @php
+                                $note = $payment->notes ?? '';
+                                $isInst = $payment->enrollment?->payment_type === 'installment';
+                                if (str_contains(strtolower($note), 'down')) {
+                                    $typeColor = 'bg-purple-100 text-purple-700';
+                                    $typeLabel = 'Down Payment';
+                                } elseif (str_contains(strtolower($note), 'installment')) {
+                                    $typeColor = 'bg-blue-100 text-blue-700';
+                                    $typeLabel = $note;
+                                } elseif ($isInst) {
+                                    $typeColor = 'bg-blue-100 text-blue-700';
+                                    $typeLabel = 'Installment';
+                                } else {
+                                    $typeColor = 'bg-gray-100 text-gray-600';
+                                    $typeLabel = 'Full Payment';
+                                }
+                            @endphp
+                            <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $typeColor }}">{{ $typeLabel }}</span>
+                        </td>
                         <td class="px-4 py-3 text-sm font-semibold text-gray-900">
                             &#8358;{{ number_format($payment->amount, 2) }}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-600 capitalize">
-                            {{ $payment->gateway ?? '—' }}
                         </td>
                         <td class="px-4 py-3">
                             @php

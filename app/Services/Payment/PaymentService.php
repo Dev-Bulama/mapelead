@@ -19,8 +19,14 @@ class PaymentService
 
     public function initiate(Enrollment $enrollment, string $gateway = 'paystack', array $options = []): array
     {
-        $reference = 'ML-' . strtoupper(Str::random(12));
-        $amount    = $options['amount'] ?? ($enrollment->course->effective_price - ($enrollment->discount_amount ?? 0));
+        $reference   = 'ML-' . strtoupper(Str::random(12));
+        $amount      = $options['amount'] ?? ($enrollment->course->effective_price - ($enrollment->discount_amount ?? 0));
+        $paymentType = $options['payment_type'] ?? 'full';
+
+        $notes = match($paymentType) {
+            'installment' => 'Down payment',
+            default       => 'Full payment',
+        };
 
         $payment = Payment::create([
             'user_id'       => $enrollment->user_id,
@@ -30,6 +36,7 @@ class PaymentService
             'amount'        => $amount,
             'currency'      => $enrollment->currency ?? 'NGN',
             'status'        => 'pending',
+            'notes'         => $notes,
         ]);
 
         $callbackUrl = route('enroll.payment.callback', $reference);
@@ -95,11 +102,14 @@ class PaymentService
         }
 
         $enrollment = $payment->enrollment;
+
+        // Installment down payment: stay partial, not fully paid
+        $isInstallment = $enrollment->payment_type === 'installment';
         $enrollment->update([
             'status'         => 'active',
-            'payment_status' => 'paid',
+            'payment_status' => $isInstallment ? 'partial' : 'paid',
             'amount_paid'    => $payment->amount,
-            'enrolled_at'    => now(),
+            'enrolled_at'    => $enrollment->enrolled_at ?? now(),
         ]);
 
         $enrollment->course->increment('total_students');

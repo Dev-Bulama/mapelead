@@ -126,9 +126,11 @@
                                 {{ $enrollment->batch->batch->name ?? '—' }}
                             </span>
                         </td>
-                        <td class="px-4 py-3">
+                        <td class="px-4 py-3 min-w-[160px]">
                             @php
                                 $ps = $enrollment->payment_status;
+                                $plan = $enrollment->installmentPlan;
+                                $isInst = $enrollment->payment_type === 'installment';
                                 $psColor = match($ps) {
                                     'paid'     => 'bg-green-100 text-green-700',
                                     'partial'  => 'bg-blue-100 text-blue-700',
@@ -137,11 +139,42 @@
                                     default    => 'bg-gray-100 text-gray-500',
                                 };
                             @endphp
-                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $psColor }}">
-                                {{ ucfirst($ps) }}
-                            </span>
-                            @if($enrollment->payment_type === 'installment')
-                            <span class="ml-1 text-xs text-gray-400">Inst.</span>
+                            @if($isInst && $plan)
+                                {{-- Installment breakdown --}}
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $psColor }}">
+                                            {{ $ps === 'paid' ? 'Fully Paid' : 'Installment' }}
+                                        </span>
+                                        @if($plan->status === 'overdue')
+                                        <span class="px-1.5 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700">Overdue</span>
+                                        @endif
+                                    </div>
+                                    <div class="text-xs text-gray-700 font-medium">
+                                        ₦{{ number_format($plan->amount_paid, 0) }}
+                                        <span class="text-gray-400">/ ₦{{ number_format($plan->total_amount, 0) }}</span>
+                                    </div>
+                                    @if($plan->outstanding_balance > 0)
+                                    <div class="text-xs text-red-600">₦{{ number_format($plan->outstanding_balance, 0) }} left</div>
+                                    @endif
+                                    @php
+                                        $paidPct = $plan->total_amount > 0 ? round(($plan->amount_paid / $plan->total_amount) * 100) : 0;
+                                    @endphp
+                                    <div class="w-full bg-gray-200 rounded-full h-1 mt-1">
+                                        <div class="h-1 rounded-full {{ $ps === 'paid' ? 'bg-green-500' : 'bg-blue-500' }}"
+                                             style="width: {{ $paidPct }}%"></div>
+                                    </div>
+                                    <div class="text-xs text-gray-400">
+                                        {{ $plan->paid_installments ?? 0 }} / {{ $plan->installment_count }} installments
+                                    </div>
+                                </div>
+                            @else
+                                <span class="px-2 py-0.5 rounded-full text-xs font-semibold {{ $psColor }}">
+                                    {{ ucfirst($ps) }}
+                                </span>
+                                @if($enrollment->amount_paid > 0)
+                                <div class="text-xs text-gray-500 mt-0.5">₦{{ number_format($enrollment->amount_paid, 0) }}</div>
+                                @endif
                             @endif
                         </td>
                         <td class="px-4 py-3">
