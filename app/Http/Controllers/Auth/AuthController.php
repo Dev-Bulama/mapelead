@@ -37,6 +37,16 @@ class AuthController extends Controller
 
         $user->update(['last_login_at' => now(), 'last_login_ip' => $request->ip()]);
         $request->session()->regenerate();
+
+        // Honor explicit ?redirect= param first (e.g. from "Enroll Now" on course page)
+        if ($redirect = $request->query('redirect')) {
+            $parsed = parse_url($redirect);
+            $appHost = parse_url(config('app.url'), PHP_URL_HOST);
+            if (empty($parsed['host']) || $parsed['host'] === $appHost) {
+                return redirect($redirect);
+            }
+        }
+
         return $this->redirectByRole($user);
     }
 

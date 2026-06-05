@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ScriptInjection;
 use App\Services\CMS\SettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SettingsController extends Controller
 {
@@ -22,7 +23,21 @@ class SettingsController extends Controller
 
     public function update(Request $request, string $group)
     {
-        $this->settings->updateGroup($group, $request->all());
+        $data = $request->except(['_token', '_method']);
+
+        // Handle file uploads — store to public disk so asset() URLs work
+        foreach ($request->allFiles() as $key => $file) {
+            if ($file && $file->isValid()) {
+                // Delete old file if one exists
+                $old = \App\Models\SiteSetting::get($key);
+                if ($old && Storage::disk('public')->exists($old)) {
+                    Storage::disk('public')->delete($old);
+                }
+                $data[$key] = $file->store("settings/{$group}", 'public');
+            }
+        }
+
+        $this->settings->updateGroup($group, $data);
         return back()->with('success', 'Settings saved!');
     }
 
@@ -66,13 +81,78 @@ class SettingsController extends Controller
 
     public function menus()
     {
-        $menus = \App\Models\NavigationMenu::with(['items.children'])->get();
-        return view('admin.settings.menus', compact('menus'));
+        $menus = \App\Models\NavigationMenu::with(['items' => fn($q) => $q->orderBy('sort_order'), 'items.children' => fn($q) => $q->orderBy('sort_order')])->get();
+        $pages = \App\Models\Page::where('status', 'published')->orderBy('title')->get();
+        return view('admin.settings.menus', compact('menus', 'pages'));
     }
 
-    public function updateMenus(Request $request)
+    public function storeMenu(Request $request)
     {
-        // Menu update logic handled via AJAX in the view
+        $data = $request->validate([
+            'name'     => 'required|string|max:100',
+            'location' => 'required|string|max:100',
+        ]);
+        \App\Models\NavigationMenu::create(array_merge($data, ['is_active' => true]));
+        return back()->with('success', 'Menu created.');
+    }
+
+    public function storeMenuItem(Request $request)
+    {
+        $data = $request->validate([
+            'menu_id'    => 'required|exists:navigation_menus,id',
+            'parent_id'  => 'nullable|exists:navigation_items,id',
+            'label'      => 'required|string|max:100',
+            'url'        => 'nullable|string|max:500',
+            'page_id'    => 'nullable|exists:pages,id',
+            'target'     => 'in:_self,_blank',
+            'is_active'  => 'nullable|boolean',
+        ]);
+
+        // If a page was selected, generate its URL
+        if (!empty($data['page_id'])) {
+            $page = \App\Models\Page::find($data['page_id']);
+            $data['url'] = '/' . $page->slug;
+        }
+        unset($data['page_id']);
+
+        $max = \App\Models\NavigationItem::where('menu_id', $data['menu_id'])
+            ->whereNull('parent_id')->max('sort_order') ?? 0;
+        $data['sort_order']  = $max + 1;
+        $data['is_active']   = true;
+        $data['is_external'] = ($data['target'] ?? '_self') === '_blank';
+
+        \App\Models\NavigationItem::create($data);
+        return back()->with('success', 'Menu item added.');
+    }
+
+    public function updateMenuItem(Request $request, \App\Models\NavigationItem $item)
+    {
+        $data = $request->validate([
+            'label'      => 'required|string|max:100',
+            'url'        => 'nullable|string|max:500',
+            'target'     => 'in:_self,_blank',
+            'is_active'  => 'nullable|boolean',
+            'sort_order' => 'nullable|integer',
+        ]);
+        $data['is_external'] = ($data['target'] ?? '_self') === '_blank';
+        $data['is_active'] = $request->boolean('is_active');
+        $item->update($data);
+        return back()->with('success', 'Menu item updated.');
+    }
+
+    public function destroyMenuItem(\App\Models\NavigationItem $item)
+    {
+        $item->children()->delete();
+        $item->delete();
+        return back()->with('success', 'Menu item removed.');
+    }
+
+    public function reorderMenuItems(Request $request)
+    {
+        $request->validate(['items' => 'required|array', 'items.*.id' => 'required|integer', 'items.*.sort_order' => 'required|integer']);
+        foreach ($request->items as $row) {
+            \App\Models\NavigationItem::where('id', $row['id'])->update(['sort_order' => $row['sort_order']]);
+        }
         return response()->json(['success' => true]);
     }
 

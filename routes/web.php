@@ -311,7 +311,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/settings/seo', [SettingsController::class, 'seo'])->name('settings.seo');
     Route::post('/settings/seo', [SettingsController::class, 'updateSeo'])->name('settings.seo.update');
     Route::get('/settings/menus', [SettingsController::class, 'menus'])->name('settings.menus');
-    Route::post('/settings/menus', [SettingsController::class, 'updateMenus'])->name('settings.menus.update');
+    Route::post('/settings/menus', [SettingsController::class, 'storeMenu'])->name('settings.menus.store');
+    Route::post('/settings/menus/items', [SettingsController::class, 'storeMenuItem'])->name('settings.menus.items.store');
+    Route::put('/settings/menus/items/{item}', [SettingsController::class, 'updateMenuItem'])->name('settings.menus.items.update');
+    Route::delete('/settings/menus/items/{item}', [SettingsController::class, 'destroyMenuItem'])->name('settings.menus.items.destroy');
+    Route::post('/settings/menus/items/reorder', [SettingsController::class, 'reorderMenuItems'])->name('settings.menus.items.reorder');
     Route::post('/settings/integrations', [SettingsController::class, 'updateIntegrations'])->name('settings.integrations');
 });
 

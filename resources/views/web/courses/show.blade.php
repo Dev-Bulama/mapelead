@@ -489,10 +489,17 @@
                                 </button>
                             </form>
                             @else
-                            <a href="{{ route('auth.login') }}?redirect={{ urlencode(route('courses.show', $course->slug)) }}"
+                            @auth
+                            <a href="{{ route('enroll.checkout', $course->slug) }}"
                                class="block w-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-center py-4 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-500/30 text-base mb-3">
                                 Enroll Now
                             </a>
+                            @else
+                            <a href="{{ route('auth.login') }}?redirect={{ urlencode(route('enroll.checkout', $course->slug)) }}"
+                               class="block w-full bg-brand-600 hover:bg-brand-700 text-white font-bold text-center py-4 rounded-2xl transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-500/30 text-base mb-3">
+                                Enroll Now — Login to Continue
+                            </a>
+                            @endauth
                             @endif
                             <p class="text-center text-xs text-gray-500 mb-3">30-day money-back guarantee</p>
                             @endif
