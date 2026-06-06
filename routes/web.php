@@ -202,8 +202,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::match(['POST', 'PUT', 'PATCH'], '/cms/hero-banners', [CmsController::class, 'updateHeroBanner'])->name('cms.hero.update');
     Route::delete('/cms/hero-banners/{id}', [CmsController::class, 'destroyHeroBanner'])->name('cms.hero.destroy');
     Route::post('/cms/testimonials', [CmsController::class, 'storeTestimonial'])->name('cms.testimonials.store');
+    Route::put('/cms/testimonials/{id}', [CmsController::class, 'updateTestimonial'])->name('cms.testimonials.update');
     Route::delete('/cms/testimonials/{id}', [CmsController::class, 'destroyTestimonial'])->name('cms.testimonials.destroy');
     Route::post('/cms/faqs', [CmsController::class, 'storeFaq'])->name('cms.faqs.store');
+    Route::put('/cms/faqs/{id}', [CmsController::class, 'updateFaq'])->name('cms.faqs.update');
     Route::delete('/cms/faqs/{id}', [CmsController::class, 'destroyFaq'])->name('cms.faqs.destroy');
 
     // Media

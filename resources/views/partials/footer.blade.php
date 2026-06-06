@@ -35,9 +35,13 @@
             {{-- Brand Column --}}
             <div>
                 <div class="flex items-center gap-2 mb-4">
+                    @if(!empty($general['logo']))
+                    <img src="{{ asset('storage/' . $general['logo']) }}" alt="{{ $general['site_name'] ?? 'MapeLearn' }}" class="h-8 w-auto">
+                    @else
                     <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
                         <span class="text-white font-bold text-sm">ML</span>
                     </div>
+                    @endif
                     <span class="text-white font-display font-bold text-xl">{{ $general['site_name'] ?? 'MapeLearn' }}</span>
                 </div>
                 <p class="text-gray-400 text-sm leading-relaxed">
@@ -45,7 +49,13 @@
                 </p>
                 {{-- Social Links --}}
                 <div class="flex gap-3 mt-5">
-                    @foreach(['facebook' => 'M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z', 'twitter' => 'M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z', 'instagram' => 'M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01M6.5 20.5h11a4 4 0 004-4v-11a4 4 0 00-4-4h-11a4 4 0 00-4 4v11a4 4 0 004 4z', 'linkedin' => 'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z M4 6a2 2 0 100-4 2 2 0 000 4z'] as $network => $path)
+                    @foreach([
+                        'facebook'  => 'M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z',
+                        'twitter'   => 'M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z',
+                        'instagram' => 'M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37zm1.5-4.87h.01M6.5 20.5h11a4 4 0 004-4v-11a4 4 0 00-4-4h-11a4 4 0 00-4 4v11a4 4 0 004 4z',
+                        'linkedin'  => 'M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z M4 6a2 2 0 100-4 2 2 0 000 4z',
+                        'youtube'   => 'M22.54 6.42a2.78 2.78 0 00-1.95-1.95C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58zM9.75 15.02V8.98L15.5 12l-5.75 3.02z',
+                    ] as $network => $path)
                         @if(!empty($social[$network . '_url']))
                             <a href="{{ $social[$network . '_url'] }}" target="_blank" rel="noopener"
                                class="w-9 h-9 bg-gray-800 hover:bg-brand-600 rounded-lg flex items-center justify-center transition-colors">
@@ -66,14 +76,26 @@
 
             {{-- Footer Menu Columns --}}
             @foreach([
-                ['menu' => $footer1, 'label' => 'Quick Links'],
-                ['menu' => $footer2, 'label' => 'Courses'],
-                ['menu' => $footer3, 'label' => 'Company'],
+                [
+                    'menu'     => $footer1,
+                    'label'    => 'Quick Links',
+                    'fallback' => [['Home', '/'], ['Courses', '/courses'], ['About Us', '/about'], ['Contact', '/contact']],
+                ],
+                [
+                    'menu'     => $footer2,
+                    'label'    => 'Courses',
+                    'fallback' => [['All Courses', '/courses'], ['Online Courses', '/courses?type=online'], ['Free Courses', '/courses?free=1'], ['Certificates', '/courses']],
+                ],
+                [
+                    'menu'     => $footer3,
+                    'label'    => 'Company',
+                    'fallback' => [['About Us', '/about'], ['Blog', '/blog'], ['Privacy Policy', '/privacy-policy'], ['Terms of Service', '/terms-of-service']],
+                ],
             ] as $col)
                 <div>
                     <h4 class="text-white font-semibold mb-4">{{ $col['label'] }}</h4>
                     <ul class="space-y-2">
-                        @if($col['menu'])
+                        @if($col['menu'] && $col['menu']->items->isNotEmpty())
                             @foreach($col['menu']->items as $item)
                                 <li>
                                     <a href="{{ $item->resolved_url }}" class="text-gray-400 hover:text-white text-sm transition-colors">
@@ -82,7 +104,7 @@
                                 </li>
                             @endforeach
                         @else
-                            @foreach([['Courses', '/courses'], ['About Us', '/about'], ['Blog', '/blog'], ['Contact', '/contact']] as [$label, $url])
+                            @foreach($col['fallback'] as [$label, $url])
                                 <li><a href="{{ $url }}" class="text-gray-400 hover:text-white text-sm transition-colors">{{ $label }}</a></li>
                             @endforeach
                         @endif
