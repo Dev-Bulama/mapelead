@@ -40,6 +40,16 @@
             class="px-5 py-2 rounded-lg text-sm font-medium transition-all duration-150">
             FAQs
         </button>
+        <button @click="activeTab = 'features'"
+            :class="activeTab === 'features' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+            class="px-5 py-2 rounded-lg text-sm font-medium transition-all duration-150">
+            Why Choose Us
+        </button>
+        <button @click="activeTab = 'contact'"
+            :class="activeTab === 'contact' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+            class="px-5 py-2 rounded-lg text-sm font-medium transition-all duration-150">
+            Contact Info
+        </button>
     </div>
 
     {{-- ═══════════════════════════════════════════ HERO BANNERS ═══ --}}
@@ -344,15 +354,16 @@
             @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @foreach($testimonials as $testimonial)
-                <div class="relative bg-gray-50 border border-gray-200 rounded-xl overflow-hidden" x-data="{ editing: false, editRating: {{ $testimonial->rating }} }">
-                    {{-- DISPLAY --}}
+                <div class="relative bg-gray-50 border border-gray-200 rounded-xl overflow-hidden" x-data="{ editing: false, rating: {{ $testimonial->rating }} }">
+
+                    {{-- View Mode --}}
                     <div x-show="!editing" class="p-5">
                         @if($testimonial->is_featured)
-                        <span class="absolute top-3 right-3 inline-flex items-center px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-medium rounded-full border border-amber-200">Featured</span>
+                        <span class="absolute top-3 right-16 inline-flex items-center px-2 py-0.5 bg-amber-50 text-amber-700 text-xs font-medium rounded-full border border-amber-200">Featured</span>
                         @endif
                         <div class="flex items-center gap-3 mb-3">
                             @if($testimonial->avatar)
-                            <img src="{{ $testimonial->avatar }}" alt="{{ $testimonial->name }}" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-sm">
+                            <img src="{{ asset('storage/' . $testimonial->avatar) }}" alt="{{ $testimonial->name }}" class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-sm">
                             @else
                             <div class="w-11 h-11 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-sm border-2 border-white shadow-sm">
                                 {{ strtoupper(substr($testimonial->name, 0, 2)) }}
@@ -378,7 +389,7 @@
                             @else
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-500 text-xs font-medium rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>Inactive</span>
                             @endif
-                            <div class="flex items-center gap-1">
+                            <div class="flex gap-1">
                                 <button @click="editing = true" class="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 px-2 py-1 rounded-lg hover:bg-indigo-50 transition-colors">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/></svg>
                                     Edit
@@ -395,56 +406,57 @@
                         </div>
                     </div>
 
-                    {{-- EDIT FORM --}}
-                    <div x-show="editing" x-transition class="p-4 bg-indigo-50 border-t border-indigo-100">
-                        <h4 class="text-xs font-semibold text-indigo-800 mb-3">Edit Testimonial</h4>
+                    {{-- Edit Mode --}}
+                    <div x-show="editing" class="p-5 bg-indigo-50 border-t border-indigo-100">
+                        <h4 class="text-xs font-semibold text-indigo-700 uppercase tracking-wide mb-3">Edit Testimonial</h4>
                         <form action="{{ route('admin.cms.testimonials.update', $testimonial->id) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
                             @csrf
                             @method('PUT')
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Name <span class="text-red-500">*</span></label>
-                                <input type="text" name="name" value="{{ $testimonial->name }}" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Title / Role</label>
-                                <input type="text" name="title" value="{{ $testimonial->title }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Company</label>
-                                <input type="text" name="company" value="{{ $testimonial->company }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Content <span class="text-red-500">*</span></label>
-                                <textarea name="content" rows="3" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ $testimonial->content }}</textarea>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Rating</label>
-                                <input type="hidden" name="rating" :value="editRating">
-                                <div class="flex gap-1">
-                                    <template x-for="star in [1,2,3,4,5]" :key="star">
-                                        <button type="button" @click="editRating = star"
-                                            :class="star <= editRating ? 'text-amber-400' : 'text-gray-300'"
-                                            class="text-xl leading-none hover:text-amber-400 transition-colors focus:outline-none">&#9733;</button>
-                                    </template>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Name *</label>
+                                    <input type="text" name="name" value="{{ $testimonial->name }}" required class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Title / Role</label>
+                                    <input type="text" name="title" value="{{ $testimonial->title }}" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Company</label>
+                                    <input type="text" name="company" value="{{ $testimonial->company }}" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Avatar</label>
+                                    <input type="file" name="avatar" accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-indigo-50 file:text-indigo-700">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Replace Avatar</label>
-                                <input type="file" name="avatar" accept="image/*" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-indigo-50 file:text-indigo-700">
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Content *</label>
+                                <textarea name="content" rows="3" required class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ $testimonial->content }}</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-2">Rating</label>
+                                <input type="hidden" name="rating" :value="rating">
+                                <div class="flex gap-0.5">
+                                    <template x-for="star in [1,2,3,4,5]" :key="star">
+                                        <button type="button" @click="rating = star" :class="star <= rating ? 'text-amber-400' : 'text-gray-300'" class="text-xl leading-none hover:text-amber-400 transition-colors focus:outline-none">&#9733;</button>
+                                    </template>
+                                    <span class="ml-2 text-xs text-gray-500 self-center" x-text="rating + '/5'"></span>
+                                </div>
                             </div>
                             <div class="flex items-center gap-4">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" name="is_featured" value="1" {{ $testimonial->is_featured ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                                    <span class="text-xs text-gray-700">Featured</span>
-                                </label>
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" name="is_active" value="1" {{ $testimonial->is_active ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="is_active" value="1" {{ $testimonial->is_active ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
                                     <span class="text-xs text-gray-700">Active</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" name="is_featured" value="1" {{ $testimonial->is_featured ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500">
+                                    <span class="text-xs text-gray-700">Featured</span>
                                 </label>
                             </div>
                             <div class="flex gap-2 pt-1">
-                                <button type="submit" class="text-white text-xs font-medium px-4 py-1.5 rounded-lg transition-colors" style="background-color: #4f46e5;">Save</button>
-                                <button type="button" @click="editing = false" class="bg-white border border-gray-300 text-gray-700 text-xs font-medium px-4 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                                <button type="submit" class="text-xs font-medium text-white px-4 py-1.5 rounded-lg" style="background-color: #4f46e5;">Save</button>
+                                <button type="button" @click="editing = false" class="text-xs font-medium text-gray-600 bg-white border border-gray-300 px-4 py-1.5 rounded-lg hover:bg-gray-50">Cancel</button>
                             </div>
                         </form>
                     </div>
@@ -515,10 +527,9 @@
             <div class="space-y-2">
                 @foreach($faqs as $index => $faq)
                 <div class="border border-gray-200 rounded-xl overflow-hidden" x-data="{ open: false, editing: false }">
-                    {{-- COLLAPSED ROW --}}
-                    <div x-show="!editing" class="flex items-center gap-4 p-4 cursor-pointer hover:bg-gray-50 transition-colors select-none" @click="!editing && (open = !open)">
-                        <span class="inline-flex items-center justify-center w-7 h-7 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-lg shrink-0">{{ $index + 1 }}</span>
-                        <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors select-none">
+                        <span @click="open = !open" class="cursor-pointer inline-flex items-center justify-center w-7 h-7 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-lg shrink-0">{{ $index + 1 }}</span>
+                        <div class="flex-1 min-w-0 cursor-pointer" @click="open = !open">
                             <p class="text-sm font-medium text-gray-900 truncate">{{ $faq->question }}</p>
                         </div>
                         <div class="flex items-center gap-2 shrink-0" @click.stop>
@@ -530,7 +541,7 @@
                             @else
                             <span class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-500 text-xs font-medium rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>Inactive</span>
                             @endif
-                            <button @click.stop="editing = true" class="inline-flex items-center text-indigo-500 hover:text-indigo-700 p-1 rounded hover:bg-indigo-50 transition-colors">
+                            <button @click.stop="editing = !editing" class="inline-flex items-center text-indigo-500 hover:text-indigo-700 p-1 rounded hover:bg-indigo-50 transition-colors" title="Edit">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/></svg>
                             </button>
                             <form action="{{ route('admin.cms.faqs.destroy', $faq->id) }}" method="POST" onsubmit="return confirm('Delete this FAQ?')" @click.stop>
@@ -540,17 +551,13 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
                                 </button>
                             </form>
-                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200 cursor-pointer" :class="open ? 'rotate-180' : ''" @click.stop="open = !open" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
                         </div>
                     </div>
-                    {{-- EXPANDED ANSWER --}}
                     <div x-show="open && !editing" x-transition class="px-4 pb-4 border-t border-gray-100">
                         <p class="text-sm text-gray-600 leading-relaxed pt-3">{{ $faq->answer }}</p>
                     </div>
-
-                    {{-- EDIT FORM --}}
-                    <div x-show="editing" x-transition class="p-5 bg-indigo-50 border-t border-indigo-100">
-                        <h4 class="text-xs font-semibold text-indigo-800 mb-3">Edit FAQ</h4>
+                    <div x-show="editing" x-transition class="border-t border-indigo-100 bg-indigo-50 p-4">
                         <form action="{{ route('admin.cms.faqs.update', $faq->id) }}" method="POST" class="space-y-3">
                             @csrf
                             @method('PUT')
@@ -560,29 +567,31 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-600 mb-1">Answer <span class="text-red-500">*</span></label>
-                                <textarea name="answer" rows="4" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ $faq->answer }}</textarea>
+                                <textarea name="answer" rows="3" required class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">{{ $faq->answer }}</textarea>
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Category</label>
-                                <input type="text" name="category" value="{{ $faq->category }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. Billing, Enrollment, Technical">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Category</label>
+                                    <input type="text" name="category" value="{{ $faq->category }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. Billing">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Sort Order</label>
+                                    <input type="number" name="sort_order" value="{{ $faq->sort_order ?? 0 }}" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1">Sort Order</label>
-                                <input type="number" name="sort_order" value="{{ $faq->sort_order }}" min="0" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            </div>
-                            <div class="flex items-center gap-6">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" name="is_featured" value="1" {{ $faq->is_featured ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                                    <span class="text-xs text-gray-700">Featured</span>
-                                </label>
+                            <div class="flex items-center gap-5">
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" name="is_active" value="1" {{ $faq->is_active ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                                    <span class="text-xs text-gray-700">Active</span>
+                                    <span class="text-sm text-gray-700">Active</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="is_featured" value="1" {{ $faq->is_featured ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                    <span class="text-sm text-gray-700">Featured</span>
                                 </label>
                             </div>
                             <div class="flex gap-2 pt-1">
-                                <button type="submit" class="text-white text-xs font-medium px-4 py-1.5 rounded-lg transition-colors" style="background-color: #4f46e5;">Save</button>
-                                <button type="button" @click="editing = false" class="bg-white border border-gray-300 text-gray-700 text-xs font-medium px-4 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                                <button type="submit" class="text-xs font-medium text-white px-4 py-1.5 rounded-lg transition-colors" style="background-color: #4f46e5;">Save Changes</button>
+                                <button type="button" @click="editing = false" class="text-xs font-medium text-gray-600 bg-white border border-gray-300 px-4 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
                             </div>
                         </form>
                     </div>
@@ -590,6 +599,175 @@
                 @endforeach
             </div>
             @endif
+        </div>
+    </div>
+
+
+    {{-- ── WHY CHOOSE US TAB ──────────────────────────────────────────── --}}
+    <div x-show="activeTab === 'features'">
+        <div class="bg-white rounded-2xl border border-gray-200 p-6">
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold text-gray-900">Why Choose Us Section</h2>
+                <p class="text-sm text-gray-500">Edit the "Our Difference" section on the homepage.</p>
+            </div>
+
+            <form action="{{ route('admin.cms.features.update') }}" method="POST" class="space-y-8">
+                @csrf
+
+                {{-- Section Header --}}
+                <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Section Header Text</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Badge / Label</label>
+                            <input type="text" name="why_choose_us_badge" value="{{ $wcuSettings['badge'] }}"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                   placeholder="Our Difference">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Heading</label>
+                            <input type="text" name="why_choose_us_title" value="{{ $wcuSettings['title'] }}"
+                                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                   placeholder="Why 10,000+ Students Choose MapeLearn">
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Subtitle</label>
+                            <textarea name="why_choose_us_subtitle" rows="2"
+                                      class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                      placeholder="We've built every aspect of our platform with one goal…">{{ $wcuSettings['subtitle'] }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Feature Cards --}}
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Feature Cards (6 cards)</h3>
+                    @php
+                    $colorOptions = [
+                        'bg-blue-50 text-blue-600'     => 'Blue',
+                        'bg-purple-50 text-purple-600' => 'Purple',
+                        'bg-green-50 text-green-600'   => 'Green',
+                        'bg-orange-50 text-orange-600' => 'Orange',
+                        'bg-yellow-50 text-yellow-600' => 'Yellow',
+                        'bg-pink-50 text-pink-600'     => 'Pink',
+                        'bg-red-50 text-red-600'       => 'Red',
+                        'bg-indigo-50 text-indigo-600' => 'Indigo',
+                        'bg-teal-50 text-teal-600'     => 'Teal',
+                        'bg-cyan-50 text-cyan-600'     => 'Cyan',
+                    ];
+                    @endphp
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        @foreach($currentFeatures as $i => $feature)
+                        <div class="border border-gray-200 rounded-xl p-4 bg-gray-50">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="inline-flex items-center justify-center w-7 h-7 {{ $feature['color'] }} rounded-lg text-xs font-bold">{{ $i + 1 }}</span>
+                                <span class="text-xs font-medium text-gray-600">Feature Card {{ $i + 1 }}</span>
+                            </div>
+                            <input type="hidden" name="feature_{{ $i }}_icon" value="{{ $feature['icon'] }}">
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Title</label>
+                                    <input type="text" name="feature_{{ $i }}_title" value="{{ $feature['title'] }}"
+                                           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                           placeholder="Feature title">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
+                                    <textarea name="feature_{{ $i }}_desc" rows="2"
+                                              class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                              placeholder="Brief description of this feature…">{{ $feature['desc'] }}</textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Icon Color</label>
+                                    <select name="feature_{{ $i }}_color"
+                                            class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                                        @foreach($colorOptions as $value => $label)
+                                        <option value="{{ $value }}" {{ $feature['color'] === $value ? 'selected' : '' }}>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-2 border-t border-gray-100">
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition-colors shadow-sm"
+                            style="background-color: #4f46e5;">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Save Why Choose Us Section
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- ── CONTACT INFO TAB ────────────────────────────────────────────── --}}
+    <div x-show="activeTab === 'contact'">
+        <div class="bg-white rounded-2xl border border-gray-200 p-6">
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold text-gray-900">Contact Info Section</h2>
+                <p class="text-sm text-gray-500">Edit the contact info block displayed on the homepage.</p>
+            </div>
+
+            <form action="{{ route('admin.settings.update', 'general') }}" method="POST" class="space-y-6">
+                @csrf
+                <input type="hidden" name="_tab" value="general">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            <svg class="w-4 h-4 inline text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                            Phone Number
+                        </label>
+                        <input type="text" name="contact_phone"
+                               value="{{ old('contact_phone', \App\Models\SiteSetting::get('contact_phone', '')) }}"
+                               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none transition"
+                               placeholder="+234 800 000 0000">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            <svg class="w-4 h-4 inline text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            Email Address
+                        </label>
+                        <input type="email" name="contact_email"
+                               value="{{ old('contact_email', \App\Models\SiteSetting::get('contact_email', '')) }}"
+                               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none transition"
+                               placeholder="hello@mapelearn.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            <svg class="w-4 h-4 inline text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            Address / Location
+                        </label>
+                        <input type="text" name="contact_address"
+                               value="{{ old('contact_address', \App\Models\SiteSetting::get('contact_address', '')) }}"
+                               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none transition"
+                               placeholder="Lagos, Nigeria">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            <svg class="w-4 h-4 inline text-gray-400 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Office Hours
+                        </label>
+                        <input type="text" name="contact_office_hours"
+                               value="{{ old('contact_office_hours', \App\Models\SiteSetting::get('contact_office_hours', '')) }}"
+                               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none transition"
+                               placeholder="Mon – Sat, 8am – 6pm">
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-2 border-t border-gray-100">
+                    <button type="submit"
+                            class="inline-flex items-center gap-2 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition-colors shadow-sm"
+                            style="background-color: #4f46e5;">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Save Contact Info
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

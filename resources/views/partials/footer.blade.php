@@ -34,16 +34,24 @@
 
             {{-- Brand Column --}}
             <div>
-                <div class="flex items-center gap-2 mb-4">
-                    @php $logoPath = $general['site_logo'] ?? $general['logo'] ?? null; @endphp
+                @php
+                    $logoPath   = $general['site_logo'] ?? null;
+                    $logoHeight = (int) ($footer['footer_logo_height'] ?? 48);
+                    $logoHeight = max(24, min(120, $logoHeight));
+                @endphp
+                <div class="mb-4">
                     @if($logoPath)
-                    <img src="{{ asset('storage/' . $logoPath) }}" alt="{{ $general['site_name'] ?? 'MapeLearn' }}" class="h-8 w-auto">
+                        <img src="{{ asset('storage/' . $logoPath) }}"
+                             alt="{{ $general['site_name'] ?? 'MapeLearn' }}"
+                             style="height: {{ $logoHeight }}px; max-width: 200px; width: auto; object-fit: contain;">
                     @else
-                    <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-sm">ML</span>
-                    </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">ML</span>
+                            </div>
+                            <span class="text-white font-display font-bold text-xl">{{ $general['site_name'] ?? 'MapeLearn' }}</span>
+                        </div>
                     @endif
-                    <span class="text-white font-display font-bold text-xl">{{ $general['site_name'] ?? 'MapeLearn' }}</span>
                 </div>
                 <p class="text-gray-400 text-sm leading-relaxed">
                     {{ $footer['footer_about'] ?? 'Empowering African professionals with world-class tech skills.' }}

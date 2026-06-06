@@ -128,6 +128,49 @@
                                placeholder="Lagos, Nigeria">
                     </div>
 
+                    {{-- Contact Info (used in homepage contact section) --}}
+                    <div class="md:col-span-2">
+                        <div class="border-t border-gray-100 pt-4 mb-2">
+                            <p class="text-sm font-semibold text-gray-700">Contact Information <span class="text-xs font-normal text-gray-400">(displayed on homepage contact section)</span></p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Contact Phone</label>
+                        <input type="text"
+                               name="contact_phone"
+                               value="{{ old('contact_phone', $all['general']['contact_phone'] ?? '') }}"
+                               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                      focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                               placeholder="+234 800 000 0000">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Contact Email</label>
+                        <input type="email"
+                               name="contact_email"
+                               value="{{ old('contact_email', $all['general']['contact_email'] ?? '') }}"
+                               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                      focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                               placeholder="hello@mapelearn.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Contact Address</label>
+                        <input type="text"
+                               name="contact_address"
+                               value="{{ old('contact_address', $all['general']['contact_address'] ?? '') }}"
+                               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                      focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                               placeholder="Lagos, Nigeria">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Office Hours</label>
+                        <input type="text"
+                               name="contact_office_hours"
+                               value="{{ old('contact_office_hours', $all['general']['contact_office_hours'] ?? '') }}"
+                               class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                      focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                               placeholder="Mon – Sat, 8am – 6pm">
+                    </div>
+
                     {{-- Currency --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Currency Code</label>
@@ -490,6 +533,39 @@
 
         {{-- ─── FOOTER ──────────────────────────────────────────── --}}
         <div id="settings-panel-footer" style="{{ $activeTab === 'footer' ? 'display:block' : 'display:none' }}">
+
+            {{-- Logo upload form (saves to general group, key=site_logo) --}}
+            <form method="POST"
+                  action="{{ route('admin.settings.update', 'general') }}"
+                  enctype="multipart/form-data"
+                  class="p-6 pb-4 border-b border-gray-100 space-y-4">
+                @csrf
+                <input type="hidden" name="_tab" value="footer">
+                <h3 class="text-sm font-semibold text-gray-700">Footer Logo</h3>
+                <div x-data="imagePreview('{{ !empty($all['general']['site_logo']) ? asset(\'storage/\' . $all[\'general\'][\'site_logo\']) : \'\' }}')" class="flex items-start gap-6">
+                    <div class="shrink-0 w-40 h-16 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
+                        <template x-if="preview">
+                            <img :src="preview" class="max-w-full max-h-full object-contain p-2" alt="Logo preview">
+                        </template>
+                        <template x-if="!preview">
+                            <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </template>
+                    </div>
+                    <div class="flex-1 space-y-2">
+                        <input type="file" name="site_logo" accept="image/*" @change="onFileChange($event)"
+                               class="block w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 transition">
+                        <p class="text-xs text-gray-400">PNG, SVG or JPG, max 2 MB. Recommended: 200×60 px.</p>
+                        @if(!empty($all['general']['site_logo']))
+                            <p class="text-xs text-gray-400">Current: <span class="text-gray-500">{{ basename($all['general']['site_logo']) }}</span></p>
+                        @endif
+                        <button type="submit" class="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-medium px-4 py-1.5 rounded-lg transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                            Upload Logo
+                        </button>
+                    </div>
+                </div>
+            </form>
+
             <form method="POST"
                   action="{{ route('admin.settings.update', 'general') }}"
                   enctype="multipart/form-data"
@@ -546,6 +622,24 @@
                 @csrf
                 <input type="hidden" name="_tab" value="footer">
 
+                {{-- Logo height slider --}}
+                <div x-data="{ logoHeight: {{ $all['footer']['footer_logo_height'] ?? 48 }} }">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Footer Logo Height
+                        <span class="text-gray-400 font-normal text-xs ml-1">(<span x-text="logoHeight"></span> px)</span>
+                    </label>
+                    <div class="flex items-center gap-4">
+                        <span class="text-xs text-gray-400 shrink-0">24 px</span>
+                        <input type="range" name="footer_logo_height"
+                               min="24" max="120" step="4"
+                               :value="logoHeight"
+                               @input="logoHeight = $event.target.value"
+                               class="flex-1 accent-brand-600">
+                        <span class="text-xs text-gray-400 shrink-0">120 px</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">Drag the slider to resize the footer logo. Default is 48 px.</p>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     <div class="md:col-span-2">
@@ -570,7 +664,7 @@
 
                     {{-- Render remaining footer settings dynamically --}}
                     @foreach($all['footer'] as $key => $value)
-                        @if(!in_array($key, ['footer_about','footer_copyright']))
+                        @if(!in_array($key, ['footer_about','footer_copyright','footer_logo_height']))
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1.5">
                                     {{ ucwords(str_replace('_', ' ', $key)) }}

@@ -214,6 +214,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/cms/faqs', [CmsController::class, 'storeFaq'])->name('cms.faqs.store');
     Route::put('/cms/faqs/{id}', [CmsController::class, 'updateFaq'])->name('cms.faqs.update');
     Route::delete('/cms/faqs/{id}', [CmsController::class, 'destroyFaq'])->name('cms.faqs.destroy');
+    Route::put('/cms/testimonials/{id}', [CmsController::class, 'updateTestimonial'])->name('cms.testimonials.update');
+    Route::post('/cms/features', [CmsController::class, 'updateFeatures'])->name('cms.features.update');
 
     // Media
     Route::get('/media', [MediaController::class, 'index'])->name('media.index');

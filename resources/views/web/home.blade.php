@@ -515,52 +515,28 @@ function newsTicker() {
 ═══════════════════════════════════════════════════════════════════ --}}
 <section class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Our Difference</span>
-            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Why 10,000+ Students Choose MapeLearn</h2>
-            <p class="text-gray-500 text-lg max-w-2xl mx-auto">We've built every aspect of our platform with one goal: getting you hired and growing your career faster.</p>
-        </div>
-
         @php
-        $features = [
-            [
-                'title' => 'Industry-Led Curriculum',
-                'desc'  => 'Our programs are designed in collaboration with tech leaders at top companies. Every course maps directly to real job requirements.',
-                'icon'  => 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
-                'color' => 'bg-blue-50 text-blue-600',
-            ],
-            [
-                'title' => 'Expert Instructors',
-                'desc'  => 'Learn from senior engineers, CTOs, and product leaders with 10+ years of real-world experience at top African and global tech companies.',
-                'icon'  => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z',
-                'color' => 'bg-purple-50 text-purple-600',
-            ],
-            [
-                'title' => 'Flexible Learning',
-                'desc'  => 'Study at your own pace with on-demand videos, or join our live cohorts. Access content on any device, anytime — even offline.',
-                'icon'  => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-                'color' => 'bg-green-50 text-green-600',
-            ],
-            [
-                'title' => 'Job Placement Support',
-                'desc'  => 'Dedicated career coaches, resume reviews, mock interviews, and direct connections to our 200+ hiring partner companies.',
-                'icon'  => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-                'color' => 'bg-orange-50 text-orange-600',
-            ],
-            [
-                'title' => 'Certificate Programs',
-                'desc'  => 'Earn verifiable blockchain-backed certificates recognized by top employers. Showcase your credentials on LinkedIn with one click.',
-                'icon'  => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-                'color' => 'bg-yellow-50 text-yellow-600',
-            ],
-            [
-                'title' => 'Community & Networking',
-                'desc'  => 'Join a vibrant community of 10,000+ peers. Collaborate on projects, attend events, and build a professional network that opens doors.',
-                'icon'  => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
-                'color' => 'bg-pink-50 text-pink-600',
-            ],
+        $wcuBadge    = $settings['why_choose_us_badge']    ?? 'Our Difference';
+        $wcuTitle    = $settings['why_choose_us_title']    ?? 'Why 10,000+ Students Choose MapeLearn';
+        $wcuSubtitle = $settings['why_choose_us_subtitle'] ?? "We've built every aspect of our platform with one goal: getting you hired and growing your career faster.";
+        $featuresJson = $settings['why_choose_us_features'] ?? null;
+        $features = $featuresJson ? json_decode($featuresJson, true) : [
+            ['title' => 'Industry-Led Curriculum', 'desc' => 'Our programs are designed in collaboration with tech leaders at top companies. Every course maps directly to real job requirements.', 'icon' => 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z', 'color' => 'bg-blue-50 text-blue-600'],
+            ['title' => 'Expert Instructors', 'desc' => 'Learn from senior engineers, CTOs, and product leaders with 10+ years of real-world experience at top African and global tech companies.', 'icon' => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z', 'color' => 'bg-purple-50 text-purple-600'],
+            ['title' => 'Flexible Learning', 'desc' => 'Study at your own pace with on-demand videos, or join our live cohorts. Access content on any device, anytime — even offline.', 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'color' => 'bg-green-50 text-green-600'],
+            ['title' => 'Job Placement Support', 'desc' => 'Dedicated career coaches, resume reviews, mock interviews, and direct connections to our 200+ hiring partner companies.', 'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'color' => 'bg-orange-50 text-orange-600'],
+            ['title' => 'Certificate Programs', 'desc' => 'Earn verifiable blockchain-backed certificates recognized by top employers. Showcase your credentials on LinkedIn with one click.', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'color' => 'bg-yellow-50 text-yellow-600'],
+            ['title' => 'Community & Networking', 'desc' => 'Join a vibrant community of 10,000+ peers. Collaborate on projects, attend events, and build a professional network that opens doors.', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', 'color' => 'bg-pink-50 text-pink-600'],
         ];
         @endphp
+        {{-- Tailwind color safelist (used by CMS dynamic classes) --}}
+        {{-- bg-blue-50 text-blue-600 bg-purple-50 text-purple-600 bg-green-50 text-green-600 bg-orange-50 text-orange-600 bg-yellow-50 text-yellow-600 bg-pink-50 text-pink-600 bg-red-50 text-red-600 bg-indigo-50 text-indigo-600 bg-teal-50 text-teal-600 bg-cyan-50 text-cyan-600 --}}
+
+        <div class="text-center mb-16">
+            <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">{{ $wcuBadge }}</span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{{ $wcuTitle }}</h2>
+            <p class="text-gray-500 text-lg max-w-2xl mx-auto">{{ $wcuSubtitle }}</p>
+        </div>
 
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($features as $feature)
@@ -1103,7 +1079,7 @@ function galleryLightbox() {
                 ['icon' => 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z', 'label' => 'Call Us', 'value' => \App\Models\SiteSetting::get('contact_phone', '+234 800 000 0000'), 'href' => 'tel:' . preg_replace('/\s+/', '', \App\Models\SiteSetting::get('contact_phone', '+2348000000000'))],
                 ['icon' => 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'label' => 'Email Us', 'value' => \App\Models\SiteSetting::get('contact_email', 'hello@mapelearn.com'), 'href' => 'mailto:' . \App\Models\SiteSetting::get('contact_email', 'hello@mapelearn.com')],
                 ['icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z', 'label' => 'Visit Us', 'value' => \App\Models\SiteSetting::get('contact_address', 'Lagos, Nigeria'), 'href' => '#'],
-                ['icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'label' => 'Office Hours', 'value' => 'Mon – Sat, 8am – 6pm', 'href' => '#'],
+                ['icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'label' => 'Office Hours', 'value' => \App\Models\SiteSetting::get('contact_office_hours', 'Mon – Sat, 8am – 6pm'), 'href' => '#'],
             ];
             @endphp
             @foreach($contactItems as $item)
