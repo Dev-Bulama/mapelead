@@ -178,7 +178,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('courses', CourseManagementController::class);
     Route::post('/courses/{id}/publish', [CourseManagementController::class, 'publish'])->name('courses.publish');
     Route::post('/courses/{id}/unpublish', [CourseManagementController::class, 'unpublish'])->name('courses.unpublish');
+    Route::post('/courses/{course}/assign-instructors', [CourseManagementController::class, 'assignInstructors'])->name('courses.assign-instructors');
     Route::resource('courses.modules', \App\Http\Controllers\Admin\ModuleController::class)->shallow();
+
+    // Instructor Management
+    Route::get('/instructors', [\App\Http\Controllers\Admin\InstructorManagementController::class, 'index'])->name('instructors.index');
+    Route::get('/instructors/{instructor}', [\App\Http\Controllers\Admin\InstructorManagementController::class, 'show'])->name('instructors.show');
+    Route::post('/instructors/{instructor}/toggle-verified', [\App\Http\Controllers\Admin\InstructorManagementController::class, 'toggleVerified'])->name('instructors.toggle-verified');
+    Route::post('/instructors/{instructor}/toggle-featured', [\App\Http\Controllers\Admin\InstructorManagementController::class, 'toggleFeatured'])->name('instructors.toggle-featured');
     Route::resource('modules.lessons', \App\Http\Controllers\Admin\LessonController::class)->shallow();
 
     // Enrollments & Admission Management

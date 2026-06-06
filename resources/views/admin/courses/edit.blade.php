@@ -259,6 +259,82 @@
         </div>
     </form>
 
+    {{-- Session Instructor Assignment --}}
+    <div class="bg-white rounded-2xl border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h3 class="font-semibold text-gray-900 text-sm uppercase tracking-wide">Session Instructors</h3>
+                <p class="text-xs text-gray-500 mt-1">Assign up to 3 instructors — one per session slot — with their scheduled class time.</p>
+            </div>
+        </div>
+
+        @if(session('success') && str_contains(session('success'), 'Session'))
+        <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm">{{ session('success') }}</div>
+        @endif
+
+        <form action="{{ route('admin.courses.assign-instructors', $course->id) }}" method="POST" class="space-y-4">
+            @csrf
+
+            @php
+                $sessionConfig = [
+                    'morning'   => ['label' => 'Morning Session',   'icon' => '🌅', 'bg' => 'bg-orange-50 border-orange-200',  'time_range' => '05:00 – 11:59'],
+                    'afternoon' => ['label' => 'Afternoon Session',  'icon' => '☀️', 'bg' => 'bg-yellow-50 border-yellow-200',  'time_range' => '12:00 – 16:59'],
+                    'evening'   => ['label' => 'Evening Session',    'icon' => '🌙', 'bg' => 'bg-indigo-50 border-indigo-200',  'time_range' => '17:00 – 23:59'],
+                ];
+            @endphp
+
+            @foreach($sessionConfig as $sessionKey => $cfg)
+            @php $existing = $sessionMap[$sessionKey] ?? null; @endphp
+            <div class="rounded-xl border {{ $cfg['bg'] }} p-4">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-lg">{{ $cfg['icon'] }}</span>
+                    <div>
+                        <p class="text-sm font-semibold text-gray-900">{{ $cfg['label'] }}</p>
+                        <p class="text-xs text-gray-500">Typical hours: {{ $cfg['time_range'] }}</p>
+                    </div>
+                    @if($existing)
+                    <span class="ml-auto inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>Assigned
+                    </span>
+                    @endif
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Instructor</label>
+                        <select name="sessions[{{ $sessionKey }}][instructor_id]"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+                            <option value="">— None (leave slot empty) —</option>
+                            @foreach($instructors as $inst)
+                            <option value="{{ $inst->id }}" {{ $existing && $existing->instructor_id == $inst->id ? 'selected' : '' }}>
+                                {{ $inst->user?->full_name ?? '(ID '.$inst->id.')' }}
+                                @if($inst->title) — {{ $inst->title }} @endif
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Class Time</label>
+                        <input type="time" name="sessions[{{ $sessionKey }}][session_time]"
+                               value="{{ $existing?->session_time ? substr($existing->session_time, 0, 5) : '' }}"
+                               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+                               placeholder="e.g. 09:00">
+                        @if($existing && $existing->session_time)
+                        <p class="text-xs text-gray-400 mt-1">Current: {{ $existing->formatted_time }}</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @endforeach
+
+            <div class="flex items-center gap-3 pt-2">
+                <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors text-sm">
+                    Save Session Assignments
+                </button>
+                <p class="text-xs text-gray-400">Setting an instructor to "None" will remove that session slot.</p>
+            </div>
+        </form>
+    </div>
+
     {{-- Danger Zone --}}
     <div class="bg-white rounded-2xl border border-red-200 p-6">
         <h3 class="font-semibold text-red-700 text-sm uppercase tracking-wide mb-3">Danger Zone</h3>

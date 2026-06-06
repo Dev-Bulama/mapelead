@@ -35,6 +35,7 @@ class Course extends Model
     }
 
     public function instructor() { return $this->belongsTo(Instructor::class); }
+    public function courseInstructors() { return $this->hasMany(CourseInstructor::class)->orderBy('sort_order'); }
     public function category() { return $this->belongsTo(CourseCategory::class, 'category_id'); }
     public function modules() { return $this->hasMany(CourseModule::class)->orderBy('sort_order'); }
     public function lessons() { return $this->hasMany(Lesson::class); }

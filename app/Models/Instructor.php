@@ -20,6 +20,7 @@ class Instructor extends Model
 
     public function user() { return $this->belongsTo(User::class); }
     public function courses() { return $this->hasMany(Course::class); }
+    public function sessionAssignments() { return $this->hasMany(CourseInstructor::class); }
 
     public function getFullNameAttribute() { return $this->user?->full_name ?? ''; }
     public function getAvatarUrlAttribute() { return $this->user?->avatar_url ?? ''; }

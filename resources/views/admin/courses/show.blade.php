@@ -53,7 +53,7 @@
                     $totalDuration = $course->modules->flatMap(fn($m) => $m->lessons)->sum('duration_minutes');
                 @endphp
                 @foreach([
-                    ['label' => 'Instructor', 'value' => $course->instructor->user->full_name ?? '—'],
+                    ['label' => 'Lead Instructor', 'value' => $course->instructor->user->full_name ?? '—'],
                     ['label' => 'Enrollments', 'value' => $course->enrollments->count()],
                     ['label' => 'Modules', 'value' => $course->modules->count()],
                     ['label' => 'Lessons', 'value' => $totalLessons],
@@ -68,6 +68,43 @@
                     </div>
                 @endforeach
             </div>
+
+            {{-- Session Instructors --}}
+            @if($course->courseInstructors->isNotEmpty())
+            <div class="bg-white rounded-2xl border border-gray-200 p-5">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-gray-900 text-sm">Session Instructors</h3>
+                    <a href="{{ route('admin.courses.edit', $course->id) }}" class="text-xs text-indigo-600 hover:underline">Edit</a>
+                </div>
+                @php
+                    $sessionIcons = ['morning' => '🌅', 'afternoon' => '☀️', 'evening' => '🌙'];
+                    $sessionColors = [
+                        'morning'   => 'bg-orange-50 border-orange-200 text-orange-800',
+                        'afternoon' => 'bg-yellow-50 border-yellow-200 text-yellow-800',
+                        'evening'   => 'bg-indigo-50 border-indigo-200 text-indigo-800',
+                    ];
+                @endphp
+                <div class="space-y-2">
+                    @foreach($course->courseInstructors as $si)
+                    <div class="flex items-center gap-3 p-3 rounded-xl border {{ $sessionColors[$si->session] ?? 'bg-gray-50 border-gray-200 text-gray-700' }}">
+                        <span class="text-lg">{{ $sessionIcons[$si->session] ?? '⏰' }}</span>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold uppercase tracking-wide">{{ ucfirst($si->session) }} Session</p>
+                            <p class="text-sm font-medium text-gray-900">{{ $si->instructor->full_name }}</p>
+                        </div>
+                        @if($si->session_time)
+                        <span class="text-xs font-mono font-semibold text-gray-600 shrink-0">{{ $si->formatted_time }}</span>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @else
+            <div class="bg-gray-50 border border-dashed border-gray-300 rounded-2xl p-4 text-center">
+                <p class="text-xs text-gray-500">No session instructors assigned.</p>
+                <a href="{{ route('admin.courses.edit', $course->id) }}" class="text-xs text-indigo-600 hover:underline mt-1 inline-block">Assign Instructors →</a>
+            </div>
+            @endif
         </div>
 
         {{-- Curriculum --}}

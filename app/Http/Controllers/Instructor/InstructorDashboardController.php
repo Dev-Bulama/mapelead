@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Instructor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
+use App\Models\CourseInstructor;
 use App\Models\Enrollment;
 
 class InstructorDashboardController extends Controller
@@ -17,7 +18,12 @@ class InstructorDashboardController extends Controller
         $totalRevenue  = Enrollment::whereIn('course_id', $courses->pluck('id'))
             ->where('payment_status', 'paid')->sum('amount_paid');
 
-        return view('instructor.dashboard', compact('instructor', 'courses', 'totalStudents', 'totalRevenue'));
+        $sessionAssignments = CourseInstructor::where('instructor_id', $instructor->id)
+            ->with(['course' => fn($q) => $q->withCount('enrollments')->with('category')])
+            ->orderBy('sort_order')
+            ->get();
+
+        return view('instructor.dashboard', compact('instructor', 'courses', 'totalStudents', 'totalRevenue', 'sessionAssignments'));
     }
 
     public function students()

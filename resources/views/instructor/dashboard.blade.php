@@ -95,6 +95,54 @@
         @endif
     </div>
 
+    {{-- My Session Assignments --}}
+    @if($sessionAssignments->isNotEmpty())
+    <div class="bg-white rounded-2xl border border-gray-100 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">My Assigned Sessions</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            @php
+                $sessionCfg = [
+                    'morning'   => ['icon' => '🌅', 'label' => 'Morning',   'bg' => 'from-orange-50 to-amber-50',  'border' => 'border-orange-200', 'badge' => 'bg-orange-100 text-orange-700'],
+                    'afternoon' => ['icon' => '☀️', 'label' => 'Afternoon', 'bg' => 'from-yellow-50 to-amber-50', 'border' => 'border-yellow-200', 'badge' => 'bg-yellow-100 text-yellow-700'],
+                    'evening'   => ['icon' => '🌙', 'label' => 'Evening',   'bg' => 'from-indigo-50 to-purple-50', 'border' => 'border-indigo-200', 'badge' => 'bg-indigo-100 text-indigo-700'],
+                ];
+            @endphp
+            @foreach($sessionAssignments as $assignment)
+            @php $cfg = $sessionCfg[$assignment->session] ?? ['icon' => '⏰', 'label' => ucfirst($assignment->session), 'bg' => 'from-gray-50 to-gray-50', 'border' => 'border-gray-200', 'badge' => 'bg-gray-100 text-gray-700']; @endphp
+            <div class="bg-gradient-to-br {{ $cfg['bg'] }} border {{ $cfg['border'] }} rounded-2xl p-5">
+                <div class="flex items-start justify-between mb-3">
+                    <span class="text-2xl">{{ $cfg['icon'] }}</span>
+                    <span class="inline-flex items-center px-2.5 py-1 {{ $cfg['badge'] }} text-xs font-semibold rounded-full">
+                        {{ $cfg['label'] }}
+                    </span>
+                </div>
+                <p class="font-semibold text-gray-900 text-sm leading-tight">{{ $assignment->course->title ?? '—' }}</p>
+                @if($assignment->course->category)
+                <p class="text-xs text-gray-500 mt-1">{{ $assignment->course->category->name }}</p>
+                @endif
+                <div class="flex items-center gap-2 mt-3 flex-wrap">
+                    @if($assignment->session_time)
+                    <span class="inline-flex items-center gap-1 text-xs font-mono font-bold text-gray-700 bg-white border border-gray-200 px-2.5 py-1 rounded-lg">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        {{ $assignment->formatted_time }}
+                    </span>
+                    @endif
+                    @if($assignment->course)
+                    <span class="text-xs text-gray-500">{{ number_format($assignment->course->enrollments_count ?? 0) }} students</span>
+                    @endif
+                </div>
+                @if($assignment->course)
+                <a href="{{ route('instructor.courses.show', $assignment->course_id) }}"
+                   class="mt-3 inline-flex items-center text-xs font-medium text-brand-600 hover:text-brand-700">
+                    View course →
+                </a>
+                @endif
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <a href="{{ route('instructor.courses.create') }}" class="bg-white rounded-2xl border border-gray-100 p-6 hover:border-brand-200 hover:shadow-sm transition-all group">
             <div class="w-10 h-10 bg-brand-50 rounded-xl flex items-center justify-center group-hover:bg-brand-100 transition-colors mb-3">

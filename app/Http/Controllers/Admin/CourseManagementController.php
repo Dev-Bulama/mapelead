@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\CourseCategory;
+use App\Models\CourseInstructor;
 use App\Models\Instructor;
 use App\Models\User;
 use App\Services\Course\CourseService;
@@ -81,15 +82,47 @@ class CourseManagementController extends Controller
 
     public function show(Course $course)
     {
-        $course->load(['instructor.user', 'category', 'modules.lessons', 'enrollments']);
+        $course->load(['instructor.user', 'category', 'modules.lessons', 'enrollments', 'courseInstructors.instructor.user']);
         return view('admin.courses.show', compact('course'));
     }
 
     public function edit(Course $course)
     {
-        $categories  = CourseCategory::active()->get();
-        $instructors = $this->resolvedInstructors();
-        return view('admin.courses.edit', compact('course', 'categories', 'instructors'));
+        $categories   = CourseCategory::active()->get();
+        $instructors  = $this->resolvedInstructors();
+        $course->load('courseInstructors.instructor.user');
+        $sessionMap = $course->courseInstructors->keyBy('session');
+        return view('admin.courses.edit', compact('course', 'categories', 'instructors', 'sessionMap'));
+    }
+
+    public function assignInstructors(Request $request, Course $course)
+    {
+        $request->validate([
+            'sessions.morning.instructor_id'   => 'nullable|exists:instructors,id',
+            'sessions.morning.session_time'    => 'nullable|date_format:H:i',
+            'sessions.afternoon.instructor_id' => 'nullable|exists:instructors,id',
+            'sessions.afternoon.session_time'  => 'nullable|date_format:H:i',
+            'sessions.evening.instructor_id'   => 'nullable|exists:instructors,id',
+            'sessions.evening.session_time'    => 'nullable|date_format:H:i',
+        ]);
+
+        $sessionOrder = ['morning' => 0, 'afternoon' => 1, 'evening' => 2];
+
+        foreach ($sessionOrder as $session => $sortOrder) {
+            $instructorId = $request->input("sessions.{$session}.instructor_id");
+            $time         = $request->input("sessions.{$session}.session_time") ?: null;
+
+            if ($instructorId) {
+                CourseInstructor::updateOrCreate(
+                    ['course_id' => $course->id, 'session' => $session],
+                    ['instructor_id' => $instructorId, 'session_time' => $time, 'sort_order' => $sortOrder]
+                );
+            } else {
+                CourseInstructor::where('course_id', $course->id)->where('session', $session)->delete();
+            }
+        }
+
+        return back()->with('success', 'Session instructors updated successfully.');
     }
 
     public function update(Request $request, Course $course)
