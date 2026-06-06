@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ContactForm;
 use App\Models\Lead;
 use App\Models\NewsletterSubscriber;
+use App\Models\Testimonial;
 use Illuminate\Http\Request;
 
 class ContactController extends Controller
@@ -42,6 +43,29 @@ class ContactController extends Controller
         }
 
         return back()->with('success', 'Your message has been sent. We\'ll get back to you shortly!');
+    }
+
+    public function submitReview(Request $request)
+    {
+        $data = $request->validate([
+            'name'    => 'required|string|max:100',
+            'title'   => 'nullable|string|max:100',
+            'company' => 'nullable|string|max:100',
+            'content' => 'required|string|min:20|max:1000',
+            'rating'  => 'required|integer|between:1,5',
+        ]);
+
+        Testimonial::create(array_merge($data, [
+            'is_active'   => false,
+            'is_featured' => false,
+            'sort_order'  => 0,
+        ]));
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Thank you! Your review has been submitted for approval.']);
+        }
+
+        return back()->with('review_success', 'Thank you! Your review has been submitted and will appear after approval.');
     }
 
     public function subscribe(Request $request)

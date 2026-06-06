@@ -51,6 +51,7 @@ Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:contact');
 Route::post('/newsletter/subscribe', [ContactController::class, 'subscribe'])->name('newsletter.subscribe')->middleware('throttle:newsletter');
+Route::post('/submit-review', [ContactController::class, 'submitReview'])->name('review.submit')->middleware('throttle:5,1');
 Route::get('/sitemap.xml', [HomeController::class, 'sitemap'])->name('sitemap');
 
 // Courses
@@ -214,7 +215,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/cms/faqs', [CmsController::class, 'storeFaq'])->name('cms.faqs.store');
     Route::put('/cms/faqs/{id}', [CmsController::class, 'updateFaq'])->name('cms.faqs.update');
     Route::delete('/cms/faqs/{id}', [CmsController::class, 'destroyFaq'])->name('cms.faqs.destroy');
-    Route::put('/cms/testimonials/{id}', [CmsController::class, 'updateTestimonial'])->name('cms.testimonials.update');
     Route::post('/cms/features', [CmsController::class, 'updateFeatures'])->name('cms.features.update');
 
     // Media

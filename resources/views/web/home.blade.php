@@ -755,6 +755,122 @@ function newsTicker() {
 </section>
 
 {{-- ═══════════════════════════════════════════════════════════════════
+     SHARE YOUR STORY
+═══════════════════════════════════════════════════════════════════ --}}
+<section class="py-16 bg-gray-50 border-t border-gray-100">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8"
+         x-data="{
+             open: false,
+             rating: 5,
+             submitted: false,
+             @if(session('review_success')) open: true, submitted: true, @endif
+         }">
+
+        {{-- CTA to open form --}}
+        <div class="text-center" x-show="!open">
+            <p class="text-gray-500 text-sm mb-4">Studied with us? We'd love to hear your story.</p>
+            <button @click="open = true"
+                    class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/>
+                </svg>
+                Share Your Story
+            </button>
+        </div>
+
+        {{-- Success message --}}
+        <div x-show="submitted" x-transition class="text-center py-6">
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-green-100 rounded-full mb-4">
+                <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-1">Thank you!</h3>
+            <p class="text-gray-500 text-sm">Your review has been submitted and will appear after approval.</p>
+        </div>
+
+        {{-- Submission form --}}
+        <div x-show="open && !submitted" x-transition>
+            <div class="text-center mb-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Share Your Experience</h3>
+                <p class="text-gray-500 text-sm">Your review will appear on our site after a quick moderation check.</p>
+            </div>
+
+            <form action="{{ route('review.submit') }}" method="POST" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8 space-y-5">
+                @csrf
+
+                @if(session('review_success'))
+                <div class="flex items-center gap-3 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl text-sm">
+                    {{ session('review_success') }}
+                </div>
+                @endif
+
+                @if($errors->any())
+                <div class="flex flex-col gap-1 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                    @foreach($errors->all() as $error)
+                    <span>{{ $error }}</span>
+                    @endforeach
+                </div>
+                @endif
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Name <span class="text-red-500">*</span></label>
+                        <input type="text" name="name" value="{{ old('name') }}" required maxlength="100"
+                               class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                               placeholder="Jane Doe">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Role / Title</label>
+                        <input type="text" name="title" value="{{ old('title') }}" maxlength="100"
+                               class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                               placeholder="e.g. Software Engineer">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Company / Organisation</label>
+                        <input type="text" name="company" value="{{ old('company') }}" maxlength="100"
+                               class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                               placeholder="Where do you work?">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Review <span class="text-red-500">*</span></label>
+                        <textarea name="content" rows="4" required minlength="20" maxlength="1000"
+                                  class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
+                                  placeholder="Tell us about your learning experience — what you gained, what changed for you…">{{ old('content') }}</textarea>
+                        <p class="text-xs text-gray-400 mt-1">Minimum 20 characters.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Rating <span class="text-red-500">*</span></label>
+                    <input type="hidden" name="rating" :value="rating">
+                    <div class="flex items-center gap-1">
+                        <template x-for="star in [1,2,3,4,5]" :key="star">
+                            <button type="button" @click="rating = star"
+                                    :class="star <= rating ? 'text-amber-400' : 'text-gray-300'"
+                                    class="text-3xl leading-none hover:text-amber-400 transition-colors focus:outline-none select-none">
+                                &#9733;
+                            </button>
+                        </template>
+                        <span class="ml-3 text-sm text-gray-500" x-text="rating + ' / 5 stars'"></span>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-2">
+                    <button type="button" @click="open = false" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors shadow-sm">
+                        Submit Review
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════════
      FAQ SECTION
 ═══════════════════════════════════════════════════════════════════ --}}
 <section class="py-20 bg-white">
