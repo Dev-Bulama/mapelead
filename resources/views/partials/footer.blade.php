@@ -35,8 +35,9 @@
             {{-- Brand Column --}}
             <div>
                 <div class="flex items-center gap-2 mb-4">
-                    @if(!empty($general['logo']))
-                    <img src="{{ asset('storage/' . $general['logo']) }}" alt="{{ $general['site_name'] ?? 'MapeLearn' }}" class="h-8 w-auto">
+                    @php $logoPath = $general['site_logo'] ?? $general['logo'] ?? null; @endphp
+                    @if($logoPath)
+                    <img src="{{ asset('storage/' . $logoPath) }}" alt="{{ $general['site_name'] ?? 'MapeLearn' }}" class="h-8 w-auto">
                     @else
                     <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
                         <span class="text-white font-bold text-sm">ML</span>
