@@ -43,7 +43,11 @@ class SettingsController extends Controller
 
     public function scripts()
     {
-        $scripts = ScriptInjection::orderBy('location')->get();
+        try {
+            $scripts = ScriptInjection::orderBy('location')->orderBy('name')->get();
+        } catch (\Throwable $e) {
+            $scripts = collect();
+        }
         return view('admin.settings.scripts', compact('scripts'));
     }
 
@@ -54,10 +58,14 @@ class SettingsController extends Controller
             'provider'  => 'nullable|string|max:100',
             'location'  => 'required|in:head,body_start,body_end',
             'code'      => 'required|string',
-            'is_active' => 'boolean',
         ]);
 
-        ScriptInjection::updateOrCreate(['name' => $data['name']], $data);
+        $data['is_active'] = $request->boolean('is_active', true);
+
+        ScriptInjection::updateOrCreate(
+            ['name' => $data['name']],
+            $data
+        );
         return back()->with('success', 'Script saved!');
     }
 

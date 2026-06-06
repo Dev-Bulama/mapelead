@@ -70,7 +70,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 
     {{-- Head Scripts from CMS --}}
-    @foreach(\App\Models\ScriptInjection::active()->where('location','head')->get() as $script)
+    @php try { $__headScripts = \App\Models\ScriptInjection::active()->where('location','head')->get(); } catch(\Throwable $e) { $__headScripts = collect(); } @endphp
+    @foreach($__headScripts as $script)
         {!! $script->code !!}
     @endforeach
 
@@ -88,6 +89,12 @@
     @stack('styles')
 </head>
 <body class="font-sans bg-gray-50 text-gray-900 antialiased">
+
+    {{-- Body Start Scripts from CMS --}}
+    @php try { $__bodyStartScripts = \App\Models\ScriptInjection::active()->where('location','body_start')->get(); } catch(\Throwable $e) { $__bodyStartScripts = collect(); } @endphp
+    @foreach($__bodyStartScripts as $script)
+        {!! $script->code !!}
+    @endforeach
 
     {{-- Announcement Bar --}}
     @php $announcement = \App\Models\Announcement::where('is_active', true)->where(fn($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>', now()))->first(); @endphp
@@ -145,7 +152,8 @@
     @include('partials.footer')
 
     {{-- Body End Scripts from CMS --}}
-    @foreach(\App\Models\ScriptInjection::active()->where('location','body_end')->get() as $script)
+    @php try { $__bodyEndScripts = \App\Models\ScriptInjection::active()->where('location','body_end')->get(); } catch(\Throwable $e) { $__bodyEndScripts = collect(); } @endphp
+    @foreach($__bodyEndScripts as $script)
         {!! $script->code !!}
     @endforeach
 
