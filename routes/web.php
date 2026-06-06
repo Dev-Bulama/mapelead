@@ -313,9 +313,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/support/{id}/close', [SupportController::class, 'close'])->name('support.close');
     Route::post('/support/{support}/reply', [SupportController::class, 'reply'])->name('support.reply');
 
-    // Settings
+    // Settings — specific routes MUST come before the {group} wildcard
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
-    Route::post('/settings/{group}', [SettingsController::class, 'update'])->name('settings.update');
     Route::get('/settings/scripts', [SettingsController::class, 'scripts'])->name('settings.scripts');
     Route::post('/settings/scripts', [SettingsController::class, 'storeScript'])->name('settings.scripts.store');
     Route::delete('/settings/scripts/{id}', [SettingsController::class, 'destroyScript'])->name('settings.scripts.destroy');
@@ -328,6 +327,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/settings/menus/items/{item}', [SettingsController::class, 'destroyMenuItem'])->name('settings.menus.items.destroy');
     Route::post('/settings/menus/items/reorder', [SettingsController::class, 'reorderMenuItems'])->name('settings.menus.items.reorder');
     Route::post('/settings/integrations', [SettingsController::class, 'updateIntegrations'])->name('settings.integrations');
+    Route::post('/settings/{group}', [SettingsController::class, 'update'])->name('settings.update');
 });
 
 // ─── Public Certificate Verification ──────────────────────────────────────────
