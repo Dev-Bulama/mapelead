@@ -542,7 +542,8 @@
                 @csrf
                 <input type="hidden" name="_tab" value="footer">
                 <h3 class="text-sm font-semibold text-gray-700">Footer Logo</h3>
-                <div x-data="imagePreview('{{ !empty($all['general']['site_logo']) ? asset(\'storage/\' . $all[\'general\'][\'site_logo\']) : \'\' }}')" class="flex items-start gap-6">
+                @php $footerLogoPreview = !empty($all['general']['site_logo']) ? asset('storage/' . $all['general']['site_logo']) : ''; @endphp
+                <div x-data="imagePreview('{{ $footerLogoPreview }}')" class="flex items-start gap-6">
                     <div class="shrink-0 w-40 h-16 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
                         <template x-if="preview">
                             <img :src="preview" class="max-w-full max-h-full object-contain p-2" alt="Logo preview">
