@@ -174,14 +174,6 @@ class CourseManagementController extends Controller
         return redirect()->route('admin.courses.index')->with('success', 'Course deleted!');
     }
 
-    public function assignInstructors(Request $request, int $id)
-    {
-        $course = Course::findOrFail($id);
-        $request->validate(['instructor_id' => 'required|exists:instructors,id']);
-        $course->update(['instructor_id' => $request->instructor_id]);
-        return back()->with('success', 'Instructor assigned successfully!');
-    }
-
     public function publish(int $id)
     {
         $course = Course::findOrFail($id);
