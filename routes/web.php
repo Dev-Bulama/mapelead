@@ -180,6 +180,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('courses', CourseManagementController::class);
     Route::post('/courses/{id}/publish', [CourseManagementController::class, 'publish'])->name('courses.publish');
     Route::post('/courses/{id}/unpublish', [CourseManagementController::class, 'unpublish'])->name('courses.unpublish');
+    Route::post('/courses/{id}/assign-instructors', [CourseManagementController::class, 'assignInstructors'])->name('courses.assign-instructors');
     Route::resource('courses.modules', \App\Http\Controllers\Admin\ModuleController::class)->shallow();
     Route::resource('modules.lessons', \App\Http\Controllers\Admin\LessonController::class)->shallow();
 
