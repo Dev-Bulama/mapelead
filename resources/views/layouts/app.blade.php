@@ -77,6 +77,7 @@
     @endforeach
 
     <style>
+        html, body { overflow-x: hidden; max-width: 100%; }
         [x-cloak] { display: none !important; }
         .gradient-text { background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero-gradient { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #1e1b4b 100%); }

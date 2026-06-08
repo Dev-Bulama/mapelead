@@ -627,7 +627,7 @@ function newsTicker() {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <p class="text-center text-xs font-semibold uppercase tracking-widest text-gray-400 mb-8">Trusted by leading organisations</p>
     </div>
-    <div class="relative overflow-hidden">
+    <div class="w-full overflow-hidden">
         <div class="flex gap-12 items-center partner-marquee">
             @php $doubled = array_merge($partnerLogos, $partnerLogos); @endphp
             @foreach($doubled as $partner)
@@ -648,6 +648,7 @@ function newsTicker() {
         .partner-marquee {
             animation: marquee 30s linear infinite;
             width: max-content;
+            will-change: transform;
         }
         .partner-marquee:hover { animation-play-state: paused; }
         @keyframes marquee {
