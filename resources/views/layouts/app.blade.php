@@ -62,7 +62,8 @@
         }
     </script>
 
-    {{-- Alpine.js --}}
+    {{-- Alpine.js + Intersect plugin (must load before Alpine) --}}
+    <script defer src="https://unpkg.com/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     {{-- Google Fonts --}}

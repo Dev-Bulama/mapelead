@@ -710,7 +710,8 @@ function newsTicker() {
                 });
             }
         }"
-        x-intersect="animate()"
+        x-intersect.once="animate()"
+        x-init="setTimeout(() => animate(), 800)"
         class="grid grid-cols-2 lg:grid-cols-4 gap-6">
             <template x-for="counter in counters" :key="counter.label">
                 <div class="bg-white bg-opacity-5 border border-white border-opacity-10 rounded-2xl p-8 text-center">
