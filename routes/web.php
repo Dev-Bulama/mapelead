@@ -176,17 +176,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/users/{id}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle');
 
     // Course Management
+    Route::resource('course-categories', \App\Http\Controllers\Admin\CourseCategoryController::class)->except(['create', 'show', 'edit']);
     Route::resource('courses', CourseManagementController::class);
     Route::post('/courses/{id}/publish', [CourseManagementController::class, 'publish'])->name('courses.publish');
     Route::post('/courses/{id}/unpublish', [CourseManagementController::class, 'unpublish'])->name('courses.unpublish');
-    Route::post('/courses/{course}/assign-instructors', [CourseManagementController::class, 'assignInstructors'])->name('courses.assign-instructors');
     Route::resource('courses.modules', \App\Http\Controllers\Admin\ModuleController::class)->shallow();
-
-    // Instructor Management
-    Route::get('/instructors', [\App\Http\Controllers\Admin\InstructorManagementController::class, 'index'])->name('instructors.index');
-    Route::get('/instructors/{instructor}', [\App\Http\Controllers\Admin\InstructorManagementController::class, 'show'])->name('instructors.show');
-    Route::post('/instructors/{instructor}/toggle-verified', [\App\Http\Controllers\Admin\InstructorManagementController::class, 'toggleVerified'])->name('instructors.toggle-verified');
-    Route::post('/instructors/{instructor}/toggle-featured', [\App\Http\Controllers\Admin\InstructorManagementController::class, 'toggleFeatured'])->name('instructors.toggle-featured');
     Route::resource('modules.lessons', \App\Http\Controllers\Admin\LessonController::class)->shallow();
 
     // Enrollments & Admission Management
@@ -207,7 +201,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // CMS
     Route::get('/cms', [CmsController::class, 'index'])->name('cms.index');
     Route::resource('cms/pages', \App\Http\Controllers\Admin\PageBuilderController::class)->names('cms.pages');
-    Route::match(['POST', 'PUT', 'PATCH'], '/cms/hero-banners', [CmsController::class, 'updateHeroBanner'])->name('cms.hero.update');
+    Route::post('/cms/hero-banners', [CmsController::class, 'updateHeroBanner'])->name('cms.hero.update');
     Route::delete('/cms/hero-banners/{id}', [CmsController::class, 'destroyHeroBanner'])->name('cms.hero.destroy');
     Route::post('/cms/testimonials', [CmsController::class, 'storeTestimonial'])->name('cms.testimonials.store');
     Route::put('/cms/testimonials/{id}', [CmsController::class, 'updateTestimonial'])->name('cms.testimonials.update');
@@ -216,6 +210,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/cms/faqs/{id}', [CmsController::class, 'updateFaq'])->name('cms.faqs.update');
     Route::delete('/cms/faqs/{id}', [CmsController::class, 'destroyFaq'])->name('cms.faqs.destroy');
     Route::post('/cms/features', [CmsController::class, 'updateFeatures'])->name('cms.features.update');
+    Route::post('/cms/stats', [CmsController::class, 'updateStats'])->name('cms.stats.update');
+    Route::post('/cms/partners', [CmsController::class, 'addPartnerLogo'])->name('cms.partners.add');
+    Route::delete('/cms/partners/{index}', [CmsController::class, 'deletePartnerLogo'])->name('cms.partners.delete');
 
     // Media
     Route::get('/media', [MediaController::class, 'index'])->name('media.index');

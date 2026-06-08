@@ -70,8 +70,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 
     {{-- Head Scripts from CMS --}}
-    @php try { $__headScripts = \App\Models\ScriptInjection::active()->where('location','head')->get(); } catch(\Throwable $e) { $__headScripts = collect(); } @endphp
-    @foreach($__headScripts as $script)
+    @php try { $headScripts = \App\Models\ScriptInjection::active()->where('location','head')->get(); } catch(\Exception $e) { $headScripts = collect(); } @endphp
+    @foreach($headScripts as $script)
         {!! $script->code !!}
     @endforeach
 
@@ -89,10 +89,9 @@
     @stack('styles')
 </head>
 <body class="font-sans bg-gray-50 text-gray-900 antialiased">
-
     {{-- Body Start Scripts from CMS --}}
-    @php try { $__bodyStartScripts = \App\Models\ScriptInjection::active()->where('location','body_start')->get(); } catch(\Throwable $e) { $__bodyStartScripts = collect(); } @endphp
-    @foreach($__bodyStartScripts as $script)
+    @php try { $bodyStartScripts = \App\Models\ScriptInjection::active()->where('location','body_start')->get(); } catch(\Exception $e) { $bodyStartScripts = collect(); } @endphp
+    @foreach($bodyStartScripts as $script)
         {!! $script->code !!}
     @endforeach
 
@@ -152,8 +151,8 @@
     @include('partials.footer')
 
     {{-- Body End Scripts from CMS --}}
-    @php try { $__bodyEndScripts = \App\Models\ScriptInjection::active()->where('location','body_end')->get(); } catch(\Throwable $e) { $__bodyEndScripts = collect(); } @endphp
-    @foreach($__bodyEndScripts as $script)
+    @php try { $bodyEndScripts = \App\Models\ScriptInjection::active()->where('location','body_end')->get(); } catch(\Exception $e) { $bodyEndScripts = collect(); } @endphp
+    @foreach($bodyEndScripts as $script)
         {!! $script->code !!}
     @endforeach
 

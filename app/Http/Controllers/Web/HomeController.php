@@ -88,10 +88,14 @@ class HomeController extends Controller
                 ->get(),
 
             'stats' => [
-                'students'    => SiteSetting::get('stat_students', '10,000+'),
-                'courses'     => SiteSetting::get('stat_courses', '50+'),
-                'instructors' => SiteSetting::get('stat_instructors', '25+'),
-                'placement'   => SiteSetting::get('stat_placement', '92%'),
+                'students'           => SiteSetting::get('stat_students', '10,000+'),
+                'courses'            => SiteSetting::get('stat_courses', '50+'),
+                'instructors'        => SiteSetting::get('stat_instructors', '25+'),
+                'placement'          => SiteSetting::get('stat_placement', '92%'),
+                'students_label'     => SiteSetting::get('stat_students_label', 'Students Trained'),
+                'courses_label'      => SiteSetting::get('stat_courses_label', 'Expert Courses'),
+                'instructors_label'  => SiteSetting::get('stat_instructors_label', 'Industry Instructors'),
+                'placement_label'    => SiteSetting::get('stat_placement_label', 'Job Placement Rate'),
             ],
         ];
 

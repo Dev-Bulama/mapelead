@@ -61,11 +61,7 @@ class ContactController extends Controller
             'sort_order'  => 0,
         ]));
 
-        if ($request->expectsJson()) {
-            return response()->json(['message' => 'Thank you! Your review has been submitted for approval.']);
-        }
-
-        return back()->with('review_success', 'Thank you! Your review has been submitted and will appear after approval.');
+        return back()->with('review_success', 'Thank you! Your review has been submitted and is pending approval.');
     }
 
     public function subscribe(Request $request)

@@ -515,28 +515,52 @@ function newsTicker() {
 ═══════════════════════════════════════════════════════════════════ --}}
 <section class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Our Difference</span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Why 10,000+ Students Choose MapeLearn</h2>
+            <p class="text-gray-500 text-lg max-w-2xl mx-auto">We've built every aspect of our platform with one goal: getting you hired and growing your career faster.</p>
+        </div>
+
         @php
-        $wcuBadge    = $settings['why_choose_us_badge']    ?? 'Our Difference';
-        $wcuTitle    = $settings['why_choose_us_title']    ?? 'Why 10,000+ Students Choose MapeLearn';
-        $wcuSubtitle = $settings['why_choose_us_subtitle'] ?? "We've built every aspect of our platform with one goal: getting you hired and growing your career faster.";
-        $featuresJson = $settings['why_choose_us_features'] ?? null;
-        $features = $featuresJson ? json_decode($featuresJson, true) : [
-            ['title' => 'Industry-Led Curriculum', 'desc' => 'Our programs are designed in collaboration with tech leaders at top companies. Every course maps directly to real job requirements.', 'icon' => 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z', 'color' => 'bg-blue-50 text-blue-600'],
-            ['title' => 'Expert Instructors', 'desc' => 'Learn from senior engineers, CTOs, and product leaders with 10+ years of real-world experience at top African and global tech companies.', 'icon' => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z', 'color' => 'bg-purple-50 text-purple-600'],
-            ['title' => 'Flexible Learning', 'desc' => 'Study at your own pace with on-demand videos, or join our live cohorts. Access content on any device, anytime — even offline.', 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'color' => 'bg-green-50 text-green-600'],
-            ['title' => 'Job Placement Support', 'desc' => 'Dedicated career coaches, resume reviews, mock interviews, and direct connections to our 200+ hiring partner companies.', 'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'color' => 'bg-orange-50 text-orange-600'],
-            ['title' => 'Certificate Programs', 'desc' => 'Earn verifiable blockchain-backed certificates recognized by top employers. Showcase your credentials on LinkedIn with one click.', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'color' => 'bg-yellow-50 text-yellow-600'],
-            ['title' => 'Community & Networking', 'desc' => 'Join a vibrant community of 10,000+ peers. Collaborate on projects, attend events, and build a professional network that opens doors.', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', 'color' => 'bg-pink-50 text-pink-600'],
+        $features = [
+            [
+                'title' => 'Industry-Led Curriculum',
+                'desc'  => 'Our programs are designed in collaboration with tech leaders at top companies. Every course maps directly to real job requirements.',
+                'icon'  => 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
+                'color' => 'bg-blue-50 text-blue-600',
+            ],
+            [
+                'title' => 'Expert Instructors',
+                'desc'  => 'Learn from senior engineers, CTOs, and product leaders with 10+ years of real-world experience at top African and global tech companies.',
+                'icon'  => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z',
+                'color' => 'bg-purple-50 text-purple-600',
+            ],
+            [
+                'title' => 'Flexible Learning',
+                'desc'  => 'Study at your own pace with on-demand videos, or join our live cohorts. Access content on any device, anytime — even offline.',
+                'icon'  => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+                'color' => 'bg-green-50 text-green-600',
+            ],
+            [
+                'title' => 'Job Placement Support',
+                'desc'  => 'Dedicated career coaches, resume reviews, mock interviews, and direct connections to our 200+ hiring partner companies.',
+                'icon'  => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+                'color' => 'bg-orange-50 text-orange-600',
+            ],
+            [
+                'title' => 'Certificate Programs',
+                'desc'  => 'Earn verifiable blockchain-backed certificates recognized by top employers. Showcase your credentials on LinkedIn with one click.',
+                'icon'  => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+                'color' => 'bg-yellow-50 text-yellow-600',
+            ],
+            [
+                'title' => 'Community & Networking',
+                'desc'  => 'Join a vibrant community of 10,000+ peers. Collaborate on projects, attend events, and build a professional network that opens doors.',
+                'icon'  => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+                'color' => 'bg-pink-50 text-pink-600',
+            ],
         ];
         @endphp
-        {{-- Tailwind color safelist (used by CMS dynamic classes) --}}
-        {{-- bg-blue-50 text-blue-600 bg-purple-50 text-purple-600 bg-green-50 text-green-600 bg-orange-50 text-orange-600 bg-yellow-50 text-yellow-600 bg-pink-50 text-pink-600 bg-red-50 text-red-600 bg-indigo-50 text-indigo-600 bg-teal-50 text-teal-600 bg-cyan-50 text-cyan-600 --}}
-
-        <div class="text-center mb-16">
-            <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">{{ $wcuBadge }}</span>
-            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{{ $wcuTitle }}</h2>
-            <p class="text-gray-500 text-lg max-w-2xl mx-auto">{{ $wcuSubtitle }}</p>
-        </div>
 
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($features as $feature)
@@ -592,6 +616,49 @@ function newsTicker() {
 @endif
 
 {{-- ═══════════════════════════════════════════════════════════════════
+     PARTNER LOGOS MARQUEE
+═══════════════════════════════════════════════════════════════════ --}}
+@php
+    $partnerLogosJson = \App\Models\SiteSetting::get('partner_logos', null);
+    $partnerLogos = $partnerLogosJson ? json_decode($partnerLogosJson, true) : [];
+@endphp
+@if(!empty($partnerLogos))
+<section class="py-12 bg-white border-y border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <p class="text-center text-xs font-semibold uppercase tracking-widest text-gray-400 mb-8">Trusted by leading organisations</p>
+    </div>
+    <div class="relative overflow-hidden">
+        <div class="flex gap-12 items-center partner-marquee">
+            @php $doubled = array_merge($partnerLogos, $partnerLogos); @endphp
+            @foreach($doubled as $partner)
+            <a href="{{ $partner['url'] ?? '#' }}" target="_blank" rel="noopener"
+               class="flex-shrink-0 grayscale hover:grayscale-0 opacity-60 hover:opacity-100 transition-all duration-300">
+                @if(!empty($partner['logo']))
+                    <img src="{{ asset('storage/' . $partner['logo']) }}"
+                         alt="{{ $partner['name'] ?? '' }}"
+                         class="h-10 max-w-[140px] w-auto object-contain">
+                @else
+                    <span class="text-gray-400 font-semibold text-sm px-4">{{ $partner['name'] ?? '' }}</span>
+                @endif
+            </a>
+            @endforeach
+        </div>
+    </div>
+    <style>
+        .partner-marquee {
+            animation: marquee 30s linear infinite;
+            width: max-content;
+        }
+        .partner-marquee:hover { animation-play-state: paused; }
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+    </style>
+</section>
+@endif
+
+{{-- ═══════════════════════════════════════════════════════════════════
      STATS COUNTER SECTION
 ═══════════════════════════════════════════════════════════════════ --}}
 <section class="py-20 bg-brand-950 relative overflow-hidden">
@@ -605,13 +672,27 @@ function newsTicker() {
             <p class="text-brand-300 text-lg">Real impact, real results — backed by data.</p>
         </div>
 
+        @php
+            $statStudents    = (int) preg_replace('/[^0-9]/', '', $stats['students']    ?? '10000') ?: 10000;
+            $statCourses     = (int) preg_replace('/[^0-9]/', '', $stats['courses']     ?? '50')    ?: 50;
+            $statInstructors = (int) preg_replace('/[^0-9]/', '', $stats['instructors'] ?? '25')    ?: 25;
+            $statPlacement   = (int) preg_replace('/[^0-9]/', '', $stats['placement']   ?? '92')    ?: 92;
+            $statSufStudents = preg_match('/%/', $stats['students']    ?? '') ? '%' : '+';
+            $statSufCourses  = preg_match('/%/', $stats['courses']     ?? '') ? '%' : '+';
+            $statSufInst     = preg_match('/%/', $stats['instructors'] ?? '') ? '%' : '+';
+            $statSufPlace    = preg_match('/%/', $stats['placement']   ?? '+') ? '%' : '+';
+            $statLabelStudents    = $stats['students_label']    ?? 'Students Trained';
+            $statLabelCourses     = $stats['courses_label']     ?? 'Expert Courses';
+            $statLabelInstructors = $stats['instructors_label'] ?? 'Industry Instructors';
+            $statLabelPlacement   = $stats['placement_label']   ?? 'Job Placement Rate';
+        @endphp
         <div x-data="{
             animated: false,
             counters: [
-                { label: 'Students Trained', value: {{ preg_replace('/[^0-9]/', '', $stats['students'] ?? 10000) }}, suffix: '+', prefix: '', current: 0, icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
-                { label: 'Expert Courses', value: {{ preg_replace('/[^0-9]/', '', $stats['courses'] ?? 150) }}, suffix: '+', prefix: '', current: 0, icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
-                { label: 'Industry Instructors', value: {{ preg_replace('/[^0-9]/', '', $stats['instructors'] ?? 50) }}, suffix: '+', prefix: '', current: 0, icon: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z' },
-                { label: 'Job Placement Rate', value: {{ preg_replace('/[^0-9]/', '', $stats['placement'] ?? 92) }}, suffix: '%', prefix: '', current: 0, icon: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
+                { label: '{{ addslashes($statLabelStudents) }}',    value: {{ $statStudents }},    suffix: '{{ $statSufStudents }}', prefix: '', current: 0, icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
+                { label: '{{ addslashes($statLabelCourses) }}',     value: {{ $statCourses }},     suffix: '{{ $statSufCourses }}',  prefix: '', current: 0, icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+                { label: '{{ addslashes($statLabelInstructors) }}', value: {{ $statInstructors }}, suffix: '{{ $statSufInst }}',     prefix: '', current: 0, icon: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z' },
+                { label: '{{ addslashes($statLabelPlacement) }}',   value: {{ $statPlacement }},   suffix: '{{ $statSufPlace }}',    prefix: '', current: 0, icon: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
             ],
             animate() {
                 if (this.animated) return;
@@ -678,13 +759,13 @@ function newsTicker() {
                     </div>
                     {{-- Quote --}}
                     <blockquote class="text-gray-700 text-sm leading-relaxed mb-6 italic">
-                        "{{ $testimonial['quote'] ?? $testimonial['body'] ?? '' }}"
+                        "{{ $testimonial->content ?? '' }}"
                     </blockquote>
                     {{-- Author --}}
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full overflow-hidden bg-brand-100 shrink-0">
-                            @if(!empty($testimonial['avatar']))
-                                <img src="{{ $testimonial['avatar'] }}" alt="{{ $testimonial['name'] }}" class="w-full h-full object-cover">
+                            @if($testimonial->avatar)
+                                <img src="{{ asset('storage/' . $testimonial->avatar) }}" alt="{{ $testimonial->name }}" class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-brand-600 font-bold text-sm">
                                     {{ strtoupper(substr($testimonial['name'] ?? 'A', 0, 1)) }}
@@ -755,116 +836,68 @@ function newsTicker() {
 </section>
 
 {{-- ═══════════════════════════════════════════════════════════════════
-     SHARE YOUR STORY
+     SHARE YOUR STORY — Public Review Form
 ═══════════════════════════════════════════════════════════════════ --}}
-<section class="py-16 bg-gray-50 border-t border-gray-100">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8"
-         x-data="{
-             open: false,
-             rating: 5,
-             submitted: false,
-             @if(session('review_success')) open: true, submitted: true, @endif
-         }">
-
-        {{-- CTA to open form --}}
-        <div class="text-center" x-show="!open">
-            <p class="text-gray-500 text-sm mb-4">Studied with us? We'd love to hear your story.</p>
-            <button @click="open = true"
-                    class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors shadow-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/>
-                </svg>
-                Share Your Story
-            </button>
+<section class="py-16 bg-gray-50 border-y border-gray-100">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8">
+            <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Your Voice Matters</span>
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Share Your Story</h2>
+            <p class="text-gray-500">Completed a course? We'd love to hear about your experience.</p>
         </div>
 
-        {{-- Success message --}}
-        <div x-show="submitted" x-transition class="text-center py-6">
-            <div class="inline-flex items-center justify-center w-14 h-14 bg-green-100 rounded-full mb-4">
-                <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
-                </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-900 mb-1">Thank you!</h3>
-            <p class="text-gray-500 text-sm">Your review has been submitted and will appear after approval.</p>
+        @if(session('review_success'))
+        <div class="mb-6 bg-green-50 border border-green-200 text-green-800 rounded-2xl px-5 py-4 text-sm text-center">
+            {{ session('review_success') }}
         </div>
+        @endif
 
-        {{-- Submission form --}}
-        <div x-show="open && !submitted" x-transition>
-            <div class="text-center mb-8">
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Share Your Experience</h3>
-                <p class="text-gray-500 text-sm">Your review will appear on our site after a quick moderation check.</p>
-            </div>
-
-            <form action="{{ route('review.submit') }}" method="POST" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8 space-y-5">
+        <div class="bg-white rounded-2xl border border-gray-200 p-7 shadow-sm" x-data="{ rating: 5 }">
+            <form action="{{ route('review.submit') }}" method="POST" class="space-y-5">
                 @csrf
-
-                @if(session('review_success'))
-                <div class="flex items-center gap-3 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl text-sm">
-                    {{ session('review_success') }}
-                </div>
-                @endif
-
-                @if($errors->any())
-                <div class="flex flex-col gap-1 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-                    @foreach($errors->all() as $error)
-                    <span>{{ $error }}</span>
-                    @endforeach
-                </div>
-                @endif
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="name" value="{{ old('name') }}" required maxlength="100"
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Your Name <span class="text-red-500">*</span></label>
+                        <input type="text" name="name" required value="{{ old('name') }}"
                                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-                               placeholder="Jane Doe">
+                               placeholder="Full name">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Role / Title</label>
-                        <input type="text" name="title" value="{{ old('title') }}" maxlength="100"
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Title / Role</label>
+                        <input type="text" name="title" value="{{ old('title') }}"
                                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
                                placeholder="e.g. Software Engineer">
                     </div>
-                    <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Company / Organisation</label>
-                        <input type="text" name="company" value="{{ old('company') }}" maxlength="100"
-                               class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-                               placeholder="Where do you work?">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Your Review <span class="text-red-500">*</span></label>
-                        <textarea name="content" rows="4" required minlength="20" maxlength="1000"
-                                  class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
-                                  placeholder="Tell us about your learning experience — what you gained, what changed for you…">{{ old('content') }}</textarea>
-                        <p class="text-xs text-gray-400 mt-1">Minimum 20 characters.</p>
-                    </div>
                 </div>
-
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Rating <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Company / Organisation</label>
+                    <input type="text" name="company" value="{{ old('company') }}"
+                           class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                           placeholder="Where do you work?">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
                     <input type="hidden" name="rating" :value="rating">
-                    <div class="flex items-center gap-1">
+                    <div class="flex gap-2">
                         <template x-for="star in [1,2,3,4,5]" :key="star">
                             <button type="button" @click="rating = star"
-                                    :class="star <= rating ? 'text-amber-400' : 'text-gray-300'"
-                                    class="text-3xl leading-none hover:text-amber-400 transition-colors focus:outline-none select-none">
-                                &#9733;
-                            </button>
+                                :class="star <= rating ? 'text-amber-400' : 'text-gray-300'"
+                                class="text-3xl leading-none hover:text-amber-400 transition-colors">&#9733;</button>
                         </template>
-                        <span class="ml-3 text-sm text-gray-500" x-text="rating + ' / 5 stars'"></span>
+                        <span class="self-center text-sm text-gray-500 ml-1" x-text="rating + ' / 5'"></span>
                     </div>
                 </div>
-
-                <div class="flex items-center justify-between pt-2">
-                    <button type="button" @click="open = false" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
-                        Cancel
-                    </button>
-                    <button type="submit"
-                            class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors shadow-sm">
-                        Submit Review
-                    </button>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Your Review <span class="text-red-500">*</span></label>
+                    <textarea name="content" rows="4" required minlength="20" maxlength="1000"
+                              class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent resize-none"
+                              placeholder="Tell us about your experience with our courses... (min. 20 characters)">{{ old('content') }}</textarea>
                 </div>
+                <button type="submit"
+                        class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 rounded-xl transition-colors text-sm">
+                    Submit My Review
+                </button>
+                <p class="text-xs text-gray-400 text-center">Reviews are reviewed before being published on the site.</p>
             </form>
         </div>
     </div>
@@ -1195,7 +1228,7 @@ function galleryLightbox() {
                 ['icon' => 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z', 'label' => 'Call Us', 'value' => \App\Models\SiteSetting::get('contact_phone', '+234 800 000 0000'), 'href' => 'tel:' . preg_replace('/\s+/', '', \App\Models\SiteSetting::get('contact_phone', '+2348000000000'))],
                 ['icon' => 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'label' => 'Email Us', 'value' => \App\Models\SiteSetting::get('contact_email', 'hello@mapelearn.com'), 'href' => 'mailto:' . \App\Models\SiteSetting::get('contact_email', 'hello@mapelearn.com')],
                 ['icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z', 'label' => 'Visit Us', 'value' => \App\Models\SiteSetting::get('contact_address', 'Lagos, Nigeria'), 'href' => '#'],
-                ['icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'label' => 'Office Hours', 'value' => \App\Models\SiteSetting::get('contact_office_hours', 'Mon – Sat, 8am – 6pm'), 'href' => '#'],
+                ['icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'label' => 'Office Hours', 'value' => 'Mon – Sat, 8am – 6pm', 'href' => '#'],
             ];
             @endphp
             @foreach($contactItems as $item)

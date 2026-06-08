@@ -58,14 +58,12 @@ class SettingsController extends Controller
             'provider'  => 'nullable|string|max:100',
             'location'  => 'required|in:head,body_start,body_end',
             'code'      => 'required|string',
+            'is_active' => 'boolean',
         ]);
 
         $data['is_active'] = $request->boolean('is_active', true);
 
-        ScriptInjection::updateOrCreate(
-            ['name' => $data['name']],
-            $data
-        );
+        ScriptInjection::updateOrCreate(['name' => $data['name']], $data);
         return back()->with('success', 'Script saved!');
     }
 
