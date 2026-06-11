@@ -43,10 +43,10 @@
                         placeholder="Brief description of this category..."></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Icon</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Icon <span class="text-gray-400 font-normal text-xs">(emoji)</span></label>
                     <input type="text" name="icon" maxlength="50"
                         class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500"
-                        placeholder="e.g. laptop, code, star">
+                        placeholder="e.g. 💻 📱 🎨 🌐 📚">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
@@ -158,10 +158,10 @@
                                         class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
                                 </div>
                                 <div class="col-span-2 sm:col-span-1">
-                                    <label class="block text-xs font-medium text-gray-600 mb-1">Icon</label>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Icon <span class="text-gray-400 font-normal">(emoji)</span></label>
                                     <input type="text" name="icon" value="{{ $category->icon }}" maxlength="50"
                                         class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500"
-                                        placeholder="e.g. laptop, code, star">
+                                        placeholder="e.g. 💻 📱 🎨 🌐 📚">
                                 </div>
                                 <div class="col-span-2">
                                     <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>

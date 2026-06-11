@@ -30,7 +30,11 @@
             <div>
                 @if(isset($category) && $category->icon)
                 <div class="w-14 h-14 bg-brand-700 rounded-2xl flex items-center justify-center mb-4">
-                    <img src="{{ asset('storage/' . $category->icon) }}" alt="" class="w-8 h-8 object-contain">
+                    @if(str_contains($category->icon, '.') || str_contains($category->icon, '/'))
+                        <img src="{{ asset('storage/' . $category->icon) }}" alt="" class="w-8 h-8 object-contain">
+                    @else
+                        <span class="text-2xl leading-none">{{ $category->icon }}</span>
+                    @endif
                 </div>
                 @endif
                 <h1 class="font-display text-3xl sm:text-4xl font-extrabold text-white">

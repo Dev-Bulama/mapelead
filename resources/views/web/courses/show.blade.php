@@ -81,7 +81,21 @@
             </div>
 
             {{-- Instructor quick ref --}}
-            @if($course->instructor)
+            @if($course->courseInstructors->count())
+            <div class="flex flex-wrap items-center gap-4">
+                <span class="text-brand-400 text-xs">Instructors:</span>
+                @foreach($course->courseInstructors as $ci)
+                <div class="flex items-center gap-2">
+                    <img src="{{ $ci->instructor->avatar_url }}" alt="{{ $ci->instructor->full_name }}"
+                         class="w-9 h-9 rounded-full object-cover border-2 border-brand-500">
+                    <div>
+                        <a href="#instructor" class="text-white text-sm font-semibold hover:text-brand-300 transition-colors">{{ $ci->instructor->full_name }}</a>
+                        <span class="text-brand-400 text-xs ml-1">· {{ $ci->session_label }}</span>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            @elseif($course->instructor)
             <div class="flex items-center gap-3">
                 <img src="{{ $course->instructor->avatar_url }}" alt="{{ $course->instructor->full_name }}"
                      class="w-9 h-9 rounded-full object-cover border-2 border-brand-500">
@@ -248,7 +262,76 @@
                 </section>
 
                 {{-- INSTRUCTOR BIO --}}
-                @if($course->instructor)
+                @if($course->courseInstructors->count())
+                <section id="instructor" class="bg-white rounded-2xl border border-gray-200 p-7">
+                    <h2 class="font-display font-bold text-gray-900 text-xl mb-6">
+                        {{ $course->courseInstructors->count() > 1 ? 'Your Instructors' : 'Your Instructor' }}
+                    </h2>
+                    <div class="space-y-8">
+                    @foreach($course->courseInstructors as $ci)
+                    @php $instr = $ci->instructor; @endphp
+                    <div class="flex flex-col sm:flex-row gap-6 {{ !$loop->last ? 'pb-8 border-b border-gray-100' : '' }}">
+                        <div class="shrink-0 relative">
+                            <img src="{{ $instr->avatar_url }}" alt="{{ $instr->full_name }}"
+                                 class="w-24 h-24 rounded-2xl object-cover border-2 border-brand-100">
+                            <span class="absolute -bottom-2 -right-2 text-lg" title="{{ $ci->session_label }}">{{ $ci->session_icon }}</span>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex flex-wrap items-start justify-between gap-3 mb-2">
+                                <div>
+                                    <h3 class="font-display font-bold text-gray-900 text-lg">{{ $instr->full_name }}</h3>
+                                    <div class="flex items-center gap-2">
+                                        @if($instr->title)
+                                        <p class="text-brand-600 text-sm font-medium">{{ $instr->title }}</p>
+                                        @endif
+                                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{{ $ci->session_label }} Session@if($ci->session_time) · {{ $ci->formatted_time }}@endif</span>
+                                    </div>
+                                </div>
+                                @if($instr->is_verified)
+                                <span class="inline-flex items-center gap-1 bg-brand-50 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                                    Verified Instructor
+                                </span>
+                                @endif
+                            </div>
+
+                            <div class="flex flex-wrap gap-4 mb-4 text-sm text-gray-600">
+                                <span class="flex items-center gap-1.5">
+                                    <div class="flex items-center gap-0.5">
+                                        @for($s = 1; $s <= 5; $s++)
+                                        <svg class="w-3 h-3 {{ $s <= round($instr->average_rating ?? 0) ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current' }}" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        @endfor
+                                    </div>
+                                    <span class="font-medium">{{ number_format($instr->average_rating ?? 0, 1) }} rating</span>
+                                </span>
+                                <span class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                    {{ number_format($instr->total_students ?? 0) }} students
+                                </span>
+                                <span class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                    {{ $instr->total_courses ?? 0 }} {{ Str::plural('course', $instr->total_courses ?? 0) }}
+                                </span>
+                            </div>
+
+                            @if($instr->description)
+                            <div x-data="{ expanded: false }">
+                                <p class="text-gray-600 text-sm leading-relaxed"
+                                   :class="expanded ? '' : 'line-clamp-4'">
+                                    {{ $instr->description }}
+                                </p>
+                                <button @click="expanded = !expanded"
+                                        class="mt-2 text-brand-600 hover:text-brand-700 text-sm font-semibold transition-colors">
+                                    <span x-text="expanded ? 'Show Less' : 'Read More'"></span>
+                                </button>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                    </div>
+                </section>
+                @elseif($course->instructor)
                 <section id="instructor" class="bg-white rounded-2xl border border-gray-200 p-7">
                     <h2 class="font-display font-bold text-gray-900 text-xl mb-6">Your Instructor</h2>
                     <div class="flex flex-col sm:flex-row gap-6">

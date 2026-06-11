@@ -13,12 +13,14 @@ class CourseService
     {
         $query = Course::published()
             ->with(['instructor.user', 'category'])
-            ->when($filters['category'] ?? null, fn($q, $cat) => $q->whereHas('category', fn($q) => $q->where('slug', $cat)))
+            ->when($filters['category'] ?? null, fn($q, $cat) => $q->whereHas('category', fn($q) => $q->where('slug', $cat)->orWhere('id', (int) $cat)))
             ->when($filters['type'] ?? null, fn($q, $t) => $q->where('type', $t))
             ->when($filters['level'] ?? null, fn($q, $l) => $q->where('level', $l))
             ->when($filters['search'] ?? null, fn($q, $s) => $q->where(fn($q) => $q->where('title', 'like', "%{$s}%")->orWhere('short_description', 'like', "%{$s}%")))
             ->when($filters['price_min'] ?? null, fn($q, $p) => $q->where('price', '>=', $p))
-            ->when($filters['price_max'] ?? null, fn($q, $p) => $q->where('price', '<=', $p));
+            ->when($filters['price_max'] ?? null, fn($q, $p) => $q->where('price', '<=', $p))
+            ->when($filters['free_only'] ?? null, fn($q) => $q->where('is_free', true))
+            ->when($filters['certificate'] ?? null, fn($q) => $q->where('certificate_enabled', true));
 
         $sort = $filters['sort'] ?? 'popular';
         match ($sort) {
@@ -43,7 +45,7 @@ class CourseService
     public function findBySlug(string $slug): ?Course
     {
         return Course::published()
-            ->with(['instructor.user', 'category', 'modules.lessons', 'reviews.user', 'tags'])
+            ->with(['instructor.user', 'category', 'modules.lessons', 'reviews.user', 'tags', 'courseInstructors.instructor.user'])
             ->where('slug', $slug)
             ->firstOrFail();
     }
