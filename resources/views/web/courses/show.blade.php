@@ -284,7 +284,7 @@
                                         @if($instr->title)
                                         <p class="text-brand-600 text-sm font-medium">{{ $instr->title }}</p>
                                         @endif
-                                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{{ $ci->session_label }} Session@if($ci->session_time) · {{ $ci->formatted_time }}@endif</span>
+                                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{{ $ci->session_label }} Session{{ $ci->session_time ? ' · ' . $ci->formatted_time : '' }}</span>
                                     </div>
                                 </div>
                                 @if($instr->is_verified)
