@@ -18,7 +18,7 @@ class CourseService
             ->when($filters['level'] ?? null, fn($q, $l) => $q->where('level', $l))
             ->when($filters['search'] ?? null, fn($q, $s) => $q->where(fn($q) => $q->where('title', 'like', "%{$s}%")->orWhere('short_description', 'like', "%{$s}%")))
             ->when($filters['price_min'] ?? null, fn($q, $p) => $q->where('price', '>=', $p))
-            ->when($filters['price_max'] ?? null, fn($q, $p) => $q->where('price', '<=', $p))
+            ->when(isset($filters['price_max']) && (int)$filters['price_max'] < 10000000, fn($q) => $q->where('price', '<=', $filters['price_max']))
             ->when($filters['free_only'] ?? null, fn($q) => $q->where('is_free', true))
             ->when($filters['certificate'] ?? null, fn($q) => $q->where('certificate_enabled', true));
 

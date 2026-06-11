@@ -30,10 +30,12 @@
             <div>
                 @if(isset($category) && $category->icon)
                 <div class="w-14 h-14 bg-brand-700 rounded-2xl flex items-center justify-center mb-4">
-                    @if(str_contains($category->icon, '.') || str_contains($category->icon, '/'))
+                    @if($category->icon && (str_contains($category->icon, '.') || str_contains($category->icon, '/')))
                         <img src="{{ asset('storage/' . $category->icon) }}" alt="" class="w-8 h-8 object-contain">
-                    @else
+                    @elseif($category->icon && mb_strlen($category->icon) !== strlen($category->icon))
                         <span class="text-2xl leading-none">{{ $category->icon }}</span>
+                    @else
+                        <svg class="w-7 h-7 text-white opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
                     @endif
                 </div>
                 @endif
@@ -183,7 +185,7 @@
                         <div x-data="{
                             open: true,
                             min: {{ request('price_min', 0) }},
-                            max: {{ request('price_max', 500000) }},
+                            max: {{ request('price_max', 10000000) }},
                             formatPrice(n) { return new Intl.NumberFormat('en-NG').format(n); }
                         }">
                             <button type="button" @click="open = !open" class="flex items-center justify-between w-full mb-3">
@@ -198,18 +200,19 @@
                                 <div class="space-y-3">
                                     <div>
                                         <label class="text-xs text-gray-500 mb-1 block">Min Price</label>
-                                        <input type="range" name="price_min" x-model="min" min="0" max="500000" step="5000"
-                                               onchange="document.getElementById('filter-form').submit()"
+                                        <input type="range" name="price_min" x-model="min" min="0" max="10000000" step="50000"
                                                class="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-brand-600">
                                     </div>
                                     <div>
                                         <label class="text-xs text-gray-500 mb-1 block">Max Price</label>
-                                        <input type="range" name="price_max" x-model="max" min="0" max="500000" step="5000"
-                                               onchange="document.getElementById('filter-form').submit()"
+                                        <input type="range" name="price_max" x-model="max" min="0" max="10000000" step="50000"
                                                class="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-brand-600">
                                     </div>
                                 </div>
-                                <label class="flex items-center gap-2.5 cursor-pointer group mt-4">
+                                <button type="submit" class="mt-3 w-full bg-gray-100 hover:bg-brand-600 hover:text-white text-gray-700 text-xs font-semibold py-2 rounded-xl transition-colors">
+                                    Apply Price Filter
+                                </button>
+                                <label class="flex items-center gap-2.5 cursor-pointer group mt-3">
                                     <input type="checkbox" name="free_only" value="1"
                                            {{ request('free_only') ? 'checked' : '' }}
                                            onchange="document.getElementById('filter-form').submit()"

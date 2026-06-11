@@ -344,12 +344,11 @@ function newsTicker() {
                class="group card-hover bg-gray-50 hover:bg-brand-50 border border-gray-200 hover:border-brand-200 rounded-2xl p-6 text-center transition-all duration-200">
                 {{-- Icon placeholder --}}
                 <div class="w-14 h-14 mx-auto mb-4 bg-brand-100 group-hover:bg-brand-200 rounded-2xl flex items-center justify-center transition-colors">
-                    @if($cat->icon)
-                        @if(str_contains($cat->icon, '.') || str_contains($cat->icon, '/'))
-                            <img src="{{ asset('storage/' . $cat->icon) }}" alt="{{ $cat->name }}" class="w-8 h-8 object-contain">
-                        @else
-                            <span class="text-2xl leading-none">{{ $cat->icon }}</span>
-                        @endif
+                    @if($cat->icon && (str_contains($cat->icon, '.') || str_contains($cat->icon, '/')))
+                        <img src="{{ asset('storage/' . $cat->icon) }}" alt="{{ $cat->name }}" class="w-8 h-8 object-contain">
+                    @elseif($cat->icon && mb_strlen($cat->icon) !== strlen($cat->icon))
+                        {{-- emoji (multi-byte character) --}}
+                        <span class="text-2xl leading-none">{{ $cat->icon }}</span>
                     @else
                         <svg class="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2"/>
