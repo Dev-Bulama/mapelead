@@ -356,7 +356,7 @@ function newsTicker() {
                     @endif
                 </div>
                 <h3 class="font-semibold text-gray-800 group-hover:text-brand-700 text-sm leading-snug mb-1 transition-colors">{{ $cat->name }}</h3>
-                <p class="text-xs text-gray-500">{{ $cat->courses_count ?? $cat->courses->count() }} {{ Str::plural('course', $cat->courses_count ?? 0) }}</p>
+                <p class="text-xs text-gray-500">{{ (int)($cat->courses_count ?? 0) }} {{ Str::plural('course', (int)($cat->courses_count ?? 0)) }}</p>
             </a>
             @endforeach
 

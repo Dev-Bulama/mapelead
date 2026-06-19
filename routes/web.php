@@ -334,5 +334,8 @@ Route::get('/verify/{token}', [CertificateSettingsController::class, 'verify'])-
 // ─── Public Admission Verification ────────────────────────────────────────────
 Route::get('/admission/verify/{number}', [\App\Http\Controllers\Web\AdmissionVerificationController::class, 'verify'])->name('admission.verify.public');
 
+// ─── Public Gallery ───────────────────────────────────────────────────────────
+Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
+
 // ─── Dynamic CMS Pages (must be last) ─────────────────────────────────────────
 Route::get('/{slug}', [PageController::class, 'show'])->name('page.show');

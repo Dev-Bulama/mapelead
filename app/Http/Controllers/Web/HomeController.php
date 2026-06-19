@@ -111,6 +111,27 @@ class HomeController extends Controller
         ]);
     }
 
+    public function gallery(\Illuminate\Http\Request $request)
+    {
+        $currentCategory = $request->get('category');
+
+        $categories = GalleryItem::active()
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category');
+
+        $items = GalleryItem::active()
+            ->when($currentCategory, fn($q) => $q->where('category', $currentCategory))
+            ->orderBy('sort_order')
+            ->orderByDesc('created_at')
+            ->paginate(24)
+            ->withQueryString();
+
+        return view('web.gallery', compact('items', 'categories', 'currentCategory'));
+    }
+
     public function sitemap()
     {
         $courses = Course::published()->select('slug', 'updated_at')->get();
