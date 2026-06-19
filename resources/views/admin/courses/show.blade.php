@@ -53,7 +53,7 @@
                     $totalDuration = $course->modules->flatMap(fn($m) => $m->lessons)->sum('duration_minutes');
                 @endphp
                 @foreach([
-                    ['label' => 'Lead Instructor', 'value' => $course->instructor->user->full_name ?? '—'],
+                    ['label' => 'Lead Instructor', 'value' => $course->instructor?->user?->full_name ?? '—'],
                     ['label' => 'Enrollments', 'value' => $course->enrollments->count()],
                     ['label' => 'Modules', 'value' => $course->modules->count()],
                     ['label' => 'Lessons', 'value' => $totalLessons],

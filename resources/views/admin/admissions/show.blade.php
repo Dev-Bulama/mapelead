@@ -78,7 +78,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-1">Instructor</p>
-                        <p class="text-gray-900">{{ $enrollment->course->instructor->user->full_name ?? '—' }}</p>
+                        <p class="text-gray-900">{{ $enrollment->course->instructor?->user?->full_name ?? '—' }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-1">Enrolled On</p>

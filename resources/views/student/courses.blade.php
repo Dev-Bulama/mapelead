@@ -46,7 +46,7 @@
                         <div class="p-4">
                             <span class="text-xs text-brand-600 font-medium">{{ $enrollment->course->category->name ?? '' }}</span>
                             <h3 class="font-bold text-gray-900 mt-1 line-clamp-2">{{ $enrollment->course->title }}</h3>
-                            <p class="text-xs text-gray-500 mt-1">{{ $enrollment->course->instructor->user->full_name ?? 'Instructor' }}</p>
+                            <p class="text-xs text-gray-500 mt-1">{{ $enrollment->course->instructor?->user?->full_name ?? 'Instructor' }}</p>
 
                             <div class="mt-3">
                                 <div class="flex justify-between text-xs text-gray-500 mb-1">
