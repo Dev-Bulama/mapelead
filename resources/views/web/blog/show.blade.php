@@ -15,16 +15,20 @@
                 <a href="{{ route('home') }}" class="hover:text-brand-600">Home</a>
                 <span>›</span>
                 <a href="{{ route('blog.index') }}" class="hover:text-brand-600">Blog</a>
+                @if($post->category)
                 <span>›</span>
                 <a href="{{ route('blog.category', $post->category->slug) }}" class="hover:text-brand-600">{{ $post->category->name }}</a>
+                @endif
                 <span>›</span>
                 <span class="text-gray-700 truncate max-w-xs">{{ $post->title }}</span>
             </nav>
 
             {{-- Category + Tags --}}
             <div class="flex flex-wrap gap-2 mb-4">
+                @if($post->category)
                 <a href="{{ route('blog.category', $post->category->slug) }}"
                    class="bg-brand-50 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full">{{ $post->category->name }}</a>
+                @endif
                 @foreach($post->tags as $tag)
                     <a href="{{ route('blog.tag', $tag->slug) }}"
                        class="bg-gray-100 text-gray-600 text-xs px-3 py-1 rounded-full hover:bg-gray-200 transition-colors">#{{ $tag->name }}</a>

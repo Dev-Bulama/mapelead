@@ -410,7 +410,7 @@
                                         @endif
                                     </div>
                                     <span class="text-xs text-gray-500 truncate">
-                                        @if($cInstructors->count() === 1){{ $cInstructors->first()->instructor->full_name ?? '' }}
+                                        @if($cInstructors->count() === 1){{ $cInstructors->first()->instructor?->full_name ?? '' }}
                                         @else{{ $cInstructors->count() }} instructors
                                         @endif
                                     </span>
@@ -519,7 +519,7 @@
                                                 @endif
                                             </div>
                                             <span class="text-xs text-gray-500">
-                                                @if($cInstructors2->count() === 1){{ $cInstructors2->first()->instructor->full_name ?? '' }}
+                                                @if($cInstructors2->count() === 1){{ $cInstructors2->first()->instructor?->full_name ?? '' }}
                                                 @else{{ $cInstructors2->count() }} instructors
                                                 @endif
                                             </span>

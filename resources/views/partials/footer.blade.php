@@ -88,7 +88,7 @@
                 [
                     'menu'     => $footer1,
                     'label'    => 'Quick Links',
-                    'fallback' => [['Home', '/'], ['Courses', '/courses'], ['About Us', '/about'], ['Contact', '/contact']],
+                    'fallback' => [['Home', '/'], ['Courses', '/courses'], ['About Us', '/about'], ['Gallery', '/gallery'], ['Contact', '/contact']],
                 ],
                 [
                     'menu'     => $footer2,

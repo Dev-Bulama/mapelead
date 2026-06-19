@@ -99,6 +99,7 @@
 
                 <div class="flex items-center justify-between pt-2 border-t border-gray-100">
                     <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="hidden" name="is_active" value="0">
                         <input type="checkbox" name="is_active" value="1" checked class="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500">
                         <span class="text-sm text-gray-700">Publish immediately (visible on site)</span>
                     </label>
@@ -142,7 +143,6 @@
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-0 divide-x divide-y divide-gray-100">
             @foreach($items as $item)
-            @if(!request('cat') || request('cat') === $item->category)
             <div class="relative group bg-gray-50 aspect-square overflow-hidden">
                 <img src="{{ $item->image_url }}"
                      alt="{{ $item->alt_text ?? $item->title ?? 'Gallery' }}"
@@ -199,7 +199,6 @@
                     </form>
                 </div>
             </div>
-            @endif
             @endforeach
         </div>
     </div>

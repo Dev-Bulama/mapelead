@@ -24,17 +24,20 @@
 
     {{-- Stats Cards --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        @foreach([
-            ['label' => 'Total Courses',   'value' => $stats['total_courses'],  'icon' => 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', 'color' => 'blue'],
-            ['label' => 'Completed',        'value' => $stats['completed'],       'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'color' => 'green'],
-            ['label' => 'In Progress',      'value' => $stats['in_progress'],     'icon' => 'M13 10V3L4 14h7v7l9-11h-7z', 'color' => 'yellow'],
-            ['label' => 'Certificates',     'value' => $stats['certificates'],    'icon' => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0', 'color' => 'purple'],
-        ] as $stat)
+        @php
+        $dashStats = [
+            ['label' => 'Total Courses', 'value' => $stats['total_courses'],  'icon' => 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', 'bg' => 'bg-blue-100',   'text' => 'text-blue-600'],
+            ['label' => 'Completed',     'value' => $stats['completed'],       'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',                                                                                                                                                                                                                                                                                                                   'bg' => 'bg-green-100',  'text' => 'text-green-600'],
+            ['label' => 'In Progress',   'value' => $stats['in_progress'],     'icon' => 'M13 10V3L4 14h7v7l9-11h-7z',                                                                                                                                                                                                                                                                                                                                       'bg' => 'bg-yellow-100', 'text' => 'text-yellow-600'],
+            ['label' => 'Certificates',  'value' => $stats['certificates'],    'icon' => 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0',                                                                                                                                                                                                                                                                                        'bg' => 'bg-purple-100', 'text' => 'text-purple-600'],
+        ];
+        @endphp
+        @foreach($dashStats as $stat)
             <div class="bg-white rounded-2xl p-4 border border-gray-100">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ $stat['label'] }}</span>
-                    <div class="w-8 h-8 bg-{{ $stat['color'] }}-100 rounded-lg flex items-center justify-center">
-                        <svg class="w-4 h-4 text-{{ $stat['color'] }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-8 h-8 {{ $stat['bg'] }} rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 {{ $stat['text'] }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $stat['icon'] }}"/>
                         </svg>
                     </div>
@@ -91,7 +94,7 @@
                         <div class="p-3">
                             <p class="text-xs text-brand-600 font-medium mb-1">{{ $enrollment->course->category->name ?? '' }}</p>
                             <h4 class="font-semibold text-gray-900 text-sm line-clamp-2">{{ $enrollment->course->title }}</h4>
-                            <p class="text-xs text-gray-500 mt-1">by {{ $enrollment->course->instructor->user->full_name ?? 'Instructor' }}</p>
+                            <p class="text-xs text-gray-500 mt-1">by {{ $enrollment->course->instructor?->user?->full_name ?? 'Instructor' }}</p>
 
                             {{-- Progress --}}
                             <div class="mt-3">

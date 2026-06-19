@@ -464,7 +464,7 @@ function newsTicker() {
                             @endif
                         </div>
                         <span class="text-sm text-gray-500 truncate">
-                            @if($cInstructors->count() === 1){{ $cInstructors->first()->instructor->full_name ?? '' }}
+                            @if($cInstructors->count() === 1){{ $cInstructors->first()->instructor?->full_name ?? '' }}
                             @else{{ $cInstructors->count() }} instructors
                             @endif
                         </span>

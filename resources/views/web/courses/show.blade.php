@@ -85,6 +85,7 @@
             <div class="flex flex-wrap items-center gap-4">
                 <span class="text-brand-400 text-xs">Instructors:</span>
                 @foreach($course->courseInstructors as $ci)
+                @if($ci->instructor)
                 <div class="flex items-center gap-2">
                     <img src="{{ $ci->instructor->avatar_url }}" alt="{{ $ci->instructor->full_name }}"
                          class="w-9 h-9 rounded-full object-cover border-2 border-brand-500">
@@ -93,6 +94,7 @@
                         <span class="text-brand-400 text-xs ml-1">· {{ $ci->session_label }}</span>
                     </div>
                 </div>
+                @endif
                 @endforeach
             </div>
             @elseif($course->instructor)
@@ -270,6 +272,7 @@
                     <div class="space-y-8">
                     @foreach($course->courseInstructors as $ci)
                     @php $instr = $ci->instructor; @endphp
+                    @if(!$instr) @continue @endif
                     <div class="flex flex-col sm:flex-row gap-6 {{ !$loop->last ? 'pb-8 border-b border-gray-100' : '' }}">
                         <div class="shrink-0 relative">
                             <img src="{{ $instr->avatar_url }}" alt="{{ $instr->full_name }}"
@@ -564,13 +567,17 @@
                             <p class="text-center text-xs text-gray-500">You are enrolled in this course</p>
                             @else
                             @if($course->is_free)
-                            <form action="{{ route('courses.show', $course->slug) }}" method="POST" class="mb-3">
-                                @csrf
-                                <input type="hidden" name="action" value="enroll_free">
-                                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl transition-colors text-base">
-                                    Enroll for Free
-                                </button>
-                            </form>
+                            @auth
+                            <a href="{{ route('enroll.checkout', $course->slug) }}"
+                               class="block w-full bg-green-600 hover:bg-green-700 text-white font-bold text-center py-4 rounded-2xl transition-colors text-base mb-3">
+                                Enroll for Free
+                            </a>
+                            @else
+                            <a href="{{ route('auth.login') }}?redirect={{ urlencode(route('enroll.checkout', $course->slug)) }}"
+                               class="block w-full bg-green-600 hover:bg-green-700 text-white font-bold text-center py-4 rounded-2xl transition-colors text-base mb-3">
+                                Enroll for Free — Login to Continue
+                            </a>
+                            @endauth
                             @else
                             @auth
                             <a href="{{ route('enroll.checkout', $course->slug) }}"

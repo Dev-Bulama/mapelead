@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        $items      = GalleryItem::orderBy('sort_order')->orderByDesc('created_at')->get();
-        $categories = GalleryItem::whereNotNull('category')->distinct()->pluck('category');
+        $cat        = $request->get('cat');
+        $items      = GalleryItem::when($cat, fn($q) => $q->where('category', $cat))
+                        ->orderBy('sort_order')->orderByDesc('created_at')->get();
+        $categories = GalleryItem::whereNotNull('category')->where('category', '!=', '')->distinct()->orderBy('category')->pluck('category');
         return view('admin.gallery.index', compact('items', 'categories'));
     }
 
@@ -36,7 +38,7 @@ class GalleryController extends Controller
                 'category'   => $data['category'] ?? null,
                 'alt_text'   => $data['alt_text'] ?? null,
                 'sort_order' => $data['sort_order'] ?? 0,
-                'is_active'  => $request->boolean('is_active', true),
+                'is_active'  => $request->boolean('is_active'),
             ]);
         }
 

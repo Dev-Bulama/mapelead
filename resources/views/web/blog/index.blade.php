@@ -41,10 +41,12 @@
                             </a>
                             <div class="p-5">
                                 <div class="flex items-center gap-2 mb-3">
+                                    @if($post->category)
                                     <a href="{{ route('blog.category', $post->category->slug) }}"
                                        class="text-xs bg-brand-50 text-brand-700 font-medium px-2.5 py-1 rounded-full hover:bg-brand-100 transition-colors">
                                         {{ $post->category->name }}
                                     </a>
+                                    @endif
                                     @if($post->read_time_minutes)
                                         <span class="text-xs text-gray-400">{{ $post->read_time_minutes }} min read</span>
                                     @endif
