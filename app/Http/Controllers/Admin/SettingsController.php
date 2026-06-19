@@ -164,17 +164,23 @@ class SettingsController extends Controller
 
     public function updateIntegrations(Request $request)
     {
+        // Google login toggle — stored in site_settings (not .env)
+        \App\Models\SiteSetting::set('enable_google_login', $request->input('enable_google_login', '0'));
+
         $fields = [
-            'PAYSTACK_PUBLIC_KEY'  => $request->paystack_public_key,
-            'PAYSTACK_SECRET_KEY'  => $request->paystack_secret_key,
-            'MAIL_MAILER'          => $request->mail_mailer,
-            'MAIL_HOST'            => $request->mail_host,
-            'MAIL_PORT'            => $request->mail_port,
-            'MAIL_USERNAME'        => $request->mail_username,
-            'MAIL_PASSWORD'        => $request->mail_password,
-            'MAIL_ENCRYPTION'      => $request->mail_encryption,
-            'MAIL_FROM_ADDRESS'    => $request->mail_from_address,
-            'MAIL_FROM_NAME'       => $request->mail_from_name,
+            'PAYSTACK_PUBLIC_KEY'     => $request->paystack_public_key,
+            'PAYSTACK_SECRET_KEY'     => $request->paystack_secret_key,
+            'PAYSTACK_WEBHOOK_SECRET' => $request->paystack_webhook_secret,
+            'MAIL_MAILER'           => $request->mail_mailer,
+            'MAIL_HOST'             => $request->mail_host,
+            'MAIL_PORT'             => $request->mail_port,
+            'MAIL_USERNAME'         => $request->mail_username,
+            'MAIL_PASSWORD'         => $request->mail_password,
+            'MAIL_ENCRYPTION'       => $request->mail_encryption,
+            'MAIL_FROM_ADDRESS'     => $request->mail_from_address,
+            'MAIL_FROM_NAME'        => $request->mail_from_name,
+            'GOOGLE_CLIENT_ID'      => $request->google_client_id,
+            'GOOGLE_CLIENT_SECRET'  => $request->google_client_secret,
         ];
 
         foreach ($fields as $key => $value) {

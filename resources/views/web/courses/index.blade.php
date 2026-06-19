@@ -394,7 +394,28 @@
                                     <a href="{{ route('courses.show', $course->slug) }}">{{ $course->title }}</a>
                                 </h3>
 
-                                @if($course->instructor)
+                                @php $cInstructors = $course->courseInstructors ?? collect(); @endphp
+                                @if($cInstructors->isNotEmpty())
+                                <div class="flex items-center gap-2 mb-3">
+                                    <div class="flex -space-x-1">
+                                        @foreach($cInstructors->take(3) as $ci)
+                                        @if($ci->instructor)
+                                        <img src="{{ $ci->instructor->avatar_url }}" alt="{{ $ci->instructor->full_name }}"
+                                             title="{{ $ci->instructor->full_name }} — {{ $ci->session_label }} Session"
+                                             class="w-5 h-5 rounded-full object-cover border-2 border-white shrink-0">
+                                        @endif
+                                        @endforeach
+                                        @if($cInstructors->count() > 3)
+                                        <span class="w-5 h-5 rounded-full border-2 border-white bg-brand-100 text-brand-700 text-[9px] font-bold flex items-center justify-center shrink-0">+{{ $cInstructors->count() - 3 }}</span>
+                                        @endif
+                                    </div>
+                                    <span class="text-xs text-gray-500 truncate">
+                                        @if($cInstructors->count() === 1){{ $cInstructors->first()->instructor->full_name ?? '' }}
+                                        @else{{ $cInstructors->count() }} instructors
+                                        @endif
+                                    </span>
+                                </div>
+                                @elseif($course->instructor)
                                 <div class="flex items-center gap-2 mb-3">
                                     <img src="{{ $course->instructor->avatar_url }}" alt="{{ $course->instructor->full_name }}"
                                          class="w-5 h-5 rounded-full object-cover border border-gray-200">
@@ -482,7 +503,28 @@
                                         @if($course->short_description)
                                         <p class="text-gray-500 text-xs leading-relaxed mb-3 line-clamp-2">{{ $course->short_description }}</p>
                                         @endif
-                                        @if($course->instructor)
+                                        @php $cInstructors2 = $course->courseInstructors ?? collect(); @endphp
+                                        @if($cInstructors2->isNotEmpty())
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <div class="flex -space-x-1">
+                                                @foreach($cInstructors2->take(3) as $ci)
+                                                @if($ci->instructor)
+                                                <img src="{{ $ci->instructor->avatar_url }}" alt="{{ $ci->instructor->full_name }}"
+                                                     title="{{ $ci->instructor->full_name }} — {{ $ci->session_label }} Session"
+                                                     class="w-5 h-5 rounded-full object-cover border-2 border-white shrink-0">
+                                                @endif
+                                                @endforeach
+                                                @if($cInstructors2->count() > 3)
+                                                <span class="w-5 h-5 rounded-full border-2 border-white bg-brand-100 text-brand-700 text-[9px] font-bold flex items-center justify-center shrink-0">+{{ $cInstructors2->count() - 3 }}</span>
+                                                @endif
+                                            </div>
+                                            <span class="text-xs text-gray-500">
+                                                @if($cInstructors2->count() === 1){{ $cInstructors2->first()->instructor->full_name ?? '' }}
+                                                @else{{ $cInstructors2->count() }} instructors
+                                                @endif
+                                            </span>
+                                        </div>
+                                        @elseif($course->instructor)
                                         <div class="flex items-center gap-2 mb-3">
                                             <img src="{{ $course->instructor->avatar_url }}" alt="{{ $course->instructor->full_name }}" class="w-5 h-5 rounded-full object-cover">
                                             <span class="text-xs text-gray-500">{{ $course->instructor->full_name }}</span>

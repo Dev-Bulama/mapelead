@@ -18,11 +18,16 @@
     <div class="w-full max-w-md">
         {{-- Logo --}}
         <div class="text-center mb-8">
-            <a href="{{ route('home') }}" class="inline-flex items-center gap-2">
-                <div class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center">
-                    <span class="text-white font-bold">ML</span>
-                </div>
-                <span class="text-white font-bold text-2xl">{{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}</span>
+            @php $siteLogo = \App\Models\SiteSetting::get('site_logo'); @endphp
+            <a href="{{ route('home') }}" class="inline-flex items-center gap-2 justify-center">
+                @if($siteLogo)
+                    <img src="{{ asset('storage/' . $siteLogo) }}" alt="{{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}" class="h-12 max-w-[200px] object-contain">
+                @else
+                    <div class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center shrink-0">
+                        <span class="text-white font-bold">ML</span>
+                    </div>
+                    <span class="text-white font-bold text-2xl">{{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}</span>
+                @endif
             </a>
         </div>
 
@@ -32,7 +37,7 @@
         </div>
 
         {{-- Footer Link --}}
-        <p class="text-center text-brand-200 text-sm mt-6">
+        <p class="text-center text-white/80 text-sm mt-6">
             @yield('footer_link')
         </p>
     </div>

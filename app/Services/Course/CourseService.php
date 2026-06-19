@@ -12,7 +12,7 @@ class CourseService
     public function getAllPublished(array $filters = []): LengthAwarePaginator
     {
         $query = Course::published()
-            ->with(['instructor.user', 'category'])
+            ->with(['instructor.user', 'category', 'courseInstructors.instructor.user'])
             ->when($filters['category'] ?? null, fn($q, $cat) => $q->whereHas('category', fn($q) => $q->where('slug', $cat)->orWhere('id', (int) $cat)))
             ->when($filters['type'] ?? null, fn($q, $t) => $q->where('type', $t))
             ->when($filters['level'] ?? null, fn($q, $l) => $q->where('level', $l))

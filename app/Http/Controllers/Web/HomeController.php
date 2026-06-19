@@ -29,7 +29,7 @@ class HomeController extends Controller
 
             'featuredCourses' => Course::published()
                 ->featured()
-                ->with(['instructor.user', 'category'])
+                ->with(['instructor.user', 'category', 'courseInstructors.instructor.user'])
                 ->limit(6)
                 ->get(),
 

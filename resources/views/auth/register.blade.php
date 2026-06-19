@@ -7,6 +7,7 @@
         <p class="text-gray-500 mt-1 text-sm">Join 10,000+ students learning in-demand tech skills</p>
     </div>
 
+    @if(\App\Models\SiteSetting::get('enable_google_login', '1'))
     <a href="{{ route('auth.google') }}"
        class="flex items-center justify-center gap-3 w-full border-2 border-gray-200 hover:border-gray-300 rounded-xl py-3 font-medium text-gray-700 transition-colors mb-6">
         <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -23,6 +24,7 @@
         <span class="text-gray-400 text-sm">or with email</span>
         <div class="flex-1 h-px bg-gray-200"></div>
     </div>
+    @endif
 
     <form action="{{ route('auth.register.post') }}" method="POST" x-data="{ loading: false }" @submit="loading = true">
         @csrf
