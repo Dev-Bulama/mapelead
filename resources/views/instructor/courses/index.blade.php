@@ -33,7 +33,8 @@
         <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden flex flex-col">
             <div class="aspect-video bg-gray-100 relative overflow-hidden">
                 @if($course->thumbnail)
-                    <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="{{ $course->title }}" class="w-full h-full object-cover">
+                    <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="{{ $course->title }}" class="w-full h-full object-cover"
+                         onerror="this.onerror=null;this.src='{{ \App\Models\Course::placeholderDataUri() }}'">
                 @else
                     <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100">
                         <svg class="w-12 h-12 text-brand-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">

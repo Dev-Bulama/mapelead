@@ -522,6 +522,7 @@
                         {{-- Thumbnail / Video Preview --}}
                         <div class="relative aspect-video bg-gray-900 overflow-hidden group">
                             <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}"
+                                 onerror="this.onerror=null;this.src='{{ \App\Models\Course::placeholderDataUri() }}'"
                                  class="w-full h-full object-cover opacity-90 group-hover:opacity-70 transition-opacity">
                             @if($course->promo_video)
                             <button onclick="document.getElementById('promo-modal').classList.remove('hidden')"
@@ -730,6 +731,7 @@
                 <div class="relative aspect-video overflow-hidden bg-gray-100">
                     <a href="{{ route('courses.show', $related->slug) }}">
                         <img src="{{ $related->thumbnail_url }}" alt="{{ $related->title }}"
+                             onerror="this.onerror=null;this.src='{{ \App\Models\Course::placeholderDataUri() }}'"
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     </a>
                     @if($related->category)

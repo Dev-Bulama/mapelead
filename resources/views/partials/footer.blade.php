@@ -41,9 +41,17 @@
                 @endphp
                 <div class="mb-4">
                     @if($logoPath)
+                        @php $footerSiteName = $general['site_name'] ?? 'MapeLearn'; @endphp
                         <img src="{{ asset('storage/' . $logoPath) }}"
-                             alt="{{ $general['site_name'] ?? 'MapeLearn' }}"
-                             style="height: {{ $logoHeight }}px; max-width: 200px; width: auto; object-fit: contain;">
+                             alt="{{ $footerSiteName }}"
+                             style="height: {{ $logoHeight }}px; max-width: 200px; width: auto; object-fit: contain;"
+                             onerror="this.style.display='none';document.getElementById('footer-logo-fallback').style.display='flex'">
+                        <div id="footer-logo-fallback" class="items-center gap-2" style="display:none">
+                            <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">{{ strtoupper(substr($footerSiteName, 0, 2)) }}</span>
+                            </div>
+                            <span class="text-white font-display font-bold text-xl">{{ $footerSiteName }}</span>
+                        </div>
                     @else
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">

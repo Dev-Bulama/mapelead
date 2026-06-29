@@ -10,7 +10,15 @@
             <a href="{{ route('home') }}" class="flex items-center gap-2">
                 @php $logo = \App\Models\SiteSetting::get('site_logo'); @endphp
                 @if($logo)
-                    <img src="{{ asset('storage/'.$logo) }}" alt="{{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}" class="h-10 w-auto">
+                    @php $siteName = \App\Models\SiteSetting::get('site_name', 'MapeLearn'); @endphp
+                    <img src="{{ asset('storage/'.$logo) }}" alt="{{ $siteName }}" class="h-10 w-auto"
+                         onerror="this.style.display='none';document.getElementById('nav-logo-fallback').style.display='flex'">
+                    <div id="nav-logo-fallback" class="items-center gap-2" style="display:none">
+                        <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
+                            <span class="text-white font-bold text-sm">{{ strtoupper(substr($siteName, 0, 2)) }}</span>
+                        </div>
+                        <span class="text-xl font-display font-bold text-gray-900">{{ $siteName }}</span>
+                    </div>
                 @else
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">

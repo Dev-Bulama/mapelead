@@ -60,7 +60,18 @@ class Course extends Model
                 ? $this->thumbnail
                 : asset('storage/' . $this->thumbnail);
         }
-        return asset('images/course-placeholder.jpg');
+        return self::placeholderDataUri();
+    }
+
+    public static function placeholderDataUri(): string
+    {
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">'
+             . '<rect width="800" height="450" fill="#f3f4f6"/>'
+             . '<rect x="348" y="175" width="104" height="80" rx="8" fill="none" stroke="#d1d5db" stroke-width="3"/>'
+             . '<circle cx="370" cy="197" r="8" fill="#d1d5db"/>'
+             . '<polyline points="348,235 385,205 415,228 438,210 452,255" fill="none" stroke="#d1d5db" stroke-width="3" stroke-linejoin="round"/>'
+             . '</svg>';
+        return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
     public function getBrochureUrlAttribute(): ?string

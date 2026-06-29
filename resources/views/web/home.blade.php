@@ -400,6 +400,7 @@ function newsTicker() {
                 {{-- Thumbnail --}}
                 <div class="relative overflow-hidden aspect-video bg-gray-200">
                     <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}"
+                         onerror="this.onerror=null;this.src='{{ \App\Models\Course::placeholderDataUri() }}'"
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     @php
                         $hasActiveBatch = isset($activeBatches) && $activeBatches->where('course_id', $course->id)->isNotEmpty();

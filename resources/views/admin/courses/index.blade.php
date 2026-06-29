@@ -122,6 +122,7 @@
                                     @if($course->thumbnail)
                                         <img src="{{ asset('storage/'.$course->thumbnail) }}"
                                              class="w-12 h-9 object-cover rounded-lg shrink-0 bg-gray-100"
+                                             onerror="this.onerror=null;this.src='{{ \App\Models\Course::placeholderDataUri() }}'"
                                              alt="">
                                     @else
                                         <div class="w-12 h-9 rounded-lg bg-brand-50 flex items-center justify-center shrink-0">

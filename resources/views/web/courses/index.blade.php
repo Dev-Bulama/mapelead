@@ -361,6 +361,7 @@
                             <div class="relative aspect-video overflow-hidden bg-gray-100">
                                 <a href="{{ route('courses.show', $course->slug) }}">
                                     <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}"
+                                         onerror="this.onerror=null;this.src='{{ \App\Models\Course::placeholderDataUri() }}'"
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 </a>
                                 {{-- Badges --}}
@@ -474,6 +475,7 @@
                                 <div class="relative sm:w-56 lg:w-64 shrink-0 aspect-video sm:aspect-auto overflow-hidden bg-gray-100">
                                     <a href="{{ route('courses.show', $course->slug) }}">
                                         <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}"
+                                             onerror="this.onerror=null;this.src='{{ \App\Models\Course::placeholderDataUri() }}'"
                                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                     </a>
                                     @if($course->is_free)

@@ -258,7 +258,8 @@
                                         <span class="text-xs font-bold text-gray-400 w-4 shrink-0">{{ $i + 1 }}</span>
                                         @if($course->thumbnail)
                                             <img src="{{ asset('storage/'.$course->thumbnail) }}"
-                                                 class="w-8 h-8 rounded object-cover shrink-0" alt="">
+                                                 class="w-8 h-8 rounded object-cover shrink-0" alt=""
+                                                 onerror="this.onerror=null;this.src='{{ \App\Models\Course::placeholderDataUri() }}'">
                                         @else
                                             <div class="w-8 h-8 rounded bg-brand-100 flex items-center justify-center shrink-0">
                                                 <svg class="w-4 h-4 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

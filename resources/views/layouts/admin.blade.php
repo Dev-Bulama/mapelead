@@ -464,8 +464,13 @@
         <div class="shrink-0 px-4 py-4 border-t border-gray-700">
             <div class="flex items-center gap-3">
                 @if(auth()->user()->avatar)
+                    @php $adminInitials = strtoupper(substr(auth()->user()->first_name, 0, 1)) . strtoupper(substr(auth()->user()->last_name, 0, 1)); @endphp
                     <img src="{{ asset('storage/'.auth()->user()->avatar) }}"
-                         class="w-8 h-8 rounded-full object-cover ring-2 ring-gray-600" alt="">
+                         class="w-8 h-8 rounded-full object-cover ring-2 ring-gray-600" alt=""
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                    <div class="w-8 h-8 rounded-full bg-brand-600 items-center justify-center ring-2 ring-gray-600" style="display:none">
+                        <span class="text-white text-xs font-bold">{{ $adminInitials }}</span>
+                    </div>
                 @else
                     <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center ring-2 ring-gray-600">
                         <span class="text-white text-xs font-bold">
@@ -602,8 +607,13 @@
                         <button @click="userMenuOpen = !userMenuOpen; notifOpen = false"
                                 class="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-100 transition-colors">
                             @if(auth()->user()->avatar)
+                                @php $adminInitials2 = strtoupper(substr(auth()->user()->first_name, 0, 1)) . strtoupper(substr(auth()->user()->last_name, 0, 1)); @endphp
                                 <img src="{{ asset('storage/'.auth()->user()->avatar) }}"
-                                     class="w-8 h-8 rounded-full object-cover" alt="">
+                                     class="w-8 h-8 rounded-full object-cover" alt=""
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                                <div class="w-8 h-8 rounded-full bg-brand-600 items-center justify-center" style="display:none">
+                                    <span class="text-white text-xs font-bold">{{ $adminInitials2 }}</span>
+                                </div>
                             @else
                                 <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center">
                                     <span class="text-white text-xs font-bold">
