@@ -260,8 +260,9 @@
                 <span>Payments</span>
             </a>
 
-            <a href="#"
-               class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">
+            <a href="{{ route('admin.coupons.index') }}"
+               class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium
+                      {{ request()->routeIs('admin.coupons*') ? 'active bg-brand-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
@@ -309,7 +310,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
                 </svg>
-                <span>Contact Forms</span>
+                <span class="flex-1">Contact Forms</span>
+                @php $unreadContacts = \App\Models\ContactForm::where('status', 'new')->count(); @endphp
+                @if($unreadContacts)
+                <span class="ml-auto bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1">
+                    {{ $unreadContacts > 99 ? '99+' : $unreadContacts }}
+                </span>
+                @endif
             </a>
 
             {{-- PLATFORM --}}

@@ -12,7 +12,7 @@ class Course extends Model
 
     protected $fillable = [
         'instructor_id', 'category_id', 'title', 'slug', 'short_description', 'description',
-        'thumbnail', 'promo_video', 'type', 'level', 'status', 'language',
+        'thumbnail', 'brochure', 'promo_video', 'type', 'level', 'status', 'language',
         'duration_hours', 'duration_weeks', 'location', 'start_date', 'end_date',
         'max_students', 'price', 'discount_price', 'currency', 'is_free', 'is_featured',
         'certificate_enabled', 'is_published', 'published_at',
@@ -61,5 +61,13 @@ class Course extends Model
                 : asset('storage/' . $this->thumbnail);
         }
         return asset('images/course-placeholder.jpg');
+    }
+
+    public function getBrochureUrlAttribute(): ?string
+    {
+        if (!$this->brochure) return null;
+        return str_starts_with($this->brochure, 'http')
+            ? $this->brochure
+            : asset('storage/' . $this->brochure);
     }
 }

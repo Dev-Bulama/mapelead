@@ -62,6 +62,50 @@ class LeadController extends Controller
         return view('admin.leads.contacts', compact('contacts'));
     }
 
+    public function contactShow(ContactForm $contact)
+    {
+        if ($contact->status === 'new') {
+            $contact->update(['status' => 'read']);
+        }
+        return view('admin.leads.contact_show', compact('contact'));
+    }
+
+    public function contactReply(Request $request, ContactForm $contact)
+    {
+        $data = $request->validate([
+            'reply' => 'required|string|max:5000',
+        ]);
+
+        \Mail::send([], [], function ($message) use ($contact, $data) {
+            $message->to($contact->email, $contact->name)
+                    ->replyTo(config('mail.from.address'), config('mail.from.name'))
+                    ->subject('Re: ' . ($contact->subject ?? 'Your Message'))
+                    ->html(
+                        '<div style="font-family:sans-serif;max-width:600px;margin:0 auto">'
+                        . '<p>Hi ' . e($contact->name) . ',</p>'
+                        . '<div>' . nl2br(e($data['reply'])) . '</div>'
+                        . '<hr style="margin:24px 0;border:none;border-top:1px solid #e5e7eb">'
+                        . '<p style="color:#6b7280;font-size:13px">This is a reply to your message: <em>' . e($contact->subject ?? '') . '</em></p>'
+                        . '</div>'
+                    );
+        });
+
+        $contact->update([
+            'admin_reply' => $data['reply'],
+            'replied_at'  => now(),
+            'status'      => 'replied',
+        ]);
+
+        return back()->with('success', 'Reply sent to ' . $contact->email . '.');
+    }
+
+    public function contactStatus(Request $request, ContactForm $contact)
+    {
+        $request->validate(['status' => 'required|in:new,read,replied,archived']);
+        $contact->update(['status' => $request->status]);
+        return back()->with('success', 'Status updated.');
+    }
+
     public function exportLeads(): StreamedResponse
     {
         $leads = Lead::with('assignedTo')->orderByDesc('created_at')->get();

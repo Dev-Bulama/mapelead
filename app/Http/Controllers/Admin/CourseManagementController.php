@@ -49,6 +49,7 @@ class CourseManagementController extends Controller
             'discount_price'      => 'nullable|numeric',
             'is_free'             => 'boolean',
             'thumbnail'           => 'nullable|image|max:4096',
+            'brochure'            => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'duration_hours'      => 'nullable|integer',
             'duration_weeks'      => 'nullable|integer',
             'language'            => 'nullable|string|max:50',
@@ -68,6 +69,9 @@ class CourseManagementController extends Controller
 
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
+        }
+        if ($request->hasFile('brochure')) {
+            $data['brochure'] = $request->file('brochure')->store('courses/brochures', 'public');
         }
         if ($request->hasFile('promo_video_file')) {
             $data['promo_video'] = $request->file('promo_video_file')->store('courses/promo', 'public');
@@ -139,6 +143,7 @@ class CourseManagementController extends Controller
             'discount_price'      => 'nullable|numeric',
             'is_free'             => 'boolean',
             'thumbnail'           => 'nullable|image|max:4096',
+            'brochure'            => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'duration_hours'      => 'nullable|integer',
             'duration_weeks'      => 'nullable|integer',
             'language'            => 'nullable|string|max:50',
@@ -157,7 +162,12 @@ class CourseManagementController extends Controller
         $data = $this->convertTextareaToArrays($data);
 
         if ($request->hasFile('thumbnail')) {
+            if ($course->thumbnail) \Storage::disk('public')->delete($course->thumbnail);
             $data['thumbnail'] = $request->file('thumbnail')->store('courses/thumbnails', 'public');
+        }
+        if ($request->hasFile('brochure')) {
+            if ($course->brochure) \Storage::disk('public')->delete($course->brochure);
+            $data['brochure'] = $request->file('brochure')->store('courses/brochures', 'public');
         }
         if ($request->hasFile('promo_video_file')) {
             $data['promo_video'] = $request->file('promo_video_file')->store('courses/promo', 'public');

@@ -224,9 +224,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('leads', LeadController::class);
     Route::get('/newsletter', [LeadController::class, 'newsletter'])->name('newsletter');
     Route::get('/contact-submissions', [LeadController::class, 'contacts'])->name('contacts');
+    Route::get('/contact-submissions/{contact}', [LeadController::class, 'contactShow'])->name('contacts.show');
+    Route::post('/contact-submissions/{contact}/reply', [LeadController::class, 'contactReply'])->name('contacts.reply');
+    Route::patch('/contact-submissions/{contact}/status', [LeadController::class, 'contactStatus'])->name('contacts.status');
     Route::get('/leads/export', [LeadController::class, 'exportLeads'])->name('leads.export');
     Route::get('/contacts/export', [LeadController::class, 'exportContacts'])->name('contacts.export');
     Route::get('/newsletter/export', [LeadController::class, 'exportNewsletter'])->name('newsletter.export');
+
+    // Coupons
+    Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class)->except(['create', 'show', 'edit']);
 
     // Testimonials & FAQs
     Route::resource('testimonials', TestimonialController::class);

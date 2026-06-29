@@ -187,6 +187,14 @@
                     <p class="text-xs text-gray-400 mt-1">MP4, WebM or OGG. Max 200MB. Uploaded video will be hosted on your server.</p>
                 </div>
             </div>
+
+            {{-- Brochure --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Course Brochure / Prospectus <span class="text-gray-400 font-normal">(optional)</span></label>
+                <input type="file" name="brochure" accept=".pdf,.doc,.docx"
+                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                <p class="text-xs text-gray-400 mt-1">PDF, DOC or DOCX. Max 10MB. Students will see a download button on the public course page.</p>
+            </div>
         </div>
 
         {{-- Curriculum Notes --}}

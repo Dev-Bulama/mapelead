@@ -627,6 +627,21 @@
                                 </ul>
                             </div>
 
+                            {{-- Brochure Download --}}
+                            @if($course->brochure_url)
+                            <div class="border-t border-gray-100 pt-5 mt-5">
+                                <a href="{{ $course->brochure_url }}" target="_blank" rel="noopener"
+                                   download
+                                   class="flex items-center justify-center gap-2 w-full border-2 border-brand-600 text-brand-700 hover:bg-brand-600 hover:text-white font-semibold py-3 rounded-2xl transition-all duration-200 text-sm group">
+                                    <svg class="w-4 h-4 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                    Download Brochure
+                                </a>
+                                <p class="text-center text-xs text-gray-400 mt-1.5">PDF · Course outline & details</p>
+                            </div>
+                            @endif
+
                             {{-- Share --}}
                             <div class="border-t border-gray-100 pt-5 mt-5">
                                 <h4 class="font-semibold text-gray-900 text-sm mb-3">Share this course</h4>
