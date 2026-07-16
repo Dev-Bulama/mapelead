@@ -198,10 +198,15 @@
                                             </p>
                                         </div>
                                         <div class="text-right shrink-0 ml-3">
-                                            <p class="text-xs text-gray-500">≈ per payment</p>
+                                            <p class="text-xs text-gray-400">≈ per payment</p>
                                             <p class="text-sm font-bold text-brand-700">
-                                                ₦<span x-text="selectedOptionIndex === {{ $idx }} ? Math.ceil((modePrice - downPayment) / {{ $opt['count'] }}).toLocaleString() : '—'"></span>
+                                                ₦<span x-text="(selectedOptionIndex === {{ $idx }} && downPayment > 0)
+                                                    ? Math.ceil((modePrice - downPayment) / {{ $opt['count'] }}).toLocaleString()
+                                                    : Math.ceil(modePrice / {{ $opt['count'] }}).toLocaleString()">
+                                                </span>
                                             </p>
+                                            <p x-show="selectedOptionIndex === {{ $idx }} && downPayment > 0"
+                                               class="text-xs text-green-600 font-medium">after down payment</p>
                                         </div>
                                         <div :class="selectedOptionIndex === {{ $idx }} ? 'border-brand-600 bg-brand-600' : 'border-gray-300'"
                                              class="w-4 h-4 rounded-full border-2 flex-shrink-0 ml-3 flex items-center justify-center">
@@ -240,17 +245,26 @@
                         </div>
 
                         {{-- Plan Summary --}}
-                        <div class="bg-blue-50 rounded-xl p-4 text-xs text-blue-900 space-y-1">
-                            <p class="font-bold mb-1">Your plan summary:</p>
-                            <p>Pay <strong>₦<span x-text="downPayment.toLocaleString()"></span></strong> today as down payment.</p>
-                            <p x-show="currentOption">
-                                Then <strong x-text="currentOption ? currentOption.count : ''"></strong> payments of
-                                ≈ <strong>₦<span x-text="currentOption && downPayment < modePrice ? Math.ceil((modePrice - downPayment) / currentOption.count).toLocaleString() : '0'"></span></strong>
-                                each, spaced <strong x-text="currentOption ? currentOption.period_days : ''"></strong> days apart.
+                        <div class="bg-blue-50 rounded-xl p-4 text-xs text-blue-900">
+                            <p class="font-bold mb-2">Your plan summary:</p>
+
+                            {{-- Placeholder when no down payment entered yet --}}
+                            <p x-show="downPayment <= 0" class="text-blue-600 italic">
+                                Enter a down payment above to see your full breakdown.
                             </p>
-                            <p x-show="currentOption" class="text-blue-600 font-semibold">
-                                Full payment complete within <span x-text="currentOption ? ((currentOption.count - 1) * currentOption.period_days) + ' days' : ''"></span> of your first due date.
-                            </p>
+
+                            {{-- Full breakdown when down payment entered --}}
+                            <div x-show="downPayment > 0" class="space-y-1">
+                                <p>Pay <strong>₦<span x-text="downPayment.toLocaleString()"></span></strong> today as down payment.</p>
+                                <p x-show="currentOption">
+                                    Then <strong x-text="currentOption ? currentOption.count : ''"></strong> payments of
+                                    ≈ <strong>₦<span x-text="currentOption && downPayment < modePrice ? Math.ceil((modePrice - downPayment) / currentOption.count).toLocaleString() : '0'"></span></strong>
+                                    each, spaced <strong x-text="currentOption ? currentOption.period_days : ''"></strong> days apart.
+                                </p>
+                                <p x-show="currentOption" class="text-blue-700 font-semibold">
+                                    Full payment complete within <span x-text="currentOption ? ((currentOption.count - 1) * currentOption.period_days) + ' days' : ''"></span> of first due date.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -298,9 +312,15 @@
                         @if($course->is_free)
                         <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl text-sm hover:bg-green-700 transition-colors">Enroll Free</button>
                         @else
-                        <button type="submit" class="w-full bg-brand-600 text-white font-bold py-3 rounded-xl text-sm hover:bg-brand-700 transition-colors">
+                        <button type="submit"
+                                :disabled="paymentType === 'installment' && downPayment <= 0"
+                                :class="paymentType === 'installment' && downPayment <= 0
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    : 'bg-brand-600 hover:bg-brand-700 text-white'"
+                                class="w-full font-bold py-3 rounded-xl text-sm transition-colors">
                             <span x-show="paymentType === 'full'">Pay ₦<span x-text="modePrice.toLocaleString()"></span></span>
-                            <span x-show="paymentType === 'installment'">Pay ₦<span x-text="downPayment.toLocaleString()"></span> Now</span>
+                            <span x-show="paymentType === 'installment' && downPayment <= 0">Enter a down payment to continue</span>
+                            <span x-show="paymentType === 'installment' && downPayment > 0">Pay ₦<span x-text="downPayment.toLocaleString()"></span> Now</span>
                         </button>
                         @endif
                         <p class="text-center text-xs text-gray-400 mt-2">🔒 Secure · Paystack</p>
