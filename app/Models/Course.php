@@ -14,7 +14,10 @@ class Course extends Model
         'instructor_id', 'category_id', 'title', 'slug', 'short_description', 'description',
         'thumbnail', 'brochure', 'promo_video', 'type', 'level', 'status', 'language',
         'duration_hours', 'duration_weeks', 'location', 'start_date', 'end_date',
-        'max_students', 'price', 'discount_price', 'currency', 'is_free', 'is_featured',
+        'max_students', 'price', 'discount_price',
+        'price_online', 'price_physical_monthly', 'price_physical_quarterly',
+        'installment_options',
+        'currency', 'is_free', 'is_featured',
         'certificate_enabled', 'is_published', 'published_at',
         'requirements', 'what_you_learn', 'who_is_this_for',
         'total_students', 'total_reviews', 'average_rating', 'total_lessons', 'total_duration_minutes',
@@ -26,7 +29,9 @@ class Course extends Model
         'certificate_enabled' => 'boolean', 'is_published' => 'boolean',
         'published_at' => 'datetime', 'start_date' => 'datetime', 'end_date' => 'datetime',
         'price' => 'decimal:2', 'discount_price' => 'decimal:2', 'average_rating' => 'decimal:2',
+        'price_online' => 'decimal:2', 'price_physical_monthly' => 'decimal:2', 'price_physical_quarterly' => 'decimal:2',
         'requirements' => 'array', 'what_you_learn' => 'array', 'who_is_this_for' => 'array',
+        'installment_options' => 'array',
     ];
 
     public function getSlugOptions(): SlugOptions
@@ -51,6 +56,25 @@ class Course extends Model
         return $this->discount_price && $this->discount_price < $this->price
             ? (float) $this->discount_price
             : (float) $this->price;
+    }
+
+    public function getPriceForMode(string $mode): float
+    {
+        return match($mode) {
+            'physical_monthly'   => (float) ($this->price_physical_monthly ?? $this->effective_price),
+            'physical_quarterly' => (float) ($this->price_physical_quarterly ?? $this->effective_price),
+            default              => (float) ($this->price_online ?? $this->effective_price),
+        };
+    }
+
+    public function getInstallmentOptionsWithDefaults(): array
+    {
+        return $this->installment_options ?: [
+            ['label' => '2 payments · every 2 weeks (28 days total)', 'count' => 2, 'period_days' => 14],
+            ['label' => '3 payments · every 10 days (20 days total)', 'count' => 3, 'period_days' => 10],
+            ['label' => '4 payments · every 7 days (21 days total)', 'count' => 4, 'period_days' => 7],
+            ['label' => '2 payments · every 3 weeks (21 days total)', 'count' => 2, 'period_days' => 21],
+        ];
     }
 
     public function getThumbnailUrlAttribute(): string

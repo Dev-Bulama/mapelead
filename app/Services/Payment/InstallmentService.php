@@ -41,7 +41,8 @@ class InstallmentService
                 'status'              => 'active',
             ]);
 
-            $dueDate = \Carbon\Carbon::parse($data['first_due_date']);
+            $dueDate   = \Carbon\Carbon::parse($data['first_due_date']);
+            $periodDays = (int) ($data['period_days'] ?? 30);
 
             for ($i = 1; $i <= $installments; $i++) {
                 InstallmentSchedule::create([
@@ -51,7 +52,7 @@ class InstallmentService
                     'due_date'           => $dueDate->copy()->toDateString(),
                     'status'             => 'pending',
                 ]);
-                $dueDate->addMonth();
+                $dueDate->addDays($periodDays);
             }
 
             $enrollment->update([

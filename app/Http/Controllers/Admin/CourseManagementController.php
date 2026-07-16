@@ -65,6 +65,10 @@ class CourseManagementController extends Controller
         $data['is_free']             = $request->boolean('is_free');
         $data['is_featured']         = $request->boolean('is_featured');
         $data['certificate_enabled'] = $request->boolean('certificate_enabled');
+        $data['price_online']             = $request->price_online ?: null;
+        $data['price_physical_monthly']   = $request->price_physical_monthly ?: null;
+        $data['price_physical_quarterly'] = $request->price_physical_quarterly ?: null;
+        $data['installment_options']      = $this->parseInstallmentOptions($request);
         $data = $this->convertTextareaToArrays($data);
 
         if ($request->hasFile('thumbnail')) {
@@ -159,6 +163,10 @@ class CourseManagementController extends Controller
         $data['is_free']             = $request->boolean('is_free');
         $data['is_featured']         = $request->boolean('is_featured');
         $data['certificate_enabled'] = $request->boolean('certificate_enabled');
+        $data['price_online']             = $request->price_online ?: null;
+        $data['price_physical_monthly']   = $request->price_physical_monthly ?: null;
+        $data['price_physical_quarterly'] = $request->price_physical_quarterly ?: null;
+        $data['installment_options']      = $this->parseInstallmentOptions($request);
         $data = $this->convertTextareaToArrays($data);
 
         if ($request->hasFile('thumbnail')) {
@@ -221,6 +229,25 @@ class CourseManagementController extends Controller
                 ]);
             }
         }
+    }
+
+    private function parseInstallmentOptions(\Illuminate\Http\Request $request): ?array
+    {
+        $raw = $request->input('installment_options', []);
+        if (!is_array($raw)) return null;
+        $options = [];
+        foreach ($raw as $opt) {
+            $count = (int) ($opt['count'] ?? 0);
+            $days  = (int) ($opt['period_days'] ?? 0);
+            if ($count >= 2 && $days >= 1) {
+                $options[] = [
+                    'label'       => trim($opt['label'] ?? "{$count} payments · every {$days} days"),
+                    'count'       => $count,
+                    'period_days' => $days,
+                ];
+            }
+        }
+        return !empty($options) ? $options : null;
     }
 
     private function convertTextareaToArrays(array $data): array

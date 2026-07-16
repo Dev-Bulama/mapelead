@@ -26,6 +26,7 @@
                         Training Mode
                     </h3>
                     <div class="space-y-3">
+
                         {{-- Online --}}
                         <label class="cursor-pointer block">
                             <input type="radio" name="training_type" value="online" x-model="trainingType" class="sr-only">
@@ -39,6 +40,13 @@
                                 <div class="flex-1">
                                     <p class="font-semibold text-gray-900 text-sm">Online</p>
                                     <p class="text-xs text-gray-500 mt-0.5">Self-paced learning from anywhere · Video lectures, assignments & live sessions</p>
+                                </div>
+                                <div class="text-right shrink-0">
+                                    @if($course->is_free)
+                                        <span class="text-sm font-bold text-green-600">Free</span>
+                                    @else
+                                        <span class="text-sm font-bold text-brand-700">₦{{ number_format($prices['online']) }}</span>
+                                    @endif
                                 </div>
                                 <div :class="trainingType === 'online' ? 'border-brand-600 bg-brand-600' : 'border-gray-300'"
                                     class="w-4 h-4 rounded-full border-2 flex-shrink-0 mt-1 flex items-center justify-center">
@@ -62,6 +70,13 @@
                                     <p class="font-semibold text-gray-900 text-sm">Physical — 1 Month Intensive</p>
                                     <p class="text-xs text-gray-500 mt-0.5">In-person daily sessions · <strong class="text-orange-600">3 sessions per day</strong> · 4-week immersive programme</p>
                                 </div>
+                                <div class="text-right shrink-0">
+                                    @if($course->is_free)
+                                        <span class="text-sm font-bold text-green-600">Free</span>
+                                    @else
+                                        <span class="text-sm font-bold text-brand-700">₦{{ number_format($prices['physical_monthly']) }}</span>
+                                    @endif
+                                </div>
                                 <div :class="trainingType === 'physical_monthly' ? 'border-brand-600 bg-brand-600' : 'border-gray-300'"
                                     class="w-4 h-4 rounded-full border-2 flex-shrink-0 mt-1 flex items-center justify-center">
                                     <div x-show="trainingType === 'physical_monthly'" class="w-2 h-2 rounded-full bg-white"></div>
@@ -83,12 +98,20 @@
                                     <p class="font-semibold text-gray-900 text-sm">Physical — 3 Month Programme</p>
                                     <p class="text-xs text-gray-500 mt-0.5">In-person classroom sessions · Weekly schedule · 12-week comprehensive curriculum</p>
                                 </div>
+                                <div class="text-right shrink-0">
+                                    @if($course->is_free)
+                                        <span class="text-sm font-bold text-green-600">Free</span>
+                                    @else
+                                        <span class="text-sm font-bold text-brand-700">₦{{ number_format($prices['physical_quarterly']) }}</span>
+                                    @endif
+                                </div>
                                 <div :class="trainingType === 'physical_quarterly' ? 'border-brand-600 bg-brand-600' : 'border-gray-300'"
                                     class="w-4 h-4 rounded-full border-2 flex-shrink-0 mt-1 flex items-center justify-center">
                                     <div x-show="trainingType === 'physical_quarterly'" class="w-2 h-2 rounded-full bg-white"></div>
                                 </div>
                             </div>
                         </label>
+
                     </div>
                 </div>
 
@@ -137,56 +160,97 @@
                         <label class="cursor-pointer">
                             <input type="radio" name="payment_type" value="full" x-model="paymentType" class="sr-only">
                             <div :class="paymentType === 'full' ? 'border-brand-600 bg-brand-50' : 'border-gray-200'"
-                                class="border-2 rounded-xl p-4 transition-all hover:border-brand-300">
+                                class="border-2 rounded-xl p-4 transition-all hover:border-brand-300 h-full">
                                 <p class="text-sm font-bold text-gray-900 mb-1">Full Payment</p>
                                 <p class="text-xs text-gray-500 mb-2">Pay once, instant access</p>
-                                <p class="text-xl font-bold text-brand-700">₦{{ number_format($course->effective_price) }}</p>
+                                <p class="text-xl font-bold text-brand-700">₦<span x-text="modePrice.toLocaleString()"></span></p>
                             </div>
                         </label>
                         <label class="cursor-pointer">
                             <input type="radio" name="payment_type" value="installment" x-model="paymentType" class="sr-only">
                             <div :class="paymentType === 'installment' ? 'border-brand-600 bg-brand-50' : 'border-gray-200'"
-                                class="border-2 rounded-xl p-4 transition-all hover:border-brand-300">
+                                class="border-2 rounded-xl p-4 transition-all hover:border-brand-300 h-full">
                                 <p class="text-sm font-bold text-gray-900 mb-1">Installment</p>
-                                <p class="text-xs text-gray-500 mb-2">Pay in 2–12 payments</p>
-                                <p class="text-xs font-semibold text-green-600">Flexible payment plan</p>
+                                <p class="text-xs text-gray-500 mb-2">Split across days/weeks</p>
+                                <p class="text-xs font-semibold text-green-600">Flexible · max 30 days</p>
                             </div>
                         </label>
                     </div>
 
-                    <div x-show="paymentType === 'installment'" x-transition class="space-y-3 pt-4 border-t">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Down Payment (₦) <span class="text-red-500">*</span></label>
-                                <input type="number" name="down_payment" x-model.number="downPayment"
-                                    min="1000" step="500"
-                                    class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500"
-                                    placeholder="e.g. 20000">
-                                <p class="text-xs text-gray-400 mt-1">
-                                    Remaining: <strong class="text-red-600">₦<span x-text="Math.max(0, {{ $course->effective_price }} - downPayment).toLocaleString()"></span></strong>
-                                </p>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Number of Installments <span class="text-red-500">*</span></label>
-                                <select name="installment_count" x-model.number="installmentCount" class="w-full border rounded-lg px-3 py-2 text-sm">
-                                    @for($i = 2; $i <= 12; $i++)
-                                        <option value="{{ $i }}">{{ $i }} monthly payments</option>
-                                    @endfor
-                                </select>
-                            </div>
-                        </div>
+                    <div x-show="paymentType === 'installment'" x-transition class="space-y-4 pt-4 border-t">
+
+                        {{-- Installment Plan Selector --}}
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">First Installment Due Date <span class="text-red-500">*</span></label>
-                            <input type="date" name="first_due_date"
-                                min="{{ now()->addDays(7)->format('Y-m-d') }}"
-                                value="{{ now()->addMonth()->format('Y-m-d') }}"
-                                class="w-full border rounded-lg px-3 py-2 text-sm">
+                            <label class="block text-xs font-semibold text-gray-700 mb-2">Choose a payment spread <span class="text-red-500">*</span></label>
+                            <div class="space-y-2">
+                                @foreach($installmentOptions as $idx => $opt)
+                                <label class="cursor-pointer block">
+                                    <input type="radio" name="installment_option_index" value="{{ $idx }}"
+                                           @change="selectOption({{ $idx }})"
+                                           {{ $idx === 0 ? 'checked' : '' }} class="sr-only">
+                                    <div :class="selectedOptionIndex === {{ $idx }} ? 'border-brand-600 bg-brand-50' : 'border-gray-200 hover:border-gray-300'"
+                                         class="border-2 rounded-xl px-4 py-3 transition-all flex items-center justify-between">
+                                        <div>
+                                            <p class="text-sm font-semibold text-gray-900">{{ $opt['label'] }}</p>
+                                            <p class="text-xs text-gray-400 mt-0.5">
+                                                {{ $opt['count'] }} payments · {{ $opt['period_days'] }} days apart ·
+                                                {{ ($opt['count'] - 1) * $opt['period_days'] }} days total
+                                            </p>
+                                        </div>
+                                        <div class="text-right shrink-0 ml-3">
+                                            <p class="text-xs text-gray-500">≈ per payment</p>
+                                            <p class="text-sm font-bold text-brand-700">
+                                                ₦<span x-text="selectedOptionIndex === {{ $idx }} ? Math.ceil((modePrice - downPayment) / {{ $opt['count'] }}).toLocaleString() : '—'"></span>
+                                            </p>
+                                        </div>
+                                        <div :class="selectedOptionIndex === {{ $idx }} ? 'border-brand-600 bg-brand-600' : 'border-gray-300'"
+                                             class="w-4 h-4 rounded-full border-2 flex-shrink-0 ml-3 flex items-center justify-center">
+                                            <div x-show="selectedOptionIndex === {{ $idx }}" class="w-2 h-2 rounded-full bg-white"></div>
+                                        </div>
+                                    </div>
+                                </label>
+                                @endforeach
+                            </div>
+                            {{-- Hidden fields submitted --}}
+                            <input type="hidden" name="installment_count" :value="currentOption ? currentOption.count : 2">
+                            <input type="hidden" name="period_days" :value="currentOption ? currentOption.period_days : 14">
                         </div>
-                        <div class="bg-blue-50 rounded-xl p-3 text-xs text-blue-800">
-                            <p class="font-semibold mb-1">Your plan summary:</p>
-                            <p>Pay <strong>₦<span x-text="downPayment.toLocaleString()"></span></strong> today, then
-                                <strong x-text="installmentCount"></strong> monthly payments of
-                                ≈ <strong>₦<span x-text="installmentCount > 0 && downPayment < {{ $course->effective_price }} ? Math.ceil(({{ $course->effective_price }} - downPayment) / installmentCount).toLocaleString() : '0'"></span></strong> each</p>
+
+                        {{-- Down Payment --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">Down Payment (₦) <span class="text-red-500">*</span></label>
+                            <input type="number" name="down_payment" x-model.number="downPayment"
+                                min="1000" step="500"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                                placeholder="e.g. 20000">
+                            <p class="text-xs text-gray-400 mt-1">
+                                Remaining after down payment: <strong class="text-red-600">₦<span x-text="Math.max(0, modePrice - downPayment).toLocaleString()"></span></strong>
+                            </p>
+                        </div>
+
+                        {{-- First Due Date --}}
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-700 mb-1">First Installment Due Date <span class="text-red-500">*</span></label>
+                            <input type="date" name="first_due_date"
+                                min="{{ now()->addDay()->format('Y-m-d') }}"
+                                max="{{ now()->addDays(30)->format('Y-m-d') }}"
+                                value="{{ now()->addDays(7)->format('Y-m-d') }}"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <p class="text-xs text-gray-400 mt-1">Must be within 30 days from today</p>
+                        </div>
+
+                        {{-- Plan Summary --}}
+                        <div class="bg-blue-50 rounded-xl p-4 text-xs text-blue-900 space-y-1">
+                            <p class="font-bold mb-1">Your plan summary:</p>
+                            <p>Pay <strong>₦<span x-text="downPayment.toLocaleString()"></span></strong> today as down payment.</p>
+                            <p x-show="currentOption">
+                                Then <strong x-text="currentOption ? currentOption.count : ''"></strong> payments of
+                                ≈ <strong>₦<span x-text="currentOption && downPayment < modePrice ? Math.ceil((modePrice - downPayment) / currentOption.count).toLocaleString() : '0'"></span></strong>
+                                each, spaced <strong x-text="currentOption ? currentOption.period_days : ''"></strong> days apart.
+                            </p>
+                            <p x-show="currentOption" class="text-blue-600 font-semibold">
+                                Full payment complete within <span x-text="currentOption ? ((currentOption.count - 1) * currentOption.period_days) + ' days' : ''"></span> of your first due date.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -200,20 +264,21 @@
             <div>
                 <div class="bg-white rounded-2xl border overflow-hidden sticky top-6">
                     <div class="bg-brand-600 p-4 text-white">
-                        <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}" class="w-full h-24 object-cover rounded-lg mb-3 opacity-90">
+                        <img src="{{ $course->thumbnail_url }}" alt="{{ $course->title }}"
+                             onerror="this.onerror=null;this.src='{{ \App\Models\Course::placeholderDataUri() }}'"
+                             class="w-full h-24 object-cover rounded-lg mb-3 opacity-90">
                         <h3 class="font-bold text-sm">{{ $course->title }}</h3>
                         <p class="text-brand-200 text-xs mt-0.5">{{ $course->category->name ?? '' }}</p>
                     </div>
                     <div class="p-4">
                         @if(!$course->is_free)
                         <div class="mb-3 pb-3 border-b">
-                            @if($course->discount_price && $course->discount_price < $course->price)
-                            <div class="flex justify-between text-xs text-gray-400 mb-1">
-                                <span>Original</span><span class="line-through">₦{{ number_format($course->price) }}</span>
+                            <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                <span x-text="trainingLabel"></span>
                             </div>
-                            @endif
                             <div class="flex justify-between font-bold text-gray-900">
-                                <span>Total</span><span class="text-brand-700">₦{{ number_format($course->effective_price) }}</span>
+                                <span>Total</span>
+                                <span class="text-brand-700">₦<span x-text="modePrice.toLocaleString()"></span></span>
                             </div>
                             <div x-show="paymentType === 'installment' && downPayment > 0" class="mt-2 pt-2 border-t">
                                 <div class="flex justify-between text-sm font-bold text-green-700">
@@ -234,7 +299,7 @@
                         <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl text-sm hover:bg-green-700 transition-colors">Enroll Free</button>
                         @else
                         <button type="submit" class="w-full bg-brand-600 text-white font-bold py-3 rounded-xl text-sm hover:bg-brand-700 transition-colors">
-                            <span x-show="paymentType === 'full'">Pay ₦{{ number_format($course->effective_price) }}</span>
+                            <span x-show="paymentType === 'full'">Pay ₦<span x-text="modePrice.toLocaleString()"></span></span>
                             <span x-show="paymentType === 'installment'">Pay ₦<span x-text="downPayment.toLocaleString()"></span> Now</span>
                         </button>
                         @endif
@@ -250,13 +315,37 @@
 @push('scripts')
 <script>
 function checkout() {
+    const prices = @json($prices);
+    const options = @json($installmentOptions);
+
     return {
-        trainingType: '{{ old('training_type', 'online') }}',  // online | physical_monthly | physical_quarterly
-        paymentType: '{{ old('payment_type', 'full') }}',
+        trainingType: '{{ old('training_type', 'online') }}',
+        paymentType:  '{{ old('payment_type', 'full') }}',
         selectedBatch: null,
         downPayment: 0,
-        installmentCount: 3,
-    }
+        selectedOptionIndex: 0,
+
+        get currentOption() {
+            return options[this.selectedOptionIndex] ?? null;
+        },
+
+        get modePrice() {
+            return prices[this.trainingType] ?? prices['online'];
+        },
+
+        get trainingLabel() {
+            const labels = {
+                online: 'Online',
+                physical_monthly: 'Physical · 1 Month',
+                physical_quarterly: 'Physical · 3 Months',
+            };
+            return labels[this.trainingType] ?? 'Online';
+        },
+
+        selectOption(index) {
+            this.selectedOptionIndex = index;
+        },
+    };
 }
 </script>
 @endpush

@@ -132,9 +132,10 @@
             <h3 class="font-semibold text-gray-900 text-sm uppercase tracking-wide border-b border-gray-100 pb-3">Pricing & Details</h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Price (₦) <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Base Price (₦) <span class="text-red-500">*</span></label>
                     <input type="number" name="price" value="{{ old('price', $course->price) }}" min="0" step="0.01"
                            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    <p class="text-xs text-gray-400 mt-1">Fallback when no mode-specific price is set</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Discount Price (₦)</label>
@@ -147,6 +148,109 @@
                                class="w-4 h-4 rounded text-brand-600 border-gray-300 focus:ring-brand-500">
                         <span class="text-sm font-medium text-gray-700">Free course</span>
                     </label>
+                </div>
+            </div>
+
+            {{-- Per-mode pricing --}}
+            <div class="border-t border-gray-100 pt-5">
+                <p class="text-sm font-semibold text-gray-800 mb-1">Training Mode Prices <span class="text-xs font-normal text-gray-400">(leave blank to use base price above)</span></p>
+                <p class="text-xs text-gray-400 mb-4">Set a different price per training mode. Students will see the price update live when they switch mode on the enrollment page.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-blue-800">Online</span>
+                        </div>
+                        <input type="number" name="price_online" value="{{ old('price_online', $course->price_online) }}" min="0" step="0.01" placeholder="e.g. 750000"
+                               class="w-full border border-blue-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+                    </div>
+                    <div class="bg-orange-50 rounded-xl p-4 border border-orange-100">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-7 h-7 rounded-lg bg-orange-100 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-orange-800">Physical · 1 Month</span>
+                        </div>
+                        <input type="number" name="price_physical_monthly" value="{{ old('price_physical_monthly', $course->price_physical_monthly) }}" min="0" step="0.01" placeholder="e.g. 850000"
+                               class="w-full border border-orange-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white">
+                    </div>
+                    <div class="bg-green-50 rounded-xl p-4 border border-green-100">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            </div>
+                            <span class="text-sm font-semibold text-green-800">Physical · 3 Months</span>
+                        </div>
+                        <input type="number" name="price_physical_quarterly" value="{{ old('price_physical_quarterly', $course->price_physical_quarterly) }}" min="0" step="0.01" placeholder="e.g. 950000"
+                               class="w-full border border-green-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 bg-white">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Installment Options --}}
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-4" x-data="installmentEditor({{ json_encode($course->installment_options ?? []) }})">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                <div>
+                    <h3 class="font-semibold text-gray-900 text-sm uppercase tracking-wide">Installment Plans</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">Define the payment spread options students can choose. Max 30 days total.</p>
+                </div>
+                <button type="button" @click="addOption()" class="text-xs font-semibold text-brand-600 hover:text-brand-800 border border-brand-200 px-3 py-1.5 rounded-lg hover:bg-brand-50 transition-colors">
+                    + Add Option
+                </button>
+            </div>
+
+            <div class="space-y-2" x-show="options.length === 0">
+                <p class="text-xs text-gray-400 italic">No custom options — default system options will be used. Add options to override.</p>
+            </div>
+
+            <div class="space-y-2">
+                <template x-for="(opt, i) in options" :key="i">
+                    <div class="grid grid-cols-12 gap-2 items-center bg-gray-50 rounded-xl p-3">
+                        <div class="col-span-5">
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Label shown to student</label>
+                            <input type="text" :name="`installment_options[${i}][label]`" x-model="opt.label"
+                                   placeholder="e.g. 2 payments · every 2 weeks"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        </div>
+                        <div class="col-span-3">
+                            <label class="block text-xs font-medium text-gray-500 mb-1">No. of payments</label>
+                            <input type="number" :name="`installment_options[${i}][count]`" x-model.number="opt.count"
+                                   min="2" max="10" placeholder="2"
+                                   @change="autoLabel(i)"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        </div>
+                        <div class="col-span-3">
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Days between each</label>
+                            <input type="number" :name="`installment_options[${i}][period_days]`" x-model.number="opt.period_days"
+                                   min="1" max="30" placeholder="14"
+                                   @change="autoLabel(i)"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-brand-400">
+                        </div>
+                        <div class="col-span-1 flex items-end justify-center pb-0.5">
+                            <button type="button" @click="options.splice(i,1)" class="text-red-400 hover:text-red-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                        <div class="col-span-11 text-xs text-gray-400" x-show="opt.count >= 2 && opt.period_days >= 1">
+                            Total span: <strong x-text="((opt.count - 1) * opt.period_days) + ' days'"></strong>
+                            <span x-show="(opt.count - 1) * opt.period_days > 30" class="text-red-500 font-semibold ml-2">⚠ Exceeds 30 days</span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            {{-- Sample presets --}}
+            <div class="border-t border-gray-100 pt-3">
+                <p class="text-xs font-medium text-gray-500 mb-2">Quick presets:</p>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" @click="addPreset(2,14)" class="text-xs px-3 py-1 bg-gray-100 hover:bg-brand-50 hover:text-brand-700 rounded-full transition-colors">2 × every 14 days</button>
+                    <button type="button" @click="addPreset(3,10)" class="text-xs px-3 py-1 bg-gray-100 hover:bg-brand-50 hover:text-brand-700 rounded-full transition-colors">3 × every 10 days</button>
+                    <button type="button" @click="addPreset(4,7)" class="text-xs px-3 py-1 bg-gray-100 hover:bg-brand-50 hover:text-brand-700 rounded-full transition-colors">4 × every 7 days</button>
+                    <button type="button" @click="addPreset(2,21)" class="text-xs px-3 py-1 bg-gray-100 hover:bg-brand-50 hover:text-brand-700 rounded-full transition-colors">2 × every 21 days</button>
+                    <button type="button" @click="addPreset(3,7)" class="text-xs px-3 py-1 bg-gray-100 hover:bg-brand-50 hover:text-brand-700 rounded-full transition-colors">3 × every 7 days</button>
                 </div>
             </div>
         </div>
@@ -370,4 +474,28 @@
     </div>
 
 </div>
+
+@push('scripts')
+<script>
+function installmentEditor(existing) {
+    return {
+        options: existing.length ? existing : [],
+        addOption() {
+            this.options.push({ label: '', count: 2, period_days: 14 });
+        },
+        addPreset(count, days) {
+            const label = `${count} payments · every ${days} days (${(count - 1) * days} days total)`;
+            const exists = this.options.some(o => o.count === count && o.period_days === days);
+            if (!exists) this.options.push({ label, count, period_days: days });
+        },
+        autoLabel(i) {
+            const o = this.options[i];
+            if (o.count >= 2 && o.period_days >= 1) {
+                o.label = `${o.count} payments · every ${o.period_days} days (${(o.count - 1) * o.period_days} days total)`;
+            }
+        },
+    };
+}
+</script>
+@endpush
 @endsection

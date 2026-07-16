@@ -102,21 +102,30 @@ class StudentCourseController extends Controller
             ->where('status', 'active')
             ->get();
 
-        return view('student.checkout', compact('course', 'batches'));
+        $prices = [
+            'online'              => $course->getPriceForMode('online'),
+            'physical_monthly'    => $course->getPriceForMode('physical_monthly'),
+            'physical_quarterly'  => $course->getPriceForMode('physical_quarterly'),
+        ];
+        $installmentOptions = $course->getInstallmentOptionsWithDefaults();
+
+        return view('student.checkout', compact('course', 'batches', 'prices', 'installmentOptions'));
     }
 
     public function initPayment(string $slug, Request $request)
     {
         $request->validate([
-            'payment_type'    => 'required|in:full,installment',
-            'training_type'   => 'required|in:online,physical_monthly,physical_quarterly',
-            'batch_id'        => 'nullable|exists:batches,id',
-            'down_payment'    => 'required_if:payment_type,installment|nullable|numeric|min:1000',
-            'installment_count' => 'required_if:payment_type,installment|nullable|integer|min:2|max:12',
-            'first_due_date'  => 'required_if:payment_type,installment|nullable|date|after:today',
+            'payment_type'      => 'required|in:full,installment',
+            'training_type'     => 'required|in:online,physical_monthly,physical_quarterly',
+            'batch_id'          => 'nullable|exists:batches,id',
+            'down_payment'      => 'required_if:payment_type,installment|nullable|numeric|min:1000',
+            'installment_count' => 'required_if:payment_type,installment|nullable|integer|min:2|max:10',
+            'period_days'       => 'required_if:payment_type,installment|nullable|integer|min:1|max:30',
+            'first_due_date'    => 'required_if:payment_type,installment|nullable|date|after:today',
         ]);
 
         $course = Course::published()->where('slug', $slug)->firstOrFail();
+        $modePrice = $course->getPriceForMode($request->training_type);
 
         if ($course->is_free) {
             $enrollment = $this->enrollmentService->enroll(auth()->user(), $course, [
@@ -133,7 +142,7 @@ class StudentCourseController extends Controller
         $enrollment = $this->enrollmentService->enroll(auth()->user(), $course, [
             'payment_type'  => $request->payment_type,
             'training_type' => $request->training_type,
-            'amount'        => $course->effective_price,
+            'amount'        => $modePrice,
         ]);
 
         if ($request->batch_id) {
@@ -145,16 +154,17 @@ class StudentCourseController extends Controller
         // For installment, create plan first then pay down payment
         if ($request->payment_type === 'installment') {
             $this->installmentService->createPlan($enrollment, [
-                'total_amount'      => $course->effective_price,
+                'total_amount'      => $modePrice,
                 'down_payment'      => $request->down_payment,
                 'installment_count' => $request->installment_count,
+                'period_days'       => $request->period_days,
                 'first_due_date'    => $request->first_due_date,
                 'grace_period_days' => 3,
             ]);
 
             $paymentAmount = $request->down_payment;
         } else {
-            $paymentAmount = $course->effective_price;
+            $paymentAmount = $modePrice;
         }
 
         try {
