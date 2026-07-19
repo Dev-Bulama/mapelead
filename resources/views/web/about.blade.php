@@ -81,9 +81,9 @@
         </div>
 
         {{-- Desktop Grid --}}
-        <div class="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div class="hidden sm:flex flex-wrap justify-center gap-6">
             @foreach($teamMembers as $member)
-            <div class="group text-center">
+            <div class="group text-center w-44 lg:w-52">
                 <div class="relative mb-4 overflow-hidden rounded-2xl aspect-square bg-gray-200">
                     <img src="{{ $member->photo_url }}" alt="{{ $member->name }}"
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">

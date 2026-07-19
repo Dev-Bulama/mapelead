@@ -69,6 +69,16 @@
                     <div class="bg-green-50 border border-green-200 text-green-700 rounded-xl p-4 mb-6">{{ session('success') }}</div>
                 @endif
 
+                @php
+                    $btnText         = \App\Models\SiteSetting::get('contact_btn_text', 'Send Message');
+                    $captchaEnabled  = (bool) \App\Models\SiteSetting::get('recaptcha_enabled', false);
+                    $captchaSiteKey  = \App\Models\SiteSetting::get('recaptcha_site_key', '');
+                @endphp
+
+                @if($captchaEnabled && $captchaSiteKey)
+                <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                @endif
+
                 <form action="{{ route('contact.store') }}" method="POST" x-data="{ loading: false }" @submit="loading = true" class="space-y-5">
                     @csrf
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -108,10 +118,18 @@
                                   placeholder="Tell us how we can help...">{{ old('message') }}</textarea>
                         @error('message')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
                     </div>
+
+                    @if($captchaEnabled && $captchaSiteKey)
+                    <div>
+                        <div class="g-recaptcha" data-sitekey="{{ $captchaSiteKey }}"></div>
+                        @error('g-recaptcha-response')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                    </div>
+                    @endif
+
                     <button type="submit" :disabled="loading"
                             class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-70">
                         <svg x-show="loading" x-cloak class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
-                        <span x-text="loading ? 'Sending...' : 'Send Message'">Send Message</span>
+                        <span x-text="loading ? 'Sending...' : '{{ addslashes($btnText) }}'">{{ $btnText }}</span>
                     </button>
                 </form>
             </div>

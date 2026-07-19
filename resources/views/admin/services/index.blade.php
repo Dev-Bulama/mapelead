@@ -110,16 +110,32 @@
                 <div x-show="editing" x-cloak class="space-y-3">
                     <form action="{{ route('admin.services.update', $service) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
                         @csrf @method('PUT')
-                        <input type="text" name="title" value="{{ $service->title }}" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
+                        <input type="text" name="title" value="{{ $service->title }}" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="Title">
                         <textarea name="description" rows="2" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">{{ $service->description }}</textarea>
-                        <div class="grid grid-cols-3 gap-3">
-                            <input type="color" name="color" value="{{ $service->color ?? '#14215B' }}" class="h-9 w-full border rounded-lg px-1 py-0.5">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Icon (keyword or emoji)</label>
+                                <input type="text" name="icon" value="{{ $service->icon }}" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="e.g. shield-check, 🎓">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Color</label>
+                                <input type="color" name="color" value="{{ $service->color ?? '#14215B' }}" class="h-10 w-full border rounded-xl px-1 py-0.5">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Image</label>
+                            <input type="file" name="image" accept="image/*" class="w-full border rounded-xl px-3 py-2 text-sm file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-medium file:bg-brand-50 file:text-brand-700">
+                            @if($service->image)
+                            <p class="text-xs text-gray-400 mt-1">Current: <span class="font-medium text-gray-600">{{ basename($service->image) }}</span> — upload a new file to replace it.</p>
+                            @endif
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
                             <input type="url" name="link_url" value="{{ $service->link_url }}" class="border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="Link URL">
                             <input type="text" name="link_text" value="{{ $service->link_text }}" class="border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="Link Text">
                         </div>
                         <div class="flex items-center gap-4">
-                            <label class="flex items-center gap-1.5 text-sm"><input type="checkbox" name="is_active" value="1" {{ $service->is_active ? 'checked' : '' }} class="rounded text-brand-600"> Active</label>
-                            <label class="flex items-center gap-1.5 text-sm"><input type="checkbox" name="is_featured" value="1" {{ $service->is_featured ? 'checked' : '' }} class="rounded text-brand-600"> Featured</label>
+                            <label class="flex items-center gap-1.5 text-sm"><input type="hidden" name="is_active" value="0"><input type="checkbox" name="is_active" value="1" {{ $service->is_active ? 'checked' : '' }} class="rounded text-brand-600"> Active</label>
+                            <label class="flex items-center gap-1.5 text-sm"><input type="hidden" name="is_featured" value="0"><input type="checkbox" name="is_featured" value="1" {{ $service->is_featured ? 'checked' : '' }} class="rounded text-brand-600"> Featured</label>
                         </div>
                         <div class="flex gap-2">
                             <button type="submit" class="bg-brand-600 text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-brand-700">Save</button>

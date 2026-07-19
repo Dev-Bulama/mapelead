@@ -7,6 +7,7 @@ use App\Models\Lead;
 use App\Models\NewsletterSubscriber;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class ContactController extends Controller
 {
@@ -17,6 +18,20 @@ class ContactController extends Controller
 
     public function store(Request $request)
     {
+        if (\App\Models\SiteSetting::get('recaptcha_enabled')) {
+            $secretKey = \App\Models\SiteSetting::get('recaptcha_secret_key', '');
+            if ($secretKey) {
+                $verify = \Illuminate\Support\Facades\Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                    'secret'   => $secretKey,
+                    'response' => $request->input('g-recaptcha-response', ''),
+                    'remoteip' => $request->ip(),
+                ]);
+                if (!$verify->json('success')) {
+                    return back()->withErrors(['g-recaptcha-response' => 'Please complete the captcha verification.'])->withInput();
+                }
+            }
+        }
+
         $data = $request->validate([
             'name'    => 'required|string|max:100',
             'email'   => 'required|email|max:200',

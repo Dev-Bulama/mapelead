@@ -920,6 +920,68 @@
                     </div>
                 </div>
 
+                <div class="border-t border-gray-100"></div>
+
+                {{-- ── Contact Form Settings ──────────────────────────── --}}
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-md bg-[#14215B] flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                        </span>
+                        Contact Form
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Submit Button Text</label>
+                            <input type="text"
+                                   name="contact_btn_text"
+                                   value="{{ old('contact_btn_text', \App\Models\SiteSetting::get('contact_btn_text', 'Send Message')) }}"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="Send Message">
+                            <p class="text-xs text-gray-400 mt-1">Text shown on the contact form submit button.</p>
+                        </div>
+                        <div>
+                            {{-- Enable reCAPTCHA toggle --}}
+                            <p class="text-sm font-medium text-gray-700 mb-2">Enable reCAPTCHA v2</p>
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-200">
+                                <div>
+                                    <p class="text-sm text-gray-700">Protect contact form from bots</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Requires Google reCAPTCHA v2 keys below.</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer ml-4">
+                                    <input type="hidden" name="recaptcha_enabled" value="0">
+                                    <input type="checkbox" name="recaptcha_enabled" value="1" class="sr-only peer"
+                                           {{ \App\Models\SiteSetting::get('recaptcha_enabled') ? 'checked' : '' }}>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">reCAPTCHA Site Key (public)</label>
+                            <input type="text"
+                                   name="recaptcha_site_key"
+                                   value="{{ old('recaptcha_site_key', \App\Models\SiteSetting::get('recaptcha_site_key', '')) }}"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="6Lc...">
+                            <p class="text-xs text-gray-400 mt-1">Get from <a href="https://www.google.com/recaptcha/admin" target="_blank" class="text-brand-600 hover:underline">Google reCAPTCHA Admin</a>. Select reCAPTCHA v2 "I'm not a robot".</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">reCAPTCHA Secret Key (private)</label>
+                            <input type="password"
+                                   name="recaptcha_secret_key"
+                                   class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono
+                                          focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                   placeholder="Leave blank to keep current value">
+                            <p class="text-xs text-gray-400 mt-1">Server-side secret key for verifying captcha responses.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex justify-end pt-2 border-t border-gray-100">
                     <button type="submit"
                             class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white

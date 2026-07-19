@@ -168,6 +168,7 @@ Route::middleware(['auth', 'role:instructor|admin|super_admin'])->prefix('instru
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/docs', [DashboardController::class, 'docs'])->name('docs');
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
     Route::get('/analytics/revenue', [AnalyticsController::class, 'revenue'])->name('analytics.revenue');
 

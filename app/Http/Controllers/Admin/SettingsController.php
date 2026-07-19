@@ -167,6 +167,14 @@ class SettingsController extends Controller
         // Google login toggle — stored in site_settings (not .env)
         \App\Models\SiteSetting::set('enable_google_login', $request->input('enable_google_login', '0'));
 
+        // Contact form settings — stored in site_settings
+        \App\Models\SiteSetting::set('contact_btn_text', $request->input('contact_btn_text', 'Send Message'));
+        \App\Models\SiteSetting::set('recaptcha_enabled', $request->input('recaptcha_enabled', '0'));
+        \App\Models\SiteSetting::set('recaptcha_site_key', $request->input('recaptcha_site_key', ''));
+        if ($request->filled('recaptcha_secret_key')) {
+            \App\Models\SiteSetting::set('recaptcha_secret_key', $request->input('recaptcha_secret_key'));
+        }
+
         $fields = [
             'PAYSTACK_PUBLIC_KEY'     => $request->paystack_public_key,
             'PAYSTACK_SECRET_KEY'     => $request->paystack_secret_key,

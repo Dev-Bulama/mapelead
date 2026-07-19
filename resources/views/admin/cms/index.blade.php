@@ -130,9 +130,10 @@
                             <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wide pb-3 w-36">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        @foreach($heroBanners as $banner)
-                        <tr x-data="{ editing: false }" class="hover:bg-gray-50 transition-colors">
+                    @foreach($heroBanners as $banner)
+                    <tbody x-data="{ editing: false }">
+                        {{-- Display row --}}
+                        <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50" x-show="!editing">
                             <td class="py-3 pr-4">
                                 <span class="inline-flex items-center justify-center w-7 h-7 bg-gray-100 rounded-lg text-xs font-semibold text-gray-600">{{ $banner->sort_order }}</span>
                             </td>
@@ -146,25 +147,10 @@
                                 @endif
                             </td>
                             <td class="py-3 pr-4">
-                                <div x-show="!editing">
-                                    <p class="font-medium text-gray-900">{{ $banner->title }}</p>
-                                    @if($banner->subtitle)
-                                    <p class="text-xs text-gray-500 mt-0.5">{{ Str::limit($banner->subtitle, 50) }}</p>
-                                    @endif
-                                </div>
-                                <div x-show="editing" x-transition>
-                                    <form action="{{ route('admin.cms.hero.update') }}" method="POST" enctype="multipart/form-data" class="space-y-2">
-                                        @csrf
-                                        @method('PUT')
-                                        <input type="hidden" name="id" value="{{ $banner->id }}">
-                                        <input type="text" name="title" value="{{ $banner->title }}" required class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Title">
-                                        <input type="text" name="subtitle" value="{{ $banner->subtitle }}" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Subtitle">
-                                        <div class="flex gap-2 pt-1">
-                                            <button type="submit" class="text-xs font-medium text-white px-3 py-1.5 rounded-lg transition-colors" style="background-color: #4f46e5;">Save</button>
-                                            <button type="button" @click="editing = false" class="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors">Cancel</button>
-                                        </div>
-                                    </form>
-                                </div>
+                                <p class="font-medium text-gray-900">{{ $banner->title }}</p>
+                                @if($banner->subtitle)
+                                <p class="text-xs text-gray-500 mt-0.5">{{ Str::limit($banner->subtitle, 50) }}</p>
+                                @endif
                             </td>
                             <td class="py-3 pr-4">
                                 @if($banner->is_active)
@@ -175,7 +161,7 @@
                             </td>
                             <td class="py-3">
                                 <div class="flex items-center gap-1">
-                                    <button @click="editing = !editing" class="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 px-2.5 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors">
+                                    <button @click="editing = true" class="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 px-2.5 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"/></svg>
                                         Edit
                                     </button>
@@ -190,8 +176,72 @@
                                 </div>
                             </td>
                         </tr>
-                        @endforeach
+                        {{-- Full edit row --}}
+                        <tr x-show="editing" x-cloak class="border-b border-indigo-100 bg-indigo-50/30">
+                            <td colspan="5" class="py-4 px-3">
+                                <form action="{{ route('admin.cms.hero.update') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
+                                    @csrf
+                                    @method('PUT')
+                                    <input type="hidden" name="id" value="{{ $banner->id }}">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Title <span class="text-red-500">*</span></label>
+                                            <input type="text" name="title" value="{{ $banner->title }}" required class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Banner title">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Subtitle</label>
+                                            <input type="text" name="subtitle" value="{{ $banner->subtitle }}" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Short subtitle">
+                                        </div>
+                                        <div class="md:col-span-2">
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
+                                            <textarea name="description" rows="2" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Banner description text...">{{ $banner->description }}</textarea>
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Badge Text</label>
+                                            <input type="text" name="badge_text" value="{{ $banner->badge_text }}" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. New Course Available">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Sort Order</label>
+                                            <input type="number" name="sort_order" value="{{ $banner->sort_order }}" min="0" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Primary Button Text</label>
+                                            <input type="text" name="primary_btn_text" value="{{ $banner->primary_btn_text }}" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. Get Started">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Primary Button URL</label>
+                                            <input type="text" name="primary_btn_url" value="{{ $banner->primary_btn_url }}" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="https://">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Secondary Button Text</label>
+                                            <input type="text" name="secondary_btn_text" value="{{ $banner->secondary_btn_text }}" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. Browse Courses">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Secondary Button URL</label>
+                                            <input type="text" name="secondary_btn_url" value="{{ $banner->secondary_btn_url }}" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="https://">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-medium text-gray-600 mb-1">Replace Banner Image</label>
+                                            <input type="file" name="image" accept="image/*" class="w-full border border-gray-300 rounded-lg px-2 py-1.5 text-sm file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-medium file:bg-indigo-50 file:text-indigo-700">
+                                            @if($banner->image)
+                                            <p class="text-xs text-gray-400 mt-1">Current image will be kept if no new file is selected.</p>
+                                            @endif
+                                        </div>
+                                        <div class="flex items-center gap-3 pt-4">
+                                            <input type="hidden" name="is_active" value="0">
+                                            <input type="checkbox" name="is_active" id="edit_active_{{ $banner->id }}" value="1" {{ $banner->is_active ? 'checked' : '' }} class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                                            <label for="edit_active_{{ $banner->id }}" class="text-sm text-gray-700">Active</label>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2 pt-1">
+                                        <button type="submit" class="text-xs font-medium text-white px-4 py-2 rounded-lg transition-colors" style="background-color: #4f46e5;">Save Banner</button>
+                                        <button type="button" @click="editing = false" class="text-xs font-medium text-gray-600 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
                     </tbody>
+                    @endforeach
                 </table>
             </div>
             @endif

@@ -61,4 +61,9 @@ class DashboardController extends Controller
             'topCourses', 'recentEnrollments', 'recentPayments'
         ));
     }
+
+    public function docs()
+    {
+        return view('admin.docs');
+    }
 }
