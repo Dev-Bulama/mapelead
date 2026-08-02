@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', $settings['meta_title'] ?? 'MapeLearn — Industry-Leading Tech Training')
-@section('meta_description', $settings['meta_description'] ?? 'Join 10,000+ professionals transforming their careers with MapeLearn\'s industry-led tech programs.')
+@section('title', $settings['meta_title'] ?? 'MapeLeads — Industry-Leading Tech Training')
+@section('meta_description', $settings['meta_description'] ?? 'Join 10,000+ professionals transforming their careers with MapeLeads\'s industry-led tech programs.')
 
 @section('content')
 
@@ -542,7 +542,7 @@ function newsTicker() {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
             <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Our Difference</span>
-            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Why 10,000+ Students Choose MapeLearn</h2>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Why 10,000+ Students Choose MapeLeads</h2>
             <p class="text-gray-500 text-lg max-w-2xl mx-auto">We've built every aspect of our platform with one goal: getting you hired and growing your career faster.</p>
         </div>
 
@@ -810,7 +810,7 @@ function newsTicker() {
         <div class="text-center mb-14">
             <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Success Stories</span>
             <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">What Our Students Say</h2>
-            <p class="text-gray-500 text-lg max-w-xl mx-auto">Real stories from real people who transformed their careers with MapeLearn.</p>
+            <p class="text-gray-500 text-lg max-w-xl mx-auto">Real stories from real people who transformed their careers with MapeLeads.</p>
         </div>
 
         @if(isset($testimonials) && count($testimonials))
@@ -1131,7 +1131,7 @@ function newsTicker() {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-14">
             <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Gallery</span>
-            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Life at MapeLearn</h2>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Life at MapeLeads</h2>
             <p class="text-gray-500 text-lg max-w-xl mx-auto">Glimpses of our campus, training sessions, and the vibrant community you'll be part of.</p>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -1253,7 +1253,7 @@ function galleryLightbox() {
             @php
             $contactItems = [
                 ['icon' => 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z', 'label' => 'Call Us', 'value' => \App\Models\SiteSetting::get('contact_phone', '+234 800 000 0000'), 'href' => 'tel:' . preg_replace('/\s+/', '', \App\Models\SiteSetting::get('contact_phone', '+2348000000000'))],
-                ['icon' => 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'label' => 'Email Us', 'value' => \App\Models\SiteSetting::get('contact_email', 'hello@mapelearn.com'), 'href' => 'mailto:' . \App\Models\SiteSetting::get('contact_email', 'hello@mapelearn.com')],
+                ['icon' => 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', 'label' => 'Email Us', 'value' => \App\Models\SiteSetting::get('contact_email', 'hello@mapelead.org'), 'href' => 'mailto:' . \App\Models\SiteSetting::get('contact_email', 'hello@mapelead.org')],
                 ['icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z', 'label' => 'Visit Us', 'value' => \App\Models\SiteSetting::get('contact_address', 'Lagos, Nigeria'), 'href' => '#'],
                 ['icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'label' => 'Office Hours', 'value' => 'Mon – Sat, 8am – 6pm', 'href' => '#'],
             ];

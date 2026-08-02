@@ -10,7 +10,7 @@ class SiteSettingsSeeder extends Seeder
     {
         $settings = [
             // General
-            ['group' => 'general', 'key' => 'site_name',        'value' => 'MapeLearn',                 'type' => 'text',    'label' => 'Site Name'],
+            ['group' => 'general', 'key' => 'site_name',        'value' => 'MapeLeads',                 'type' => 'text',    'label' => 'Site Name'],
             ['group' => 'general', 'key' => 'site_tagline',     'value' => 'Africa\'s Premier Tech Training Platform', 'type' => 'text', 'label' => 'Tagline'],
             ['group' => 'general', 'key' => 'site_email',       'value' => 'hello@mapelead.org',         'type' => 'text',    'label' => 'Contact Email'],
             ['group' => 'general', 'key' => 'site_phone',       'value' => '+234 800 000 0000',          'type' => 'text',    'label' => 'Phone'],
@@ -37,13 +37,13 @@ class SiteSettingsSeeder extends Seeder
             ['group' => 'homepage','key' => 'stat_instructors', 'value' => '25+',                        'type' => 'text',    'label' => 'Instructors Count'],
             ['group' => 'homepage','key' => 'stat_placement',   'value' => '92%',                        'type' => 'text',    'label' => 'Job Placement Rate'],
             // SEO
-            ['group' => 'seo',     'key' => 'meta_title',       'value' => 'MapeLearn – Africa\'s Premier Tech Training Platform', 'type' => 'text', 'label' => 'Default Meta Title'],
-            ['group' => 'seo',     'key' => 'meta_description', 'value' => 'Join 10,000+ students learning Data Science, Cybersecurity, Product Design and more at MapeLearn.', 'type' => 'text', 'label' => 'Default Meta Description'],
+            ['group' => 'seo',     'key' => 'meta_title',       'value' => 'MapeLeads – Africa\'s Premier Tech Training Platform', 'type' => 'text', 'label' => 'Default Meta Title'],
+            ['group' => 'seo',     'key' => 'meta_description', 'value' => 'Join 10,000+ students learning Data Science, Cybersecurity, Product Design and more at MapeLeads.', 'type' => 'text', 'label' => 'Default Meta Description'],
             ['group' => 'seo',     'key' => 'google_analytics', 'value' => '',                           'type' => 'text',    'label' => 'Google Analytics ID'],
             ['group' => 'seo',     'key' => 'meta_pixel',       'value' => '',                           'type' => 'text',    'label' => 'Meta Pixel ID'],
             // Footer
-            ['group' => 'footer',  'key' => 'footer_about',     'value' => 'MapeLearn empowers African professionals with world-class tech skills through practical, industry-relevant training programs.', 'type' => 'text', 'label' => 'Footer About Text'],
-            ['group' => 'footer',  'key' => 'footer_copyright', 'value' => '© 2025 MapeLearn. All rights reserved.', 'type' => 'text', 'label' => 'Copyright Text'],
+            ['group' => 'footer',  'key' => 'footer_about',     'value' => 'MapeLeads empowers African professionals with world-class tech skills through practical, industry-relevant training programs.', 'type' => 'text', 'label' => 'Footer About Text'],
+            ['group' => 'footer',  'key' => 'footer_copyright', 'value' => '© 2025 MapeLeads. All rights reserved.', 'type' => 'text', 'label' => 'Copyright Text'],
         ];
 
         foreach ($settings as $setting) {

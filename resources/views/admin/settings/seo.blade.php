@@ -24,7 +24,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Default Meta Title</label>
                 <input type="text" name="meta_title" value="{{ old('meta_title', $seo['meta_title'] ?? '') }}"
                        class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                       placeholder="MapeLearn — Tech Training Platform">
+                       placeholder="MapeLeads — Tech Training Platform">
                 <p class="text-xs text-gray-400 mt-1">Recommended: 50-60 characters. Used when pages don't have their own title.</p>
             </div>
 

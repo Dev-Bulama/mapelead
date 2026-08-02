@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ($course->meta_title ?: $course->title) . ' — MapeLearn')
+@section('title', ($course->meta_title ?: $course->title) . ' — MapeLeads')
 @section('meta_description', $course->meta_description ?: $course->short_description)
 @section('meta_keywords', $course->meta_keywords ?? '')
 @section('og_image', $course->thumbnail_url)

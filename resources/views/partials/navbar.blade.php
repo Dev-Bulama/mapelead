@@ -10,7 +10,7 @@
             <a href="{{ route('home') }}" class="flex items-center gap-2">
                 @php $logo = \App\Models\SiteSetting::get('site_logo'); @endphp
                 @if($logo)
-                    @php $siteName = \App\Models\SiteSetting::get('site_name', 'MapeLearn'); @endphp
+                    @php $siteName = \App\Models\SiteSetting::get('site_name', 'MapeLeads'); @endphp
                     <img src="{{ asset('storage/'.$logo) }}" alt="{{ $siteName }}" class="h-10 w-auto"
                          onerror="this.style.display='none';document.getElementById('nav-logo-fallback').style.display='flex'">
                     <div id="nav-logo-fallback" class="items-center gap-2" style="display:none">
@@ -25,7 +25,7 @@
                             <span class="text-white font-bold text-sm">ML</span>
                         </div>
                         <span class="text-xl font-display font-bold text-gray-900">
-                            {{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}
+                            {{ \App\Models\SiteSetting::get('site_name', 'MapeLeads') }}
                         </span>
                     </div>
                 @endif

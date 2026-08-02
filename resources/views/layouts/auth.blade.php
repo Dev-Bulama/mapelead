@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Sign In') — {{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}</title>
+    <title>@yield('title', 'Sign In') — {{ \App\Models\SiteSetting::get('site_name', 'MapeLeads') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -21,19 +21,19 @@
             @php $siteLogo = \App\Models\SiteSetting::get('site_logo'); @endphp
             <a href="{{ route('home') }}" class="inline-flex items-center gap-2 justify-center">
                 @if($siteLogo)
-                    <img src="{{ asset('storage/' . $siteLogo) }}" alt="{{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}" class="h-12 max-w-[200px] object-contain"
+                    <img src="{{ asset('storage/' . $siteLogo) }}" alt="{{ \App\Models\SiteSetting::get('site_name', 'MapeLeads') }}" class="h-12 max-w-[200px] object-contain"
                          onerror="this.style.display='none';this.parentNode.querySelector('.auth-logo-fallback').style.display='flex'">
                     <div class="auth-logo-fallback items-center gap-2" style="display:none">
                         <div class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center shrink-0">
                             <span class="text-white font-bold">{{ strtoupper(substr(\App\Models\SiteSetting::get('site_name', 'ML'), 0, 2)) }}</span>
                         </div>
-                        <span class="text-white font-bold text-2xl">{{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}</span>
+                        <span class="text-white font-bold text-2xl">{{ \App\Models\SiteSetting::get('site_name', 'MapeLeads') }}</span>
                     </div>
                 @else
                     <div class="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center shrink-0">
                         <span class="text-white font-bold">ML</span>
                     </div>
-                    <span class="text-white font-bold text-2xl">{{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}</span>
+                    <span class="text-white font-bold text-2xl">{{ \App\Models\SiteSetting::get('site_name', 'MapeLeads') }}</span>
                 @endif
             </a>
         </div>

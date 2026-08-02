@@ -111,6 +111,25 @@ class HomeController extends Controller
         ]);
     }
 
+    public function scholarships()
+    {
+        $content = $this->settings->group('pages');
+        return view('web.scholarships', compact('content'));
+    }
+
+    public function hireFromUs()
+    {
+        $content = $this->settings->group('pages');
+        return view('web.hire-from-us', compact('content'));
+    }
+
+    public function whyUs()
+    {
+        $content = $this->settings->group('pages');
+        $testimonials = Testimonial::where('is_active', true)->orderByDesc('is_featured')->limit(6)->get();
+        return view('web.why-us', compact('content', 'testimonials'));
+    }
+
     public function gallery(\Illuminate\Http\Request $request)
     {
         $currentCategory = $request->get('category');

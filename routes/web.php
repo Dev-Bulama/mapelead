@@ -48,6 +48,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', [HomeController::class, 'about'])->name('about');
+Route::get('/scholarships', [HomeController::class, 'scholarships'])->name('scholarships');
+Route::get('/hire-from-us', [HomeController::class, 'hireFromUs'])->name('hire-from-us');
+Route::get('/why-us', [HomeController::class, 'whyUs'])->name('why-us');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store')->middleware('throttle:contact');
 Route::post('/newsletter/subscribe', [ContactController::class, 'subscribe'])->name('newsletter.subscribe')->middleware('throttle:newsletter');

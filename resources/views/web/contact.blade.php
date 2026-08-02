@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Contact Us')
-@section('meta_description', 'Get in touch with MapeLearn. We are here to help you with your tech training journey.')
+@section('meta_description', 'Get in touch with MapeLeads. We are here to help you with your tech training journey.')
 
 @section('content')
 

@@ -30,6 +30,7 @@
                         'seo'      => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>',
                         'footer'        => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>',
                         'integrations'  => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>',
+                        'pages'         => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>',
                     ];
                     $tabLabels = [
                         'general'      => 'General',
@@ -38,6 +39,7 @@
                         'seo'          => 'SEO',
                         'footer'       => 'Footer',
                         'integrations' => 'Integrations',
+                        'pages'        => 'Pages',
                     ];
                 @endphp
 
@@ -81,7 +83,7 @@
                                value="{{ old('site_name', $all['general']['site_name'] ?? '') }}"
                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                       focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
-                               placeholder="MapeLearn">
+                               placeholder="MapeLeads">
                     </div>
 
                     {{-- Site Tagline --}}
@@ -150,7 +152,7 @@
                                value="{{ old('contact_email', $all['general']['contact_email'] ?? '') }}"
                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                       focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
-                               placeholder="hello@mapelearn.com">
+                               placeholder="hello@mapelead.org">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Contact Address</label>
@@ -449,7 +451,7 @@
                                maxlength="70"
                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                       focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
-                               placeholder="MapeLearn – Africa's Premier Tech Training Platform">
+                               placeholder="MapeLeads – Africa's Premier Tech Training Platform">
                         <p class="text-xs text-gray-400 mt-1">Recommended: 50–60 characters. Used on pages without a specific title.</p>
                     </div>
 
@@ -660,7 +662,7 @@
                                value="{{ old('footer_copyright', $all['footer']['footer_copyright'] ?? '') }}"
                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                       focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
-                               placeholder="© 2025 MapeLearn. All rights reserved.">
+                               placeholder="© 2025 MapeLeads. All rights reserved.">
                     </div>
 
                     {{-- Render remaining footer settings dynamically --}}
@@ -853,7 +855,7 @@
                                    value="{{ old('mail_from_name', env('MAIL_FROM_NAME', '')) }}"
                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
-                                   placeholder="MapeLearn">
+                                   placeholder="MapeLeads">
                         </div>
 
                     </div>
@@ -995,9 +997,139 @@
             </form>
         </div>
 
+        {{-- ─── PAGES ───────────────────────────────────────────── --}}
+        <div id="settings-panel-pages" style="{{ $activeTab === 'pages' ? 'display:block' : 'display:none' }}">
+            <form method="POST" action="{{ route('admin.settings.update', 'pages') }}" class="p-6 space-y-8">
+                @csrf
+                <input type="hidden" name="_tab" value="pages">
+
+                {{-- Scholarships --}}
+                <div>
+                    <div class="flex items-center gap-2 mb-5">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-xl flex items-center justify-center"><span class="text-lg">🎓</span></div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-900">Scholarships Page</h3>
+                            <p class="text-xs text-gray-400">Accessible at <a href="{{ route('scholarships') }}" target="_blank" class="text-brand-600 hover:underline">/scholarships</a></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Page Title</label>
+                            <input type="text" name="scholarships_title" value="{{ old('scholarships_title', $all['pages']['scholarships_title'] ?? 'Scholarships & Financial Aid') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Scholarships & Financial Aid">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Subtitle</label>
+                            <input type="text" name="scholarships_subtitle" value="{{ old('scholarships_subtitle', $all['pages']['scholarships_subtitle'] ?? 'Making quality tech education accessible to all') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Making quality tech education accessible to all">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Intro Paragraph</label>
+                            <textarea name="scholarships_intro" rows="3" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Brief introduction about your scholarship programme...">{{ old('scholarships_intro', $all['pages']['scholarships_intro'] ?? '') }}</textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Eligibility Criteria (HTML allowed)</label>
+                            <textarea name="scholarships_eligibility" rows="4" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-brand-500 outline-none" placeholder="<ul><li>Must be a Nigerian resident</li><li>...</li></ul>">{{ old('scholarships_eligibility', $all['pages']['scholarships_eligibility'] ?? '') }}</textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">How to Apply (HTML allowed)</label>
+                            <textarea name="scholarships_how_to_apply" rows="4" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-brand-500 outline-none" placeholder="<ol><li>Submit your application below</li><li>...</li></ol>">{{ old('scholarships_how_to_apply', $all['pages']['scholarships_how_to_apply'] ?? '') }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">CTA Button Text</label>
+                            <input type="text" name="scholarships_cta_text" value="{{ old('scholarships_cta_text', $all['pages']['scholarships_cta_text'] ?? 'Apply Now') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Apply Now">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">CTA Button URL</label>
+                            <input type="text" name="scholarships_cta_url" value="{{ old('scholarships_cta_url', $all['pages']['scholarships_cta_url'] ?? '/contact') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="/contact">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100"></div>
+
+                {{-- Hire From Us --}}
+                <div>
+                    <div class="flex items-center gap-2 mb-5">
+                        <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center"><span class="text-lg">💼</span></div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-900">Hire From Us Page</h3>
+                            <p class="text-xs text-gray-400">Accessible at <a href="{{ route('hire-from-us') }}" target="_blank" class="text-brand-600 hover:underline">/hire-from-us</a></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Page Title</label>
+                            <input type="text" name="hire_title" value="{{ old('hire_title', $all['pages']['hire_title'] ?? 'Hire Our Graduates') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Hire Our Graduates">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Subtitle</label>
+                            <input type="text" name="hire_subtitle" value="{{ old('hire_subtitle', $all['pages']['hire_subtitle'] ?? 'Access Africa\'s top tech talent') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Access Africa's top tech talent">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Intro Paragraph</label>
+                            <textarea name="hire_intro" rows="3" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Tell employers about your graduates...">{{ old('hire_intro', $all['pages']['hire_intro'] ?? '') }}</textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Why Hire From Us (HTML allowed)</label>
+                            <textarea name="hire_why" rows="4" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-brand-500 outline-none" placeholder="<ul><li>Industry-ready graduates</li><li>...</li></ul>">{{ old('hire_why', $all['pages']['hire_why'] ?? '') }}</textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">How It Works (HTML allowed)</label>
+                            <textarea name="hire_how_it_works" rows="4" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-brand-500 outline-none" placeholder="<ol><li>Contact us with your requirements</li><li>...</li></ol>">{{ old('hire_how_it_works', $all['pages']['hire_how_it_works'] ?? '') }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">CTA Button Text</label>
+                            <input type="text" name="hire_cta_text" value="{{ old('hire_cta_text', $all['pages']['hire_cta_text'] ?? 'Contact Our Team') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Contact Our Team">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">CTA Button URL</label>
+                            <input type="text" name="hire_cta_url" value="{{ old('hire_cta_url', $all['pages']['hire_cta_url'] ?? '/contact') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="/contact">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100"></div>
+
+                {{-- Why Us --}}
+                <div>
+                    <div class="flex items-center gap-2 mb-5">
+                        <div class="w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center"><span class="text-lg">⭐</span></div>
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-900">Why MapeLeads Page</h3>
+                            <p class="text-xs text-gray-400">Accessible at <a href="{{ route('why-us') }}" target="_blank" class="text-brand-600 hover:underline">/why-us</a></p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Page Title</label>
+                            <input type="text" name="why_title" value="{{ old('why_title', $all['pages']['why_title'] ?? 'Why Choose MapeLeads?') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Why Choose MapeLeads?">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Subtitle</label>
+                            <input type="text" name="why_subtitle" value="{{ old('why_subtitle', $all['pages']['why_subtitle'] ?? 'We\'ve built every aspect of our platform with one goal: getting you hired faster') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Intro Paragraph</label>
+                            <textarea name="why_intro" rows="3" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="What makes MapeLeads different from other training centres...">{{ old('why_intro', $all['pages']['why_intro'] ?? '') }}</textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Additional Content (HTML allowed)</label>
+                            <textarea name="why_content" rows="5" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-brand-500 outline-none" placeholder="<p>Extra information about your platform...</p>">{{ old('why_content', $all['pages']['why_content'] ?? '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-2 border-t border-gray-100">
+                    <button type="submit" class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Save Page Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+
         {{-- ─── ANY EXTRA GROUPS (dynamic fallback) ─────────────── --}}
         @foreach($groups as $group)
-            @if(!in_array($group, ['general','homepage','social','seo','footer','integrations']))
+            @if(!in_array($group, ['general','homepage','social','seo','footer','integrations','pages']))
                 <div id="settings-panel-{{ $group }}" style="{{ $activeTab === $group ? 'display:block' : 'display:none' }}">
                     <form method="POST"
                           action="{{ route('admin.settings.update', $group) }}"

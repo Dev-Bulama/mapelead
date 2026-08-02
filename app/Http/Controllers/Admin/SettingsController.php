@@ -13,7 +13,7 @@ class SettingsController extends Controller
 
     public function index()
     {
-        $groups = ['general', 'homepage', 'social', 'seo', 'footer', 'integrations'];
+        $groups = ['general', 'homepage', 'social', 'seo', 'footer', 'integrations', 'pages'];
         $all = [];
         foreach ($groups as $group) {
             $all[$group] = $this->settings->group($group);

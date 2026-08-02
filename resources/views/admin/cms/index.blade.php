@@ -181,7 +181,6 @@
                             <td colspan="5" class="py-4 px-3">
                                 <form action="{{ route('admin.cms.hero.update') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
                                     @csrf
-                                    @method('PUT')
                                     <input type="hidden" name="id" value="{{ $banner->id }}">
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         <div>

@@ -7,7 +7,7 @@
     {{-- Page header --}}
     <div>
         <h2 class="text-2xl font-bold text-gray-900">Platform Documentation</h2>
-        <p class="text-sm text-gray-500 mt-0.5">Complete guide to managing the MapeLearn platform.</p>
+        <p class="text-sm text-gray-500 mt-0.5">Complete guide to managing the MapeLeads platform.</p>
     </div>
 
     <div class="flex flex-col lg:flex-row gap-6">
@@ -51,7 +51,7 @@
                 <div class="bg-white rounded-xl border border-gray-200 p-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">Platform Overview</h3>
                     <p class="text-sm text-gray-600 leading-relaxed mb-4">
-                        MapeLearn is a full-featured Learning Management System (LMS) built on Laravel. It supports course creation, student enrollment, payment processing (Paystack), installment plans, progress tracking, certificates, quizzes, assignments, and a CMS for managing all public-facing content.
+                        MapeLeads is a full-featured Learning Management System (LMS) built on Laravel. It supports course creation, student enrollment, payment processing (Paystack), installment plans, progress tracking, certificates, quizzes, assignments, and a CMS for managing all public-facing content.
                     </p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         @foreach([

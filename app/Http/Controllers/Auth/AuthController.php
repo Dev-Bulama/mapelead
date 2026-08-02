@@ -69,7 +69,7 @@ class AuthController extends Controller
         }
         Auth::login($user);
 
-        return redirect()->route('student.dashboard')->with('success', 'Welcome to MapeLearn!');
+        return redirect()->route('student.dashboard')->with('success', 'Welcome to MapeLeads!');
     }
 
     public function logout(Request $request)

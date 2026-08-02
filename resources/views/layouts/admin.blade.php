@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Dashboard') — {{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }} Admin</title>
+    <title>@yield('title', 'Dashboard') — {{ \App\Models\SiteSetting::get('site_name', 'MapeLeads') }} Admin</title>
 
     {{-- Tailwind CSS CDN --}}
     <script src="https://cdn.tailwindcss.com"></script>
@@ -135,7 +135,7 @@
             </div>
             <div class="overflow-hidden">
                 <p class="text-white font-bold text-base leading-tight truncate">
-                    {{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}
+                    {{ \App\Models\SiteSetting::get('site_name', 'MapeLeads') }}
                 </p>
                 <p class="text-gray-400 text-xs">Admin Panel</p>
             </div>
@@ -519,7 +519,7 @@
                         <span class="text-white text-xs font-bold">ML</span>
                     </div>
                     <span class="text-gray-800 font-semibold text-sm">
-                        {{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }}
+                        {{ \App\Models\SiteSetting::get('site_name', 'MapeLeads') }}
                     </span>
                     <span class="text-gray-300 text-sm">/</span>
                 </div>
@@ -814,7 +814,7 @@
         {{-- ── FOOTER ──────────────────────────────────────────────── --}}
         <footer class="border-t border-gray-200 bg-white px-6 py-3">
             <p class="text-xs text-gray-400 text-center">
-                {{ \App\Models\SiteSetting::get('site_name', 'MapeLearn') }} Admin Panel
+                {{ \App\Models\SiteSetting::get('site_name', 'MapeLeads') }} Admin Panel
                 &mdash; &copy; {{ date('Y') }}
             </p>
         </footer>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Gallery — ' . \App\Models\SiteSetting::get('site_name', 'MapeLearn'))
-@section('meta_description', 'Explore our gallery — campus life, training sessions, graduation ceremonies, and the vibrant MapeLearn community.')
+@section('title', 'Gallery — ' . \App\Models\SiteSetting::get('site_name', 'MapeLeads'))
+@section('meta_description', 'Explore our gallery — campus life, training sessions, graduation ceremonies, and the vibrant MapeLeads community.')
 
 @push('styles')
 <style>
@@ -20,7 +20,7 @@
 <div class="hero-gradient text-white py-16">
     <div class="max-w-3xl mx-auto px-4 text-center">
         <span class="inline-block bg-white/10 text-white/80 text-sm font-medium px-4 py-1.5 rounded-full mb-4">Our World</span>
-        <h1 class="text-4xl lg:text-5xl font-display font-bold mb-4">Life at MapeLearn</h1>
+        <h1 class="text-4xl lg:text-5xl font-display font-bold mb-4">Life at MapeLeads</h1>
         <p class="text-brand-200 text-lg">Glimpses of our campus, training sessions, graduation ceremonies, and the vibrant community you'll be part of.</p>
     </div>
 </div>

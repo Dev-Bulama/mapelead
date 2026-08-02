@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'About Us — MapeLearn')
-@section('meta_description', 'Learn about MapeLearn, Africa\'s premier tech training platform. Discover our mission, team, and impact.')
+@section('title', 'About Us — MapeLeads')
+@section('meta_description', 'Learn about MapeLeads, Africa\'s premier tech training platform. Discover our mission, team, and impact.')
 
 @section('content')
 

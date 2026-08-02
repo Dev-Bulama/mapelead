@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', isset($category) ? $category->name . ' — Blog' : (isset($tag) ? $tag->name . ' — Blog' : 'Blog — MapeLearn'))
+@section('title', isset($category) ? $category->name . ' — Blog' : (isset($tag) ? $tag->name . ' — Blog' : 'Blog — MapeLeads'))
 
 @section('content')
 
