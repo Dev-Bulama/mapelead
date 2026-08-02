@@ -1209,6 +1209,57 @@ function galleryLightbox() {
 @endif
 
 {{-- ═══════════════════════════════════════════════════════════════════
+     SCHOLARSHIPS / HIRE FROM US / WHY MAPELEADS PROMO STRIP
+═══════════════════════════════════════════════════════════════════ --}}
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">More From Us</span>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900">Everything You Need to Succeed</h2>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-6">
+
+            {{-- Scholarships --}}
+            <div class="group relative bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-100 rounded-2xl p-8 flex flex-col hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center text-2xl mb-5">🎓</div>
+                <h3 class="font-display font-bold text-gray-900 text-xl mb-3">Scholarships &amp; Financial Aid</h3>
+                <p class="text-gray-600 text-sm leading-relaxed flex-1">Financial barriers shouldn't stop you from a world-class tech education. Explore our merit &amp; need-based scholarship programme.</p>
+                <a href="{{ route('scholarships') }}"
+                   class="mt-6 inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm self-start">
+                    Apply for Scholarship
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+            </div>
+
+            {{-- Why MapeLeads --}}
+            <div class="group relative bg-gradient-to-br from-brand-50 to-blue-50 border border-brand-100 rounded-2xl p-8 flex flex-col hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div class="w-14 h-14 bg-brand-100 rounded-2xl flex items-center justify-center text-2xl mb-5">🚀</div>
+                <h3 class="font-display font-bold text-gray-900 text-xl mb-3">Why Choose MapeLeads?</h3>
+                <p class="text-gray-600 text-sm leading-relaxed flex-1">Expert instructors, flexible schedules, hands-on projects, and a 92% job placement rate. Discover what sets us apart from the rest.</p>
+                <a href="{{ route('why-us') }}"
+                   class="mt-6 inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm self-start">
+                    Learn More
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+            </div>
+
+            {{-- Hire From Us --}}
+            <div class="group relative bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 rounded-2xl p-8 flex flex-col hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center text-2xl mb-5">🤝</div>
+                <h3 class="font-display font-bold text-gray-900 text-xl mb-3">Hire From MapeLeads</h3>
+                <p class="text-gray-600 text-sm leading-relaxed flex-1">Looking for job-ready tech talent? Our graduates are trained to industry standards across development, data, design, and more.</p>
+                <a href="{{ route('hire-from-us') }}"
+                   class="mt-6 inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm self-start">
+                    Hire Our Graduates
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════════
      ENROLLMENT CTA SECTION
 ═══════════════════════════════════════════════════════════════════ --}}
 <section class="py-24 relative overflow-hidden bg-gradient-to-br from-brand-700 via-brand-600 to-purple-700">
