@@ -172,6 +172,11 @@ Route::middleware(['auth', 'role:instructor|admin|super_admin'])->prefix('instru
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/docs', [DashboardController::class, 'docs'])->name('docs');
+
+    // Admin profile
+    Route::get('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/password', [\App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
     Route::get('/analytics/revenue', [AnalyticsController::class, 'revenue'])->name('analytics.revenue');
 
