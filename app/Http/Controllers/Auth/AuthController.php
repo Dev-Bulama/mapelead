@@ -36,6 +36,20 @@ class AuthController extends Controller
         }
 
         $user->update(['last_login_at' => now(), 'last_login_ip' => $request->ip()]);
+
+        if ($user->two_factor_enabled) {
+            Auth::logout();
+            $request->session()->put('2fa_user_id', $user->id);
+            if ($redirect = $request->query('redirect')) {
+                $parsed = parse_url($redirect);
+                $appHost = parse_url(config('app.url'), PHP_URL_HOST);
+                if (empty($parsed['host']) || $parsed['host'] === $appHost) {
+                    $request->session()->put('2fa_redirect', $redirect);
+                }
+            }
+            return redirect()->route('auth.2fa.challenge');
+        }
+
         $request->session()->regenerate();
 
         // Honor explicit ?redirect= param first (e.g. from "Enroll Now" on course page)
@@ -57,7 +71,7 @@ class AuthController extends Controller
             'last_name'  => 'required|string|max:100',
             'email'      => 'required|email|unique:users,email',
             'phone'      => 'nullable|string|max:20',
-            'password'   => ['required', 'confirmed', PasswordRules::min(8)->mixedCase()->numbers()],
+            'password'   => ['required', 'confirmed', PasswordRules::min(8)->mixedCase()->numbers()->symbols()],
         ]);
 
         $user = User::create(array_merge($data, ['status' => 'active']));
@@ -94,7 +108,7 @@ class AuthController extends Controller
         $request->validate([
             'token'    => 'required',
             'email'    => 'required|email',
-            'password' => ['required', 'confirmed', PasswordRules::min(8)->mixedCase()->numbers()],
+            'password' => ['required', 'confirmed', PasswordRules::min(8)->mixedCase()->numbers()->symbols()],
         ]);
 
         $status = Password::reset(

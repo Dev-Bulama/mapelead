@@ -7,6 +7,7 @@ use App\Http\Controllers\Web\PageController;
 use App\Http\Controllers\Web\ContactController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\Student\StudentDashboardController;
 use App\Http\Controllers\Student\StudentCourseController;
 use App\Http\Controllers\Student\StudentProfileController;
@@ -93,10 +94,20 @@ Route::middleware('guest')->prefix('auth')->name('auth.')->group(function () {
     Route::get('/google/callback', [SocialAuthController::class, 'handleGoogleCallback'])->name('google.callback');
 });
 
+// 2FA challenge (no auth required — user isn't logged in yet)
+Route::get('/auth/two-factor', [TwoFactorController::class, 'showChallenge'])->name('auth.2fa.challenge');
+Route::post('/auth/two-factor', [TwoFactorController::class, 'challenge'])->name('auth.2fa.challenge.post')->middleware('throttle:10,1');
+
 Route::middleware('auth')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
+    Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
     Route::post('/email/resend', [AuthController::class, 'resendVerification'])->name('verification.resend');
+
+    // 2FA management
+    Route::get('/security/two-factor/setup', [TwoFactorController::class, 'showSetup'])->name('2fa.setup');
+    Route::post('/security/two-factor/enable', [TwoFactorController::class, 'enable'])->name('2fa.enable');
+    Route::post('/security/two-factor/disable', [TwoFactorController::class, 'disable'])->name('2fa.disable');
 });
 
 // ── Route aliases expected by Laravel internals & legacy links ──────────────
@@ -107,7 +118,7 @@ Route::redirect('/logout', '/auth/login');
 
 // ─── Student Dashboard Routes ──────────────────────────────────────────────────
 
-Route::middleware(['auth'])->prefix('dashboard')->name('student.')->group(function () {
+Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('student.')->group(function () {
     Route::get('/', [StudentDashboardController::class, 'index'])->name('dashboard');
     Route::get('/courses', [StudentCourseController::class, 'index'])->name('courses');
     Route::get('/courses/{slug}/learn', [StudentCourseController::class, 'learn'])->name('learn');
@@ -159,7 +170,7 @@ Route::post('/webhooks/paystack', [StudentCourseController::class, 'paystackWebh
 
 // ─── Instructor Dashboard Routes ───────────────────────────────────────────────
 
-Route::middleware(['auth', 'role:instructor|admin|super_admin'])->prefix('instructor')->name('instructor.')->group(function () {
+Route::middleware(['auth', 'verified', 'role:instructor|admin|super_admin'])->prefix('instructor')->name('instructor.')->group(function () {
     Route::get('/', [InstructorDashboardController::class, 'index'])->name('dashboard');
     Route::resource('courses', InstructorCourseController::class);
     Route::get('/courses/{id}/analytics', [InstructorDashboardController::class, 'courseAnalytics'])->name('course.analytics');

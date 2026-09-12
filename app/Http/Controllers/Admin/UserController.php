@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Password as PasswordRules;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -66,7 +67,7 @@ class UserController extends Controller
             'phone'        => 'nullable|string|max:20',
             'status'       => 'required|in:active,inactive,pending,suspended',
             'role'         => 'required|exists:roles,name',
-            'new_password' => 'nullable|string|min:8|confirmed',
+            'new_password' => ['nullable', 'confirmed', PasswordRules::min(8)->mixedCase()->numbers()->symbols()],
         ]);
 
         if (!empty($data['new_password'])) {

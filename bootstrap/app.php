@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\HandleRedirects::class,
             \App\Http\Middleware\TrackPageView::class,
+            \App\Http\Middleware\SanitizeInput::class,
         ]);
 
         // ─── Named middleware aliases ─────────────────────────────────────────

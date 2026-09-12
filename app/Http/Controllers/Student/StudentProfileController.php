@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\Password as PasswordRules;
 
 class StudentProfileController extends Controller
 {
@@ -41,7 +42,7 @@ class StudentProfileController extends Controller
         if ($request->filled('current_password') && $request->filled('new_password')) {
             $request->validate([
                 'current_password' => 'required',
-                'new_password'     => 'required|min:8|confirmed',
+                'new_password'     => ['required', 'confirmed', PasswordRules::min(8)->mixedCase()->numbers()->symbols()],
             ]);
             if (!Hash::check($request->current_password, $user->password)) {
                 return back()->withErrors(['current_password' => 'Current password is incorrect.']);

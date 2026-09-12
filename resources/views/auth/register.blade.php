@@ -66,6 +66,9 @@
                     </button>
                 </div>
                 @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                @if(!$errors->has('password'))
+                <p class="text-xs text-gray-400 mt-1">Min 8 chars · uppercase · lowercase · number · special character (!@#$…)</p>
+                @endif
             </div>
 
             <div>

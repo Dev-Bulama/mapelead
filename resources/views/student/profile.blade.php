@@ -92,9 +92,47 @@
             </div>
         </div>
 
+        <p class="text-xs text-gray-400">Password must be at least 8 characters with uppercase, lowercase, a number, and a special character.</p>
+
         <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors">
             Save Changes
         </button>
     </form>
+
+    {{-- Two-Factor Authentication --}}
+    <div class="bg-white rounded-2xl border border-gray-200 p-6 mt-6">
+        <h3 class="font-bold text-gray-900 mb-1">Two-Factor Authentication (2FA)</h3>
+        <p class="text-sm text-gray-500 mb-5">Add an extra layer of security by requiring a code from your authenticator app when signing in.</p>
+
+        @if($user->two_factor_enabled)
+        <div class="flex items-center gap-3 bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4">
+            <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            <span class="text-sm text-green-700 font-medium">2FA is enabled on your account</span>
+        </div>
+        <form method="POST" action="{{ route('2fa.disable') }}">
+            @csrf
+            <div class="flex items-end gap-3">
+                <div class="flex-1 max-w-xs">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Confirm your password to disable</label>
+                    <input type="password" name="password" required
+                           class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                    @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm">
+                    Disable 2FA
+                </button>
+            </div>
+        </form>
+        @else
+        <div class="flex items-center gap-3 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 mb-4">
+            <svg class="w-5 h-5 text-yellow-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <span class="text-sm text-yellow-700">2FA is not enabled. Your account has less protection.</span>
+        </div>
+        <a href="{{ route('2fa.setup') }}" class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            Enable 2FA
+        </a>
+        @endif
+    </div>
 </div>
 @endsection
