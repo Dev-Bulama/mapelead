@@ -448,46 +448,6 @@ function newsTicker() {
                         <a href="{{ route('courses.show', $course->slug) }}">{{ $course->title }}</a>
                     </h3>
 
-                    {{-- Instructor(s) --}}
-                    @php $cInstructors = $course->courseInstructors ?? collect(); @endphp
-                    @if($cInstructors->isNotEmpty())
-                    <div class="flex items-center gap-2 mb-3">
-                        <div class="flex -space-x-1.5">
-                            @foreach($cInstructors->take(3) as $ci)
-                            @if($ci->instructor)
-                            <img src="{{ $ci->instructor->avatar_url }}" alt="{{ $ci->instructor->full_name }}"
-                                 title="{{ $ci->instructor->full_name }} — {{ $ci->session_label }} Session"
-                                 class="w-6 h-6 rounded-full object-cover border-2 border-white shrink-0">
-                            @endif
-                            @endforeach
-                            @if($cInstructors->count() > 3)
-                            <span class="w-6 h-6 rounded-full border-2 border-white bg-brand-100 text-brand-700 text-[10px] font-bold flex items-center justify-center shrink-0">+{{ $cInstructors->count() - 3 }}</span>
-                            @endif
-                        </div>
-                        <span class="text-sm text-gray-500 truncate">
-                            @if($cInstructors->count() === 1){{ $cInstructors->first()->instructor?->full_name ?? '' }}
-                            @else{{ $cInstructors->count() }} instructors
-                            @endif
-                        </span>
-                    </div>
-                    @elseif($course->instructor)
-                    <div class="flex items-center gap-2 mb-3">
-                        <img src="{{ $course->instructor->avatar_url }}" alt="{{ $course->instructor->full_name }}"
-                             class="w-6 h-6 rounded-full object-cover border border-gray-200">
-                        <span class="text-sm text-gray-500">{{ $course->instructor->full_name }}</span>
-                    </div>
-                    @endif
-
-                    {{-- Rating --}}
-                    <div class="flex items-center gap-2 mb-3">
-                        <div class="flex items-center gap-0.5">
-                            @for($s = 1; $s <= 5; $s++)
-                            <svg class="w-3.5 h-3.5 {{ $s <= round($course->average_rating ?? 0) ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current' }}" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                            @endfor
-                        </div>
-                        <span class="text-sm font-semibold text-gray-700">{{ number_format($course->average_rating ?? 0, 1) }}</span>
-                        <span class="text-xs text-gray-400">({{ number_format($course->total_reviews ?? 0) }})</span>
-                    </div>
 
                     {{-- Meta: duration + type --}}
                     <div class="flex items-center gap-3 text-xs text-gray-500 mb-4">

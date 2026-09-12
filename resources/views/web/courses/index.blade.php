@@ -395,44 +395,6 @@
                                     <a href="{{ route('courses.show', $course->slug) }}">{{ $course->title }}</a>
                                 </h3>
 
-                                @php $cInstructors = $course->courseInstructors ?? collect(); @endphp
-                                @if($cInstructors->isNotEmpty())
-                                <div class="flex items-center gap-2 mb-3">
-                                    <div class="flex -space-x-1">
-                                        @foreach($cInstructors->take(3) as $ci)
-                                        @if($ci->instructor)
-                                        <img src="{{ $ci->instructor->avatar_url }}" alt="{{ $ci->instructor->full_name }}"
-                                             title="{{ $ci->instructor->full_name }} — {{ $ci->session_label }} Session"
-                                             class="w-5 h-5 rounded-full object-cover border-2 border-white shrink-0">
-                                        @endif
-                                        @endforeach
-                                        @if($cInstructors->count() > 3)
-                                        <span class="w-5 h-5 rounded-full border-2 border-white bg-brand-100 text-brand-700 text-[9px] font-bold flex items-center justify-center shrink-0">+{{ $cInstructors->count() - 3 }}</span>
-                                        @endif
-                                    </div>
-                                    <span class="text-xs text-gray-500 truncate">
-                                        @if($cInstructors->count() === 1){{ $cInstructors->first()->instructor?->full_name ?? '' }}
-                                        @else{{ $cInstructors->count() }} instructors
-                                        @endif
-                                    </span>
-                                </div>
-                                @elseif($course->instructor)
-                                <div class="flex items-center gap-2 mb-3">
-                                    <img src="{{ $course->instructor->avatar_url }}" alt="{{ $course->instructor->full_name }}"
-                                         class="w-5 h-5 rounded-full object-cover border border-gray-200">
-                                    <span class="text-xs text-gray-500 truncate">{{ $course->instructor->full_name }}</span>
-                                </div>
-                                @endif
-
-                                <div class="flex items-center gap-2 mb-3">
-                                    <div class="flex items-center gap-0.5">
-                                        @for($s = 1; $s <= 5; $s++)
-                                        <svg class="w-3 h-3 {{ $s <= round($course->average_rating ?? 0) ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current' }}" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                        @endfor
-                                    </div>
-                                    <span class="text-xs font-semibold text-gray-700">{{ number_format($course->average_rating ?? 0, 1) }}</span>
-                                    <span class="text-xs text-gray-400">({{ number_format($course->total_reviews ?? 0) }})</span>
-                                </div>
 
                                 <div class="flex items-center gap-3 text-xs text-gray-500 mb-4">
                                     <span class="flex items-center gap-1">
@@ -505,44 +467,9 @@
                                         @if($course->short_description)
                                         <p class="text-gray-500 text-xs leading-relaxed mb-3 line-clamp-2">{{ $course->short_description }}</p>
                                         @endif
-                                        @php $cInstructors2 = $course->courseInstructors ?? collect(); @endphp
-                                        @if($cInstructors2->isNotEmpty())
-                                        <div class="flex items-center gap-2 mb-3">
-                                            <div class="flex -space-x-1">
-                                                @foreach($cInstructors2->take(3) as $ci)
-                                                @if($ci->instructor)
-                                                <img src="{{ $ci->instructor->avatar_url }}" alt="{{ $ci->instructor->full_name }}"
-                                                     title="{{ $ci->instructor->full_name }} — {{ $ci->session_label }} Session"
-                                                     class="w-5 h-5 rounded-full object-cover border-2 border-white shrink-0">
-                                                @endif
-                                                @endforeach
-                                                @if($cInstructors2->count() > 3)
-                                                <span class="w-5 h-5 rounded-full border-2 border-white bg-brand-100 text-brand-700 text-[9px] font-bold flex items-center justify-center shrink-0">+{{ $cInstructors2->count() - 3 }}</span>
-                                                @endif
-                                            </div>
-                                            <span class="text-xs text-gray-500">
-                                                @if($cInstructors2->count() === 1){{ $cInstructors2->first()->instructor?->full_name ?? '' }}
-                                                @else{{ $cInstructors2->count() }} instructors
-                                                @endif
-                                            </span>
-                                        </div>
-                                        @elseif($course->instructor)
-                                        <div class="flex items-center gap-2 mb-3">
-                                            <img src="{{ $course->instructor->avatar_url }}" alt="{{ $course->instructor->full_name }}" class="w-5 h-5 rounded-full object-cover">
-                                            <span class="text-xs text-gray-500">{{ $course->instructor->full_name }}</span>
-                                        </div>
-                                        @endif
                                     </div>
                                     <div class="flex flex-wrap items-center justify-between gap-3">
                                         <div class="flex items-center gap-4 text-xs text-gray-500">
-                                            <span class="flex items-center gap-1">
-                                                <div class="flex items-center gap-0.5">
-                                                    @for($s = 1; $s <= 5; $s++)
-                                                    <svg class="w-3 h-3 {{ $s <= round($course->average_rating ?? 0) ? 'text-yellow-400 fill-current' : 'text-gray-300 fill-current' }}" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                                    @endfor
-                                                </div>
-                                                <span class="font-semibold text-gray-700">{{ number_format($course->average_rating ?? 0, 1) }}</span>
-                                            </span>
                                             <span>{{ $course->duration_hours ?? 0 }}h</span>
                                             <span>{{ number_format($course->total_students ?? 0) }} students</span>
                                         </div>

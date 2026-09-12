@@ -60,13 +60,19 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
-            'first_name' => 'required|string|max:100',
-            'last_name'  => 'required|string|max:100',
-            'email'      => 'required|email|unique:users,email,' . $user->id,
-            'phone'      => 'nullable|string|max:20',
-            'status'     => 'required|in:active,inactive,pending,suspended',
-            'role'       => 'required|exists:roles,name',
+            'first_name'   => 'required|string|max:100',
+            'last_name'    => 'required|string|max:100',
+            'email'        => 'required|email|unique:users,email,' . $user->id,
+            'phone'        => 'nullable|string|max:20',
+            'status'       => 'required|in:active,inactive,pending,suspended',
+            'role'         => 'required|exists:roles,name',
+            'new_password' => 'nullable|string|min:8|confirmed',
         ]);
+
+        if (!empty($data['new_password'])) {
+            $data['password'] = \Illuminate\Support\Facades\Hash::make($data['new_password']);
+        }
+        unset($data['new_password'], $data['new_password_confirmation']);
 
         $user->update($data);
         $user->syncRoles([$data['role']]);

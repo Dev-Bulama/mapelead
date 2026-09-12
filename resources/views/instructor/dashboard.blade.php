@@ -11,23 +11,69 @@
         <p class="mt-1 text-indigo-100">Here's your teaching overview.</p>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl border border-gray-100 p-6">
-            <p class="text-sm text-gray-500">Total Courses</p>
-            <p class="mt-1 text-3xl font-bold text-gray-900">{{ $courses->count() }}</p>
-        </div>
+    {{-- Stats Row 1 --}}
+    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white rounded-2xl border border-gray-100 p-6">
             <p class="text-sm text-gray-500">Total Students</p>
-            <p class="mt-1 text-3xl font-bold text-gray-900">{{ $totalStudents }}</p>
-        </div>
-        <div class="bg-white rounded-2xl border border-gray-100 p-6">
-            <p class="text-sm text-gray-500">Total Revenue</p>
-            <p class="mt-1 text-3xl font-bold text-gray-900">₦{{ number_format($totalRevenue, 2) }}</p>
+            <p class="mt-1 text-3xl font-bold text-gray-900">{{ number_format($totalStudents) }}</p>
         </div>
         <div class="bg-white rounded-2xl border border-gray-100 p-6">
             <p class="text-sm text-gray-500">Active Courses</p>
             <p class="mt-1 text-3xl font-bold text-gray-900">{{ $courses->where('status', 'published')->count() }}</p>
         </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <p class="text-sm text-gray-500">Total Enrollments</p>
+            <p class="mt-1 text-3xl font-bold text-gray-900">{{ number_format($totalEnrollments) }}</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <p class="text-sm text-gray-500">Pending Reviews</p>
+            <p class="mt-1 text-3xl font-bold {{ $pendingReviews > 0 ? 'text-orange-600' : 'text-gray-900' }}">{{ $pendingReviews }}</p>
+            @if($pendingReviews > 0)
+            <p class="text-xs text-orange-500 mt-1">Assignments awaiting grading</p>
+            @endif
+        </div>
+    </div>
+
+    {{-- Stats Row 2 --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <div class="flex items-center justify-between mb-3">
+                <p class="text-sm font-medium text-gray-700">Avg Student Progress</p>
+                <span class="text-lg font-bold text-brand-600">{{ round($avgProgress) }}%</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-2.5">
+                <div class="bg-brand-600 h-2.5 rounded-full transition-all" style="width: {{ min(100, round($avgProgress)) }}%"></div>
+            </div>
+            <p class="text-xs text-gray-400 mt-2">Across all active enrollments</p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <p class="text-sm text-gray-500">Total Revenue</p>
+            <p class="mt-1 text-3xl font-bold text-gray-900">₦{{ number_format($totalRevenue, 2) }}</p>
+            <a href="{{ route('instructor.earnings') }}" class="text-xs text-brand-600 hover:underline mt-2 inline-block">View earnings →</a>
+        </div>
+    </div>
+
+    {{-- Recent Activity --}}
+    <div class="bg-white rounded-2xl border border-gray-100 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+        @if($recentEnrollments->isEmpty())
+        <p class="text-sm text-gray-400 text-center py-6">No recent enrollments.</p>
+        @else
+        <div class="space-y-3">
+            @foreach($recentEnrollments as $enrollment)
+            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                <div class="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-600 font-semibold text-xs flex-shrink-0">
+                    {{ strtoupper(substr($enrollment->user->first_name ?? '?', 0, 1)) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">{{ $enrollment->user->full_name ?? 'Unknown' }}</p>
+                    <p class="text-xs text-gray-500 truncate">Enrolled in <span class="font-medium">{{ $enrollment->course->title ?? '—' }}</span></p>
+                </div>
+                <span class="text-xs text-gray-400 flex-shrink-0">{{ $enrollment->created_at->diffForHumans() }}</span>
+            </div>
+            @endforeach
+        </div>
+        @endif
     </div>
 
     <div class="bg-white rounded-2xl border border-gray-100 p-6">
@@ -95,10 +141,10 @@
         @endif
     </div>
 
-    {{-- My Session Assignments --}}
+    {{-- Upcoming Live Classes --}}
     @if($sessionAssignments->isNotEmpty())
     <div class="bg-white rounded-2xl border border-gray-100 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">My Assigned Sessions</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Upcoming Live Classes</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @php
                 $sessionCfg = [

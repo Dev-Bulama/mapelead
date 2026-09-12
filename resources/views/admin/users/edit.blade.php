@@ -79,6 +79,25 @@
             </div>
         </div>
 
+        <div class="bg-white rounded-2xl border border-gray-200 p-6 space-y-5">
+            <h3 class="font-semibold text-gray-900 text-sm uppercase tracking-wide border-b border-gray-100 pb-3">Reset Password <span class="text-gray-400 font-normal normal-case">(leave blank to keep current)</span></h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">New Password</label>
+                    <input type="password" name="new_password" autocomplete="new-password"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                           placeholder="Min 8 characters">
+                    @error('new_password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Confirm New Password</label>
+                    <input type="password" name="new_password_confirmation" autocomplete="new-password"
+                           class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                           placeholder="Repeat new password">
+                </div>
+            </div>
+        </div>
+
         <div class="flex items-center gap-3">
             <button type="submit" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors">
                 Save Changes
