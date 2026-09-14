@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // ─── Global web middleware ────────────────────────────────────────────
+        $middleware->web(prepend: [
+            \App\Http\Middleware\NormalizeSlashes::class,
+        ]);
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\HandleRedirects::class,
