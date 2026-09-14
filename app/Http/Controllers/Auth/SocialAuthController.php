@@ -26,7 +26,11 @@ class SocialAuthController extends Controller
             ->first();
 
         if ($user) {
-            $user->update(['google_id' => $googleUser->getId(), 'google_token' => $googleUser->token]);
+            $updates = ['google_id' => $googleUser->getId(), 'google_token' => $googleUser->token];
+            if (!$user->email_verified_at) {
+                $updates['email_verified_at'] = now();
+            }
+            $user->update($updates);
         } else {
             $nameParts = explode(' ', $googleUser->getName(), 2);
             $user = User::create([

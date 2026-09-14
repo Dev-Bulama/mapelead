@@ -115,6 +115,8 @@ Route::middleware('auth')->group(function () {
 Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::redirect('/logout', '/auth/login');
+// Laravel's Password broker internally calls route('password.reset') to build the email link
+Route::get('/auth/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
 
 // ─── Student Dashboard Routes ──────────────────────────────────────────────────
 
