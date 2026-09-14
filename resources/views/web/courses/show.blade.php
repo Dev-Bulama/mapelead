@@ -6,6 +6,12 @@
 @section('og_image', $course->thumbnail_url)
 
 @section('content')
+@php
+    $userHasPaid = auth()->check() && auth()->user()->enrollments()
+        ->where('course_id', $course->id)
+        ->where('payment_status', 'paid')
+        ->exists();
+@endphp
 
 {{-- ═══════════════════════════════════════════════════════════════
      BREADCRUMB BAR
@@ -81,8 +87,7 @@
             </div>
 
             {{-- Instructor quick ref — only visible after payment --}}
-            @php $heroPaid = auth()->check() && auth()->user()->enrollments()->where('course_id', $course->id)->where('payment_status', 'paid')->exists(); @endphp
-            @if($heroPaid && $course->courseInstructors->count())
+            @if($userHasPaid && $course->courseInstructors->count())
             <div class="flex flex-wrap items-center gap-4">
                 <span class="text-brand-400 text-xs">Instructors:</span>
                 @foreach($course->courseInstructors as $ci)
@@ -98,7 +103,7 @@
                 @endif
                 @endforeach
             </div>
-            @elseif($heroPaid && $course->instructor)
+            @elseif($userHasPaid && $course->instructor)
             <div class="flex items-center gap-3">
                 <img src="{{ $course->instructor->avatar_url }}" alt="{{ $course->instructor->full_name }}"
                      class="w-9 h-9 rounded-full object-cover border-2 border-brand-500">
@@ -265,13 +270,7 @@
                 </section>
 
                 {{-- INSTRUCTOR BIO — only visible after payment --}}
-                @php
-                    $hasPaid = auth()->check() && auth()->user()->enrollments()
-                        ->where('course_id', $course->id)
-                        ->where('payment_status', 'paid')
-                        ->exists();
-                @endphp
-                @if($hasPaid && $course->courseInstructors->count())
+                @if($userHasPaid && $course->courseInstructors->count())
                 <section id="instructor" class="bg-white rounded-2xl border border-gray-200 p-7">
                     <h2 class="font-display font-bold text-gray-900 text-xl mb-6">
                         {{ $course->courseInstructors->count() > 1 ? 'Your Instructors' : 'Your Instructor' }}
@@ -341,7 +340,7 @@
                     @endforeach
                     </div>
                 </section>
-                @elseif($hasPaid && $course->instructor)
+                @elseif($userHasPaid && $course->instructor)
                 <section id="instructor" class="bg-white rounded-2xl border border-gray-200 p-7">
                     <h2 class="font-display font-bold text-gray-900 text-xl mb-6">Your Instructor</h2>
                     <div class="flex flex-col sm:flex-row gap-6">

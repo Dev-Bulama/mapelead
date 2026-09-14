@@ -15,6 +15,10 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
                 <input type="password" name="password" required minlength="8" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                @error('password')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+                @if(!$errors->has('password'))
+                <p class="text-xs text-gray-400 mt-1">Min 8 chars · uppercase · lowercase · number · special character</p>
+                @endif
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
