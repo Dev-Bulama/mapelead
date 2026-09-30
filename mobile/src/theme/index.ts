@@ -1,9 +1,14 @@
-// Brand palette — swap these values for official brand tokens
+// Brand palette — MAPELEAD official tokens
 export const Colors = {
   // Primary brand
-  primary:   '#2563eb', // blue-600
-  primaryDark: '#1d4ed8',
-  primaryLight: '#3b82f6',
+  primary:      '#1e3adb', // brand blue
+  primaryDark:  '#1530c2',
+  primaryLight: '#4a63e8',
+
+  // Brand accent
+  cyan:    '#00c9e4', // brand cyan
+  navy:    '#0d1b3e', // dark navy (auth hero background)
+  navyMid: '#162456', // mid navy
 
   // Secondary
   secondary: '#7c3aed', // violet-600

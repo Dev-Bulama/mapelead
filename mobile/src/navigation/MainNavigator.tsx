@@ -7,9 +7,9 @@ import type { MainTabParamList, RootStackParamList } from '@/types';
 
 // Tab screens
 import HomeScreen         from '@/screens/main/HomeScreen';
-import MyCoursesScreen    from '@/screens/main/MyCoursesScreen';
 import ExploreScreen      from '@/screens/main/ExploreScreen';
-import CertificatesScreen from '@/screens/main/CertificatesScreen';
+import MyCoursesScreen    from '@/screens/main/MyCoursesScreen';
+import DownloadsScreen    from '@/screens/main/DownloadsScreen';
 import ProfileScreen      from '@/screens/main/ProfileScreen';
 
 // Pushed screens
@@ -24,16 +24,17 @@ import PaymentWebViewScreen    from '@/screens/payment/PaymentWebViewScreen';
 const Tab   = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+const TAB_ICONS: Record<string, string> = {
+  Home:       '🏠',
+  Explore:    '🔍',
+  MyLearning: '📚',
+  Downloads:  '📥',
+  Profile:    '👤',
+};
+
 function TabIcon({ name, focused }: { name: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    Home:         '🏠',
-    MyCourses:    '📚',
-    Explore:      '🔍',
-    Certificates: '🏆',
-    Profile:      '👤',
-  };
   return (
-    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>{icons[name] ?? '●'}</Text>
+    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>{TAB_ICONS[name] ?? '●'}</Text>
   );
 }
 
@@ -49,11 +50,11 @@ function TabsRoot() {
         tabBarLabelStyle: styles.tabLabel,
       })}
     >
-      <Tab.Screen name="Home"         component={HomeScreen}         options={{ title: 'Home' }} />
-      <Tab.Screen name="MyCourses"    component={MyCoursesScreen}    options={{ title: 'My Courses' }} />
-      <Tab.Screen name="Explore"      component={ExploreScreen}      options={{ title: 'Explore' }} />
-      <Tab.Screen name="Certificates" component={CertificatesScreen} options={{ title: 'Certificates' }} />
-      <Tab.Screen name="Profile"      component={ProfileScreen}      options={{ title: 'Profile' }} />
+      <Tab.Screen name="Home"       component={HomeScreen}      options={{ title: 'Home' }} />
+      <Tab.Screen name="Explore"    component={ExploreScreen}   options={{ title: 'Explore' }} />
+      <Tab.Screen name="MyLearning" component={MyCoursesScreen} options={{ title: 'My Learning' }} />
+      <Tab.Screen name="Downloads"  component={DownloadsScreen} options={{ title: 'Downloads' }} />
+      <Tab.Screen name="Profile"    component={ProfileScreen}   options={{ title: 'Profile' }} />
     </Tab.Navigator>
   );
 }
@@ -61,14 +62,14 @@ function TabsRoot() {
 export default function MainNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Main"             component={TabsRoot} />
-      <Stack.Screen name="CourseDetail"     component={CourseDetailScreen}   options={{ animation: 'slide_from_right' }} />
-      <Stack.Screen name="LessonView"       component={LessonViewScreen}     options={{ animation: 'slide_from_right' }} />
-      <Stack.Screen name="QuizView"         component={QuizScreen}           options={{ animation: 'slide_from_bottom' }} />
-      <Stack.Screen name="AssignmentView"   component={AssignmentScreen}     options={{ animation: 'slide_from_right' }} />
-      <Stack.Screen name="Notifications"    component={NotificationsScreen}  options={{ animation: 'slide_from_right' }} />
-      <Stack.Screen name="ProfileEdit"      component={ProfileEditScreen}    options={{ animation: 'slide_from_bottom' }} />
-      <Stack.Screen name="PaymentWebView"   component={PaymentWebViewScreen} options={{ animation: 'slide_from_bottom', gestureEnabled: false }} />
+      <Stack.Screen name="Main"           component={TabsRoot} />
+      <Stack.Screen name="CourseDetail"   component={CourseDetailScreen}   options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="LessonView"     component={LessonViewScreen}     options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="QuizView"       component={QuizScreen}           options={{ animation: 'slide_from_bottom' }} />
+      <Stack.Screen name="AssignmentView" component={AssignmentScreen}     options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="Notifications"  component={NotificationsScreen}  options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="ProfileEdit"    component={ProfileEditScreen}    options={{ animation: 'slide_from_bottom' }} />
+      <Stack.Screen name="PaymentWebView" component={PaymentWebViewScreen} options={{ animation: 'slide_from_bottom', gestureEnabled: false }} />
     </Stack.Navigator>
   );
 }
@@ -76,7 +77,7 @@ export default function MainNavigator() {
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: Colors.white,
-    borderTopColor:  Colors.border,
+    borderTopColor:  Colors.gray100,
     borderTopWidth:  1,
     paddingTop:      Spacing[1],
     paddingBottom:   Spacing[2],

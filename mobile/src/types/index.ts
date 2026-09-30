@@ -36,6 +36,8 @@ export interface RegisterPayload {
   password: string;
   password_confirmation: string;
   device_name?: string;
+  account_type?: 'student' | 'instructor';
+  instructor_code?: string;
 }
 
 // ── API Responses ─────────────────────────────────────────────────────────────
@@ -212,11 +214,11 @@ export type AuthStackParamList = {
 };
 
 export type MainTabParamList = {
-  Home:         undefined;
-  MyCourses:    undefined;
-  Explore:      undefined;
-  Certificates: undefined;
-  Profile:      undefined;
+  Home:       undefined;
+  Explore:    undefined;
+  MyLearning: undefined;
+  Downloads:  undefined;
+  Profile:    undefined;
 };
 
 export type RootStackParamList = {

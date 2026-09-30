@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponseTrait;
+use App\Models\InstructorCode;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
@@ -62,13 +63,36 @@ class AuthApiController extends Controller
     public function register(Request $request): JsonResponse
     {
         $request->validate([
-            'first_name'  => 'required|string|max:100',
-            'last_name'   => 'required|string|max:100',
-            'email'       => 'required|email|max:255|unique:users,email',
-            'phone'       => 'nullable|string|max:20',
-            'password'    => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
-            'device_name' => 'nullable|string|max:255',
+            'first_name'      => 'required|string|max:100',
+            'last_name'       => 'required|string|max:100',
+            'email'           => 'required|email|max:255|unique:users,email',
+            'phone'           => 'nullable|string|max:20',
+            'password'        => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+            'account_type'    => 'nullable|in:student,instructor',
+            'instructor_code' => 'nullable|string|max:100',
+            'device_name'     => 'nullable|string|max:255',
         ]);
+
+        $isInstructor = $request->account_type === 'instructor';
+
+        if ($isInstructor) {
+            if (empty($request->instructor_code)) {
+                return $this->error('Instructor ID is required for instructor registration', 422, [
+                    'instructor_code' => ['Instructor ID is required.'],
+                ]);
+            }
+
+            $code = InstructorCode::where('code', $request->instructor_code)
+                ->where('is_active', true)
+                ->whereNull('used_at')
+                ->first();
+
+            if (!$code) {
+                return $this->error('Invalid or already used Instructor ID. Please contact support.', 422, [
+                    'instructor_code' => ['Invalid or already used Instructor ID.'],
+                ]);
+            }
+        }
 
         $user = User::create([
             'first_name' => $request->first_name,
@@ -78,7 +102,17 @@ class AuthApiController extends Controller
             'password'   => $request->password,
         ]);
 
-        $user->assignRole('student');
+        if ($isInstructor) {
+            $user->assignRole('instructor');
+            // Mark instructor code as used
+            InstructorCode::where('code', $request->instructor_code)->update([
+                'used_at'          => now(),
+                'used_by_user_id'  => $user->id,
+            ]);
+        } else {
+            $user->assignRole('student');
+        }
+
         event(new Registered($user));
 
         $deviceName = $request->device_name ?? ($request->userAgent() ?? 'mobile-app');
