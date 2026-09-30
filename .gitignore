@@ -26,3 +26,11 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Mobile app
+/mobile/node_modules
+/mobile/.expo
+/mobile/dist
+/mobile/android
+/mobile/ios
+/mobile/.env
