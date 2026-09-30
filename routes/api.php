@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\LessonApiController;
 use App\Http\Controllers\Api\V1\NotificationApiController;
 use App\Http\Controllers\Api\V1\PaymentApiController;
 use App\Http\Controllers\Api\V1\ProfileApiController;
+use App\Http\Controllers\Api\V1\DeviceTokenApiController;
 use App\Http\Controllers\Api\V1\ProgressApiController;
 use App\Http\Controllers\Api\V1\QuizApiController;
 
@@ -91,5 +92,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('/courses/{courseId}/progress',   [ProgressApiController::class, 'courseProgress']);
         Route::post('/streak',                        [ProgressApiController::class, 'trackStreak']);
         Route::get('/streak',                         [ProgressApiController::class, 'streaks']);
+
+        // Device tokens (push notifications)
+        Route::post('/device-token',    [DeviceTokenApiController::class, 'register']);
+        Route::delete('/device-token',  [DeviceTokenApiController::class, 'unregister']);
     });
 });
