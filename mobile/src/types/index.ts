@@ -232,5 +232,7 @@ export type RootStackParamList = {
   Notifications:   undefined;
   Certificates:    undefined;
   Security:        undefined;
+  PaymentHistory:  undefined;
+  LearningStats:   undefined;
   PaymentWebView:  { url: string; reference: string };
 };

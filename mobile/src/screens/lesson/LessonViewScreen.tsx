@@ -4,6 +4,7 @@ import {
   ActivityIndicator, Alert, TextInput, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { downloadAttachment } from '@/screens/main/DownloadsScreen';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/api/client';
@@ -53,6 +54,41 @@ function directVideoHtml(url: string): string {
   </head><body>
   <video controls playsinline src="${url}"></video>
   </body></html>`;
+}
+
+// ── Attachment Download Button ─────────────────────────────────────────────────
+
+function AttachmentButton({ url, lessonTitle }: { url: string; lessonTitle: string }) {
+  const [downloading, setDownloading] = useState(false);
+  const [done,        setDone]        = useState(false);
+
+  const handleDownload = async () => {
+    if (done) return;
+    setDownloading(true);
+    try {
+      const filename = url.split('/').pop() ?? `${lessonTitle}_attachment`.replace(/\s+/g, '_');
+      await downloadAttachment(url, filename);
+      setDone(true);
+      Alert.alert('Downloaded', 'File saved to Downloads. Find it in the Downloads tab.');
+    } catch {
+      Alert.alert('Error', 'Download failed. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  return (
+    <TouchableOpacity
+      style={[S.attachmentBtn, done && { backgroundColor: '#dcfce7' }]}
+      onPress={handleDownload}
+      disabled={downloading}
+    >
+      <Text style={S.attachmentIcon}>{done ? '✅' : downloading ? '⏳' : '📎'}</Text>
+      <Text style={[S.attachmentText, done && { color: Colors.success }]}>
+        {done ? 'Downloaded' : downloading ? 'Downloading…' : 'Download Attachment'}
+      </Text>
+    </TouchableOpacity>
+  );
 }
 
 // ── Video Player ───────────────────────────────────────────────────────────────
@@ -266,10 +302,7 @@ export default function LessonViewScreen({ route, navigation }: Props) {
 
         {/* Attachment */}
         {lesson.attachment_url && (
-          <TouchableOpacity style={S.attachmentBtn}>
-            <Text style={S.attachmentIcon}>📎</Text>
-            <Text style={S.attachmentText}>Download Attachment</Text>
-          </TouchableOpacity>
+          <AttachmentButton url={lesson.attachment_url} lessonTitle={lesson.title} />
         )}
 
         {/* Notes panel */}

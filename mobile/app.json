@@ -12,18 +12,32 @@
       "backgroundColor": "#2563eb"
     },
     "assetBundlePatterns": ["**/*"],
+    "scheme": "mapelead",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "org.mapelead.app",
-      "buildNumber": "1"
+      "buildNumber": "1",
+      "associatedDomains": ["applinks:mapelead.org"]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#2563eb"
+        "backgroundColor": "#1e3adb"
       },
       "package": "org.mapelead.app",
-      "versionCode": 1
+      "versionCode": 2,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [{ "scheme": "mapelead" }],
+          "category": ["BROWSABLE", "DEFAULT"]
+        },
+        {
+          "action": "VIEW",
+          "data": [{ "scheme": "https", "host": "mapelead.org" }],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

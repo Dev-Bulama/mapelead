@@ -89,7 +89,9 @@ export default function ProfileScreen() {
       <View style={S.section}>
         <Text style={S.sectionLabel}>Learning</Text>
         <View style={S.menuCard}>
+          <MenuItem icon="📊" label="Learning Stats"  onPress={() => navigation.navigate('LearningStats')} />
           <MenuItem icon="🏆" label="My Certificates" onPress={() => navigation.navigate('Certificates')} />
+          <MenuItem icon="💳" label="Payment History" onPress={() => navigation.navigate('PaymentHistory')} />
           <MenuItem icon="📥" label="Downloads"       onPress={() => {}} last />
         </View>
       </View>

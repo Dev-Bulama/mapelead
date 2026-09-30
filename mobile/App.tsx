@@ -7,9 +7,11 @@ import { queryClient } from '@/stores/queryClient';
 import RootNavigator from '@/navigation/RootNavigator';
 import OfflineBanner from '@/components/common/OfflineBanner';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useStreak } from '@/hooks/useStreak';
 
 function AppInner() {
   usePushNotifications();
+  useStreak();
   return (
     <>
       <StatusBar style="auto" />
