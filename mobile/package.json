@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "expo": "~51.0.39",
+    "expo-notifications": "~0.28.19",
     "expo-status-bar": "~1.12.1",
     "expo-secure-store": "~13.0.2",
     "expo-image-picker": "~15.0.7",

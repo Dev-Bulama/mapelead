@@ -230,5 +230,7 @@ export type RootStackParamList = {
   AssignmentView:  { assignmentId: number; courseSlug: string };
   ProfileEdit:     undefined;
   Notifications:   undefined;
+  Certificates:    undefined;
+  Security:        undefined;
   PaymentWebView:  { url: string; reference: string };
 };

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
-  View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Alert,
+  View, Text, ScrollView, TouchableOpacity, StyleSheet,
+  ActivityIndicator, Alert, TextInput, KeyboardAvoidingView, Platform,
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/api/client';
@@ -12,9 +14,155 @@ import type { ApiResponse, Lesson, RootStackParamList } from '@/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LessonView'>;
 
-export default function LessonViewScreen({ route, navigation }: Props) {
-  const { lessonId, courseSlug } = route.params;
+// ── Video URL helpers ──────────────────────────────────────────────────────────
+
+function getYouTubeId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+function getVimeoId(url: string): string | null {
+  const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  return m ? m[1] : null;
+}
+
+function buildEmbedUrl(videoUrl: string, provider: string | null): string | null {
+  if (provider === 'youtube' || getYouTubeId(videoUrl)) {
+    const id = getYouTubeId(videoUrl);
+    if (id) return `https://www.youtube.com/embed/${id}?autoplay=0&rel=0&modestbranding=1`;
+  }
+  if (provider === 'vimeo' || getVimeoId(videoUrl)) {
+    const id = getVimeoId(videoUrl);
+    if (id) return `https://player.vimeo.com/video/${id}?autoplay=0`;
+  }
+  // Direct video file — wrap in HTML5 video
+  return null;
+}
+
+function directVideoHtml(url: string): string {
+  return `<!DOCTYPE html><html><head>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>*{margin:0;padding:0;box-sizing:border-box;background:#000}
+  video{width:100%;height:100vh;display:block}</style>
+  </head><body>
+  <video controls playsinline src="${url}"></video>
+  </body></html>`;
+}
+
+// ── Video Player ───────────────────────────────────────────────────────────────
+
+function VideoPlayer({ videoUrl, provider }: { videoUrl: string; provider: string | null }) {
+  const embedUrl = buildEmbedUrl(videoUrl, provider);
+
+  if (embedUrl) {
+    return (
+      <WebView
+        source={{ uri: embedUrl }}
+        style={V.webview}
+        allowsFullscreenVideo
+        javaScriptEnabled
+        mediaPlaybackRequiresUserAction={false}
+      />
+    );
+  }
+
+  // Direct video
+  return (
+    <WebView
+      source={{ html: directVideoHtml(videoUrl) }}
+      style={V.webview}
+      allowsFullscreenVideo
+      javaScriptEnabled
+      originWhitelist={['*']}
+      mediaPlaybackRequiresUserAction
+    />
+  );
+}
+
+const V = StyleSheet.create({
+  webview: { width: '100%', height: 220, backgroundColor: '#000' },
+});
+
+// ── Notes Panel ────────────────────────────────────────────────────────────────
+
+function NotesPanel({ lessonId, initialNote }: { lessonId: number; initialNote: string }) {
   const qc = useQueryClient();
+  const [text, setText] = useState(initialNote);
+  const [dirty, setDirty] = useState(false);
+
+  const { mutate: saveNote, isPending: saving } = useMutation({
+    mutationFn: (content: string) => apiClient.post(API.LESSON_NOTE(lessonId), { content }),
+    onSuccess: () => {
+      setDirty(false);
+      qc.invalidateQueries({ queryKey: ['lesson', lessonId] });
+    },
+    onError: (err) => Alert.alert('Error', extractApiError(err)),
+  });
+
+  const { mutate: deleteNote, isPending: deleting } = useMutation({
+    mutationFn: () => apiClient.delete(API.LESSON_NOTE(lessonId)),
+    onSuccess: () => {
+      setText('');
+      setDirty(false);
+      qc.invalidateQueries({ queryKey: ['lesson', lessonId] });
+    },
+  });
+
+  return (
+    <View style={N.panel}>
+      <View style={N.header}>
+        <Text style={N.title}>📝 My Notes</Text>
+        {text.length > 0 && (
+          <TouchableOpacity onPress={() => deleteNote()} disabled={deleting}>
+            <Text style={N.deleteBtn}>{deleting ? '…' : 'Delete'}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      <TextInput
+        style={N.input}
+        value={text}
+        onChangeText={(v) => { setText(v); setDirty(true); }}
+        placeholder="Add notes for this lesson…"
+        placeholderTextColor={Colors.gray400}
+        multiline
+        textAlignVertical="top"
+      />
+      {dirty && (
+        <TouchableOpacity
+          style={[N.saveBtn, saving && N.saveBtnDisabled]}
+          onPress={() => saveNote(text)}
+          disabled={saving}
+        >
+          <Text style={N.saveBtnText}>{saving ? 'Saving…' : 'Save Note'}</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+
+const N = StyleSheet.create({
+  panel:       { backgroundColor: Colors.white, borderRadius: Radii.xl, padding: Spacing[4], marginBottom: Spacing[4], ...Shadows.sm },
+  header:      { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing[3] },
+  title:       { fontSize: Typography.sizes.base, fontWeight: Typography.weights.semibold, color: Colors.textPrimary },
+  deleteBtn:   { fontSize: Typography.sizes.sm, color: Colors.error },
+  input:       { minHeight: 100, borderWidth: 1, borderColor: Colors.gray200, borderRadius: Radii.lg, padding: Spacing[3], fontSize: Typography.sizes.base, color: Colors.textPrimary, backgroundColor: Colors.gray50 },
+  saveBtn:     { backgroundColor: Colors.primary, borderRadius: Radii.lg, paddingVertical: 10, alignItems: 'center', marginTop: Spacing[3] },
+  saveBtnDisabled: { opacity: 0.6 },
+  saveBtnText: { color: Colors.white, fontSize: Typography.sizes.sm, fontWeight: Typography.weights.semibold },
+});
+
+// ── Main Screen ────────────────────────────────────────────────────────────────
+
+export default function LessonViewScreen({ route, navigation }: Props) {
+  const { lessonId } = route.params;
+  const qc = useQueryClient();
+  const [showNotes, setShowNotes] = useState(false);
 
   const { data: lesson, isLoading } = useQuery({
     queryKey: ['lesson', lessonId],
@@ -22,12 +170,25 @@ export default function LessonViewScreen({ route, navigation }: Props) {
       apiClient.get<ApiResponse<Lesson>>(API.LESSON(lessonId)).then((r) => r.data.data),
   });
 
+  // Track progress every 30s while screen is open
+  const progressRef = useRef(0);
+  useEffect(() => {
+    if (!lesson?.video_url) return;
+    const timer = setInterval(() => {
+      progressRef.current += 30;
+      apiClient.post(API.LESSON_PROGRESS(lessonId), {
+        watch_time_seconds: progressRef.current,
+      }).catch(() => {});
+    }, 30_000);
+    return () => clearInterval(timer);
+  }, [lesson?.video_url, lessonId]);
+
   const { mutate: markComplete, isPending: completing } = useMutation({
     mutationFn: () => apiClient.post(API.LESSON_COMPLETE(lessonId)),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['lesson', lessonId] });
       qc.invalidateQueries({ queryKey: ['enrollments'] });
-      Alert.alert('Done!', 'Lesson marked as complete.');
+      Alert.alert('Done!', 'Lesson marked as complete. Keep going!');
     },
     onError: (err) => Alert.alert('Error', extractApiError(err)),
   });
@@ -38,109 +199,148 @@ export default function LessonViewScreen({ route, navigation }: Props) {
   });
 
   if (isLoading) {
-    return <View style={styles.center}><ActivityIndicator color={Colors.primary} size="large" /></View>;
+    return <View style={S.center}><ActivityIndicator color={Colors.primary} size="large" /></View>;
   }
-
   if (!lesson) {
-    return <View style={styles.center}><Text>Lesson not found</Text></View>;
+    return <View style={S.center}><Text style={S.notFound}>Lesson not found</Text></View>;
   }
 
   return (
-    <View style={styles.flex}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backBtn}>‹ Back</Text>
+    <KeyboardAvoidingView
+      style={S.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      {/* ── Header ── */}
+      <View style={S.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <Text style={S.backBtn}>‹ Back</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => toggleBookmark()}>
-          <Text style={styles.bookmarkBtn}>{lesson.is_bookmarked ? '🔖' : '📌'}</Text>
-        </TouchableOpacity>
+        <View style={S.headerActions}>
+          <TouchableOpacity onPress={() => setShowNotes(v => !v)} style={S.headerIconBtn}>
+            <Text style={{ fontSize: 20 }}>📝</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => toggleBookmark()} style={S.headerIconBtn}>
+            <Text style={{ fontSize: 20 }}>{lesson.is_bookmarked ? '🔖' : '📌'}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll}>
-        {/* Module breadcrumb */}
+      {/* ── Video (outside scroll so WebView gets full width) ── */}
+      {lesson.video_url && (
+        <VideoPlayer videoUrl={lesson.video_url} provider={lesson.video_provider} />
+      )}
+
+      <ScrollView contentContainerStyle={S.scroll} keyboardShouldPersistTaps="handled">
+
+        {/* Breadcrumb */}
         {lesson.module && (
-          <Text style={styles.breadcrumb}>{lesson.module.title}</Text>
+          <Text style={S.breadcrumb}>{lesson.module.title}</Text>
         )}
 
         {/* Title */}
-        <Text style={styles.title}>{lesson.title}</Text>
+        <Text style={S.title}>{lesson.title}</Text>
 
-        {/* Video placeholder */}
-        {lesson.video_url && (
-          <View style={styles.videoPlaceholder}>
-            <Text style={styles.videoIcon}>▶</Text>
-            <Text style={styles.videoProvider}>{lesson.video_provider ?? 'video'}</Text>
-          </View>
-        )}
+        {/* Meta row */}
+        <View style={S.metaRow}>
+          {lesson.type && (
+            <View style={S.badge}>
+              <Text style={S.badgeText}>{lesson.type.charAt(0).toUpperCase() + lesson.type.slice(1)}</Text>
+            </View>
+          )}
+          {lesson.duration_minutes && (
+            <Text style={S.metaText}>{lesson.duration_minutes} min</Text>
+          )}
+          {lesson.progress?.is_completed && (
+            <View style={[S.badge, { backgroundColor: Colors.success }]}>
+              <Text style={[S.badgeText, { color: Colors.white }]}>✓ Completed</Text>
+            </View>
+          )}
+        </View>
 
         {/* Content */}
         {lesson.content && (
-          <View style={styles.contentBox}>
-            <Text style={styles.content}>{lesson.content}</Text>
+          <View style={S.contentBox}>
+            <Text style={S.content}>{lesson.content}</Text>
           </View>
         )}
 
         {/* Attachment */}
         {lesson.attachment_url && (
-          <TouchableOpacity style={styles.attachmentBtn}>
-            <Text style={styles.attachmentText}>📎 Download Attachment</Text>
+          <TouchableOpacity style={S.attachmentBtn}>
+            <Text style={S.attachmentIcon}>📎</Text>
+            <Text style={S.attachmentText}>Download Attachment</Text>
           </TouchableOpacity>
         )}
 
-        {/* Duration */}
-        {lesson.duration_minutes && (
-          <Text style={styles.meta}>{lesson.duration_minutes} min read/watch</Text>
+        {/* Notes panel */}
+        {showNotes && (
+          <NotesPanel
+            lessonId={lessonId}
+            initialNote={lesson.note?.content ?? ''}
+          />
         )}
+
+        <View style={{ height: 120 }} />
       </ScrollView>
 
-      {/* Footer: mark complete */}
-      {!lesson.progress?.is_completed && (
-        <View style={styles.footer}>
+      {/* ── Footer ── */}
+      <View style={S.footer}>
+        {!lesson.progress?.is_completed ? (
           <TouchableOpacity
-            style={[styles.completeBtn, completing && styles.completeBtnDisabled]}
+            style={[S.completeBtn, completing && S.completeBtnDisabled]}
             onPress={() => markComplete()}
             disabled={completing}
           >
-            <Text style={styles.completeBtnText}>
+            <Text style={S.completeBtnText}>
               {completing ? 'Saving…' : '✓ Mark as Complete'}
             </Text>
           </TouchableOpacity>
-        </View>
-      )}
-
-      {lesson.progress?.is_completed && (
-        <View style={styles.footer}>
-          <View style={styles.completedBadge}>
-            <Text style={styles.completedText}>✅ Completed</Text>
+        ) : (
+          <View style={S.completedBadge}>
+            <Text style={S.completedText}>✅ Lesson Completed</Text>
           </View>
-        </View>
-      )}
-    </View>
+        )}
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
-const styles = StyleSheet.create({
-  flex:              { flex: 1, backgroundColor: Colors.white },
-  center:            { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:            { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing[4], paddingTop: Spacing[12], paddingBottom: Spacing[3], backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  backBtn:           { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium },
-  bookmarkBtn:       { fontSize: 22 },
-  scroll:            { padding: Spacing[4], paddingBottom: 100 },
-  breadcrumb:        { fontSize: Typography.sizes.xs, color: Colors.primary, fontWeight: Typography.weights.semibold, textTransform: 'uppercase', marginBottom: Spacing[2] },
-  title:             { fontSize: Typography.sizes['2xl'], fontWeight: Typography.weights.bold, color: Colors.textPrimary, lineHeight: 30, marginBottom: Spacing[4] },
-  videoPlaceholder:  { backgroundColor: Colors.gray900, borderRadius: Radii.xl, height: 200, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing[4] },
-  videoIcon:         { fontSize: 40, color: Colors.white },
-  videoProvider:     { color: Colors.gray400, fontSize: Typography.sizes.sm, marginTop: Spacing[2], textTransform: 'capitalize' },
-  contentBox:        { marginBottom: Spacing[4] },
-  content:           { fontSize: Typography.sizes.base, color: Colors.textSecondary, lineHeight: 26 },
-  attachmentBtn:     { backgroundColor: Colors.gray100, borderRadius: Radii.lg, padding: Spacing[4], marginBottom: Spacing[4] },
-  attachmentText:    { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium },
-  meta:              { fontSize: Typography.sizes.sm, color: Colors.textMuted },
-  footer:            { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing[4], backgroundColor: Colors.white, borderTopWidth: 1, borderTopColor: Colors.border, ...Shadows.md },
-  completeBtn:       { backgroundColor: Colors.primary, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center' },
-  completeBtnDisabled:{ opacity: 0.6 },
-  completeBtnText:   { color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
-  completedBadge:    { backgroundColor: Colors.success, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center' },
-  completedText:     { color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
+const S = StyleSheet.create({
+  flex:           { flex: 1, backgroundColor: Colors.white },
+  center:         { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  notFound:       { fontSize: Typography.sizes.base, color: Colors.textSecondary },
+
+  // Header
+  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing[4], paddingTop: Spacing[12], paddingBottom: Spacing[3], backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.border },
+  backBtn:        { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium },
+  headerActions:  { flexDirection: 'row', gap: 4 },
+  headerIconBtn:  { padding: 6 },
+
+  // Scroll
+  scroll:         { padding: Spacing[4] },
+  breadcrumb:     { fontSize: Typography.sizes.xs, color: Colors.primary, fontWeight: Typography.weights.semibold, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: Spacing[2] },
+  title:          { fontSize: Typography.sizes['2xl'], fontWeight: Typography.weights.bold, color: Colors.textPrimary, lineHeight: 30, marginBottom: Spacing[3] },
+
+  // Meta
+  metaRow:        { flexDirection: 'row', alignItems: 'center', gap: Spacing[2], marginBottom: Spacing[4], flexWrap: 'wrap' },
+  badge:          { backgroundColor: Colors.gray100, borderRadius: Radii.full, paddingHorizontal: 10, paddingVertical: 4 },
+  badgeText:      { fontSize: Typography.sizes.xs, color: Colors.textSecondary, fontWeight: Typography.weights.medium },
+  metaText:       { fontSize: Typography.sizes.sm, color: Colors.textMuted },
+
+  // Content
+  contentBox:     { marginBottom: Spacing[4] },
+  content:        { fontSize: Typography.sizes.base, color: Colors.textSecondary, lineHeight: 26 },
+
+  // Attachment
+  attachmentBtn:  { flexDirection: 'row', alignItems: 'center', gap: Spacing[2], backgroundColor: Colors.gray100, borderRadius: Radii.lg, padding: Spacing[4], marginBottom: Spacing[4] },
+  attachmentIcon: { fontSize: 18 },
+  attachmentText: { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium },
+
+  // Footer
+  footer:         { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing[4], backgroundColor: Colors.white, borderTopWidth: 1, borderTopColor: Colors.border, ...Shadows.md },
+  completeBtn:    { backgroundColor: Colors.primary, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center' },
+  completeBtnDisabled: { opacity: 0.6 },
+  completeBtnText:{ color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
+  completedBadge: { backgroundColor: Colors.success, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center' },
+  completedText:  { color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
 });

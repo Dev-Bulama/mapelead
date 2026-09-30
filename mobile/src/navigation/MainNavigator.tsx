@@ -18,7 +18,9 @@ import LessonViewScreen        from '@/screens/lesson/LessonViewScreen';
 import QuizScreen              from '@/screens/quiz/QuizScreen';
 import AssignmentScreen        from '@/screens/assignment/AssignmentScreen';
 import NotificationsScreen     from '@/screens/main/NotificationsScreen';
+import CertificatesScreen      from '@/screens/main/CertificatesScreen';
 import ProfileEditScreen       from '@/screens/main/ProfileEditScreen';
+import SecurityScreen          from '@/screens/main/SecurityScreen';
 import PaymentWebViewScreen    from '@/screens/payment/PaymentWebViewScreen';
 
 const Tab   = createBottomTabNavigator<MainTabParamList>();
@@ -69,6 +71,8 @@ export default function MainNavigator() {
       <Stack.Screen name="AssignmentView" component={AssignmentScreen}     options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="Notifications"  component={NotificationsScreen}  options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="ProfileEdit"    component={ProfileEditScreen}    options={{ animation: 'slide_from_bottom' }} />
+      <Stack.Screen name="Security"       component={SecurityScreen}       options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="Certificates"   component={CertificatesScreen}   options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="PaymentWebView" component={PaymentWebViewScreen} options={{ animation: 'slide_from_bottom', gestureEnabled: false }} />
     </Stack.Navigator>
   );
