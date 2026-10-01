@@ -4,10 +4,13 @@ import {
   StyleSheet, ScrollView, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '@/stores/authStore';
 import { extractApiError } from '@/api/client';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 import type { AuthStackParamList } from '@/types';
+
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'Register'>;
 type AccountType = 'student' | 'instructor';
@@ -38,13 +41,13 @@ function IconInput({
   icon, value, onChangeText, placeholder, secureTextEntry, keyboardType, autoCapitalize,
   rightElement,
 }: {
-  icon: string; value: string; onChangeText: (v: string) => void; placeholder: string;
+  icon: IoniconsName; value: string; onChangeText: (v: string) => void; placeholder: string;
   secureTextEntry?: boolean; keyboardType?: any; autoCapitalize?: any;
   rightElement?: React.ReactNode;
 }) {
   return (
     <View style={inp.wrap}>
-      <Text style={inp.icon}>{icon}</Text>
+      <Ionicons name={icon} size={16} color={Colors.gray400} style={{ marginRight: Spacing[2] }} />
       <TextInput
         style={inp.field}
         value={value} onChangeText={onChangeText} placeholder={placeholder}
@@ -58,7 +61,6 @@ function IconInput({
 }
 const inp = StyleSheet.create({
   wrap:  { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: Colors.gray200, borderRadius: Radii.lg, paddingHorizontal: Spacing[4], backgroundColor: Colors.gray50 },
-  icon:  { fontSize: 16, marginRight: Spacing[2] },
   field: { flex: 1, paddingVertical: 14, fontSize: Typography.sizes.base, color: Colors.textPrimary },
 });
 
@@ -130,17 +132,19 @@ export default function RegisterScreen({ navigation }: Props) {
               style={[S.toggleBtn, accountType === 'student' && S.toggleActive]}
               onPress={() => setAccountType('student')}
             >
-              <Text style={[S.toggleText, accountType === 'student' && S.toggleTextActive]}>
-                🎓 Student / Learner
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Ionicons name="school-outline" size={15} color={accountType === 'student' ? Colors.primary : Colors.textSecondary} />
+                <Text style={[S.toggleText, accountType === 'student' && S.toggleTextActive]}>Student</Text>
+              </View>
             </TouchableOpacity>
             <TouchableOpacity
               style={[S.toggleBtn, accountType === 'instructor' && S.toggleActive]}
               onPress={() => setAccountType('instructor')}
             >
-              <Text style={[S.toggleText, accountType === 'instructor' && S.toggleTextActive]}>
-                👨‍🏫 Instructor
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Ionicons name="briefcase-outline" size={15} color={accountType === 'instructor' ? Colors.primary : Colors.textSecondary} />
+                <Text style={[S.toggleText, accountType === 'instructor' && S.toggleTextActive]}>Instructor</Text>
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -149,29 +153,29 @@ export default function RegisterScreen({ navigation }: Props) {
           {/* Name row */}
           <View style={S.row}>
             <View style={S.half}>
-              <IconInput icon="👤" value={form.first_name} onChangeText={set('first_name')} placeholder="First name" autoCapitalize="words" />
+              <IconInput icon="person-outline" value={form.first_name} onChangeText={set('first_name')} placeholder="First name" autoCapitalize="words" />
             </View>
             <View style={S.half}>
-              <IconInput icon="👤" value={form.last_name} onChangeText={set('last_name')} placeholder="Last name" autoCapitalize="words" />
+              <IconInput icon="person-outline" value={form.last_name} onChangeText={set('last_name')} placeholder="Last name" autoCapitalize="words" />
             </View>
           </View>
 
           <View style={S.fieldGap}>
-            <IconInput icon="✉️" value={form.email} onChangeText={set('email')} placeholder="Email address" keyboardType="email-address" />
+            <IconInput icon="mail-outline" value={form.email} onChangeText={set('email')} placeholder="Email address" keyboardType="email-address" />
           </View>
 
           <View style={S.fieldGap}>
-            <IconInput icon="📱" value={form.phone} onChangeText={set('phone')} placeholder="Phone number (optional)" keyboardType="phone-pad" />
+            <IconInput icon="phone-portrait-outline" value={form.phone} onChangeText={set('phone')} placeholder="Phone number (optional)" keyboardType="phone-pad" />
           </View>
 
           <View style={S.fieldGap}>
             <IconInput
-              icon="🔒" value={form.password} onChangeText={set('password')}
+              icon="lock-closed-outline" value={form.password} onChangeText={set('password')}
               placeholder="Password (8+ chars, upper, number, symbol)"
               secureTextEntry={!showPwd}
               rightElement={
-                <TouchableOpacity onPress={() => setShowPwd(v => !v)}>
-                  <Text style={{ fontSize: 16, paddingLeft: 8 }}>{showPwd ? '🙈' : '👁️'}</Text>
+                <TouchableOpacity onPress={() => setShowPwd(v => !v)} style={{ paddingLeft: 8 }}>
+                  <Ionicons name={showPwd ? 'eye-off-outline' : 'eye-outline'} size={18} color={Colors.gray400} />
                 </TouchableOpacity>
               }
             />
@@ -179,11 +183,11 @@ export default function RegisterScreen({ navigation }: Props) {
 
           <View style={S.fieldGap}>
             <IconInput
-              icon="🔒" value={form.password_confirmation} onChangeText={set('password_confirmation')}
+              icon="lock-closed-outline" value={form.password_confirmation} onChangeText={set('password_confirmation')}
               placeholder="Confirm password" secureTextEntry={!showConfirm}
               rightElement={
-                <TouchableOpacity onPress={() => setShowConfirm(v => !v)}>
-                  <Text style={{ fontSize: 16, paddingLeft: 8 }}>{showConfirm ? '🙈' : '👁️'}</Text>
+                <TouchableOpacity onPress={() => setShowConfirm(v => !v)} style={{ paddingLeft: 8 }}>
+                  <Ionicons name={showConfirm ? 'eye-off-outline' : 'eye-outline'} size={18} color={Colors.gray400} />
                 </TouchableOpacity>
               }
             />
@@ -192,7 +196,7 @@ export default function RegisterScreen({ navigation }: Props) {
           {/* Instructor ID — only shown for instructor accounts */}
           {accountType === 'instructor' && (
             <View style={S.fieldGap}>
-              <IconInput icon="🪪" value={form.instructor_code} onChangeText={set('instructor_code')} placeholder="Instructor ID (pre-assigned by admin)" />
+              <IconInput icon="id-card-outline" value={form.instructor_code} onChangeText={set('instructor_code')} placeholder="Instructor ID (pre-assigned by admin)" />
               <Text style={S.instructorHint}>Your Instructor ID is provided by the MAPELEAD admin team.</Text>
             </View>
           )}
@@ -200,7 +204,7 @@ export default function RegisterScreen({ navigation }: Props) {
           {/* Terms */}
           <TouchableOpacity style={S.termsRow} onPress={() => setAgreedTerms(v => !v)}>
             <View style={[S.checkbox, agreedTerms && S.checkboxActive]}>
-              {agreedTerms && <Text style={S.checkmark}>✓</Text>}
+              {agreedTerms && <Ionicons name="checkmark" size={12} color={Colors.white} />}
             </View>
             <Text style={S.termsText}>
               I agree to the <Text style={S.termsLink}>Terms & Conditions</Text> and <Text style={S.termsLink}>Privacy Policy</Text>
@@ -220,11 +224,11 @@ export default function RegisterScreen({ navigation }: Props) {
           </View>
           <View style={S.socialRow}>
             <TouchableOpacity style={S.socialBtn}>
-              <Text style={S.socialIcon}>🇬</Text>
+              <Ionicons name="logo-google" size={18} color={Colors.textSecondary} />
               <Text style={S.socialLabel}>Google</Text>
             </TouchableOpacity>
             <TouchableOpacity style={S.socialBtn}>
-              <Text style={S.socialIcon}>🍎</Text>
+              <Ionicons name="logo-apple" size={18} color={Colors.textSecondary} />
               <Text style={S.socialLabel}>Apple</Text>
             </TouchableOpacity>
           </View>
@@ -277,7 +281,6 @@ const S = StyleSheet.create({
   termsRow:     { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: Spacing[5] },
   checkbox:     { width: 18, height: 18, borderRadius: 4, borderWidth: 1.5, borderColor: Colors.gray300, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
   checkboxActive:{ backgroundColor: Colors.primary, borderColor: Colors.primary },
-  checkmark:    { fontSize: 11, color: Colors.white, fontWeight: Typography.weights.bold },
   termsText:    { flex: 1, fontSize: Typography.sizes.sm, color: Colors.textSecondary, lineHeight: 20 },
   termsLink:    { color: Colors.primary, fontWeight: Typography.weights.medium },
 
@@ -292,7 +295,6 @@ const S = StyleSheet.create({
   divText:      { fontSize: Typography.sizes.xs, color: Colors.textMuted },
   socialRow:    { flexDirection: 'row', gap: Spacing[3] },
   socialBtn:    { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1, borderColor: Colors.gray200, borderRadius: Radii.lg, paddingVertical: 12 },
-  socialIcon:   { fontSize: 18 },
   socialLabel:  { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.medium, color: Colors.textPrimary },
 
   // Login link

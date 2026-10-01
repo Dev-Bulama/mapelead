@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
   StyleSheet, FlatList, Image, ActivityIndicator,
-  TextInput, Dimensions,
+  TextInput, Dimensions, Alert,
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigation } from '@react-navigation/native';
@@ -12,6 +12,7 @@ import { coursesApi } from '@/api/courses';
 import { enrollmentsApi } from '@/api/enrollments';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
+import { authApi } from '@/api/auth';
 import { useAuthStore, selectUser } from '@/stores/authStore';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 import type { RootStackParamList, Course, Enrollment, CourseCategory } from '@/types';
@@ -212,8 +213,21 @@ const Cat = StyleSheet.create({
 export default function HomeScreen() {
   const navigation  = useNavigation<Nav>();
   const user        = useAuthStore(selectUser);
-  const [search, setSearch] = useState('');
+  const [search, setSearch]     = useState('');
+  const [resending, setResending] = useState(false);
   const isInstructor = user?.roles?.includes('instructor') ?? false;
+
+  const handleResendVerification = async () => {
+    setResending(true);
+    try {
+      await authApi.resendVerification();
+      Alert.alert('Email sent', 'A verification link has been sent to your email address.');
+    } catch {
+      Alert.alert('Error', 'Could not send verification email. Please try again.');
+    } finally {
+      setResending(false);
+    }
+  };
 
   const { data: unreadData } = useQuery({
     queryKey:  ['notifications', 'unread-count'],
@@ -268,6 +282,17 @@ export default function HomeScreen() {
       />
 
       <ScrollView contentContainerStyle={S.scroll} showsVerticalScrollIndicator={false}>
+
+        {/* Email verification banner */}
+        {user && !user.email_verified && (
+          <View style={S.verifyBanner}>
+            <Ionicons name="warning-outline" size={18} color="#92400e" style={{ marginRight: 8, flexShrink: 0 }} />
+            <Text style={S.verifyText}>Please verify your email address to unlock all features.</Text>
+            <TouchableOpacity onPress={handleResendVerification} disabled={resending} style={{ marginLeft: 8 }}>
+              <Text style={S.verifyResend}>{resending ? 'Sending…' : 'Resend'}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Search bar */}
         <View style={S.searchWrap}>
@@ -392,6 +417,11 @@ export default function HomeScreen() {
 const S = StyleSheet.create({
   screen:        { flex: 1, backgroundColor: Colors.surface },
   scroll:        { paddingBottom: Spacing[10] },
+
+  // Email verification banner
+  verifyBanner:  { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fef3c7', marginHorizontal: Spacing[4], marginTop: Spacing[3], borderRadius: Radii.lg, padding: Spacing[3], borderWidth: 1, borderColor: '#fde68a' },
+  verifyText:    { flex: 1, fontSize: Typography.sizes.xs, color: '#92400e', lineHeight: 16 },
+  verifyResend:  { fontSize: Typography.sizes.xs, color: '#92400e', fontWeight: Typography.weights.bold, textDecorationLine: 'underline' },
 
   // Search
   searchWrap:    { flexDirection: 'row', alignItems: 'center', marginHorizontal: Spacing[4], marginTop: Spacing[4], backgroundColor: Colors.white, borderRadius: Radii.xl, paddingHorizontal: Spacing[4], ...Shadows.sm },

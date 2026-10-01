@@ -3,7 +3,7 @@ import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
   ActivityIndicator, Alert, TextInput, KeyboardAvoidingView, Platform,
 } from 'react-native';
-import { WebView } from 'react-native-webview';
+import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { downloadAttachment } from '@/screens/main/DownloadsScreen';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -15,6 +15,54 @@ import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 import type { ApiResponse, Lesson, RootStackParamList } from '@/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LessonView'>;
+
+// ── Content Renderer (HTML or plain text) ─────────────────────────────────────
+
+const HTML_TAG_RE = /<[a-z][\s\S]*?>/i;
+
+function ContentRenderer({ content }: { content: string }) {
+  const [height, setHeight] = useState(100);
+  const hasHtml = HTML_TAG_RE.test(content);
+
+  if (!hasHtml) {
+    return <Text style={S.content}>{content}</Text>;
+  }
+
+  const wrappedHtml = `<!DOCTYPE html><html><head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, system-ui, sans-serif; font-size: 16px;
+         line-height: 1.7; color: #374151; margin: 0; padding: 0; }
+  img { max-width: 100%; height: auto; border-radius: 8px; }
+  pre, code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px;
+               font-size: 14px; overflow-x: auto; }
+  a { color: #1e3adb; }
+  h1, h2, h3, h4 { color: #111827; margin-top: 1em; margin-bottom: 0.4em; }
+  ul, ol { padding-left: 1.4em; }
+  blockquote { border-left: 3px solid #d1d5db; margin: 0; padding-left: 1em;
+                color: #6b7280; }
+</style>
+</head><body>${content}
+<script>
+  window.ReactNativeWebView.postMessage(String(document.body.scrollHeight));
+</script>
+</body></html>`;
+
+  return (
+    <WebView
+      source={{ html: wrappedHtml }}
+      style={{ width: '100%', height }}
+      scrollEnabled={false}
+      onMessage={(e: WebViewMessageEvent) => {
+        const h = parseInt(e.nativeEvent.data, 10);
+        if (!isNaN(h) && h > 0) setHeight(h + 24);
+      }}
+      originWhitelist={['*']}
+      javaScriptEnabled
+    />
+  );
+}
 
 // ── Video URL helpers ──────────────────────────────────────────────────────────
 
@@ -314,7 +362,7 @@ export default function LessonViewScreen({ route, navigation }: Props) {
         {/* Content */}
         {lesson.content && (
           <View style={S.contentBox}>
-            <Text style={S.content}>{lesson.content}</Text>
+            <ContentRenderer content={lesson.content} />
           </View>
         )}
 
