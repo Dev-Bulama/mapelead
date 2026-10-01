@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\ProgressApiController;
 use App\Http\Controllers\Api\V1\QuizApiController;
 use App\Http\Controllers\Api\V1\InstructorApiController;
 use App\Http\Controllers\Api\V1\Admin\InstructorCodeController;
+use App\Http\Controllers\Api\V1\CourseReviewApiController;
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
 
@@ -24,6 +25,9 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
     Route::get('/courses/search',    [CourseApiController::class, 'search']);
     Route::get('/courses/{slug}',    [CourseApiController::class, 'show']);
     Route::get('/categories',        [CourseApiController::class, 'categories']);
+
+    // ── Public: Course reviews ─────────────────────────────────────────────────
+    Route::get('/courses/{courseId}/reviews',  [CourseReviewApiController::class, 'index']);
 
     // ── Public: Certificate verification ──────────────────────────────────────
     Route::get('/certificates/verify/{token}', [CertificateApiController::class, 'verify']);
@@ -105,6 +109,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         // Device tokens (push notifications)
         Route::post('/device-token',    [DeviceTokenApiController::class, 'register']);
         Route::delete('/device-token',  [DeviceTokenApiController::class, 'unregister']);
+
+        // Course reviews (authenticated)
+        Route::get('/courses/{courseId}/my-review',  [CourseReviewApiController::class, 'myReview']);
+        Route::post('/courses/{courseId}/reviews',   [CourseReviewApiController::class, 'store']);
+        Route::delete('/courses/{courseId}/reviews', [CourseReviewApiController::class, 'destroy']);
 
         // ── Instructor routes ──────────────────────────────────────────────────
         Route::prefix('instructor')->middleware('role:instructor')->group(function () {

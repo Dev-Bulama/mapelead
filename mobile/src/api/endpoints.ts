@@ -73,4 +73,8 @@ export const API = {
   TWO_FA_SETUP:    '/auth/2fa/setup',
   TWO_FA_ENABLE:   '/auth/2fa/enable',
   TWO_FA_DISABLE:  '/auth/2fa/disable',
+
+  // Reviews
+  COURSE_REVIEWS:     (courseId: number) => `/courses/${courseId}/reviews`,
+  COURSE_MY_REVIEW:   (courseId: number) => `/courses/${courseId}/my-review`,
 } as const;

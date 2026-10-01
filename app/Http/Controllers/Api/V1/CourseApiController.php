@@ -134,6 +134,9 @@ class CourseApiController extends Controller
             $data['tags'] = $course->tags ? $course->tags->pluck('name')->values() : [];
         }
 
+        $data['avg_rating']   = round($course->reviews()->avg('rating') ?? 0, 1);
+        $data['review_count'] = $course->reviews()->count();
+
         return $data;
     }
 }

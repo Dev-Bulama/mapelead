@@ -113,6 +113,8 @@ export interface Course {
   price: CoursePrice;
   category: { id: number; name: string; slug: string } | null;
   published_at: string | null;
+  avg_rating:   number;
+  review_count: number;
   // detailed
   learning_outcomes?: string | null;
   requirements?: string | null;
@@ -120,6 +122,16 @@ export interface Course {
   installment_options?: InstallmentOption[];
   modules?: ModuleSummary[];
   tags?: string[];
+}
+
+export interface CourseReview {
+  id:          number;
+  rating:      number;
+  title:       string | null;
+  body:        string | null;
+  is_approved: boolean;
+  reviewer:    { full_name: string; avatar_url: string | null } | null;
+  created_at:  string | null;
 }
 
 export interface InstallmentOption {
@@ -237,4 +249,6 @@ export type RootStackParamList = {
   LearningStats:       undefined;
   PaymentWebView:      { url: string; reference: string };
   InstructorDashboard: undefined;
+  Bookmarks:           undefined;
+  Notes:               undefined;
 };
