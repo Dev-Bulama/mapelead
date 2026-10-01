@@ -185,6 +185,7 @@ export interface Lesson {
   } | null;
   is_bookmarked: boolean;
   note: { id: number; content: string } | null;
+  quiz_id: number | null;
 }
 
 // ── Notifications ──────────────────────────────────────────────────────────────

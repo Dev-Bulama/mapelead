@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Alert,
+  View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Alert, Linking,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -104,7 +104,7 @@ export default function ProfileScreen() {
           <MenuItem icon="bookmark-outline"      label="Bookmarks"       onPress={() => navigation.navigate('Bookmarks')} />
           <MenuItem icon="document-text-outline" label="My Notes"        onPress={() => navigation.navigate('Notes')} />
           <MenuItem icon="card-outline"          label="Payment History" onPress={() => navigation.navigate('PaymentHistory')} />
-          <MenuItem icon="cloud-download-outline" label="Downloads"      onPress={() => {}} last />
+          <MenuItem icon="cloud-download-outline" label="Downloads"      onPress={() => navigation.navigate('Main', { screen: 'Downloads' } as any)} last />
         </View>
       </View>
 
@@ -112,7 +112,7 @@ export default function ProfileScreen() {
         <Text style={S.sectionLabel}>Support</Text>
         <View style={S.menuCard}>
           <MenuItem icon="chatbubble-ellipses-outline" label="Support Tickets" onPress={() => navigation.navigate('SupportTickets')} />
-          <MenuItem icon="star-outline"                label="Rate the App"    onPress={() => {}} last />
+          <MenuItem icon="star-outline"                label="Rate the App"    onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=com.mapelead').catch(() => {})} last />
         </View>
       </View>
 

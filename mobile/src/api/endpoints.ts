@@ -6,6 +6,8 @@ export const API = {
   AUTH_ME:                 '/me',
   AUTH_RESEND_VERIFY:      '/auth/resend-verification',
   AUTH_CHANGE_PASSWORD:    '/auth/change-password',
+  AUTH_FORGOT_PASSWORD:    '/auth/forgot-password',
+  AUTH_RESET_PASSWORD:     '/auth/reset-password',
 
   // Profile
   PROFILE:                 '/profile',

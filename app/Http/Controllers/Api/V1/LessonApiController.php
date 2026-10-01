@@ -70,6 +70,7 @@ class LessonApiController extends Controller
             ] : null,
             'is_bookmarked'    => $isBookmarked,
             'note'             => $note ? ['id' => $note->id, 'content' => $note->content] : null,
+            'quiz_id'          => $lesson->quiz?->id,
         ]);
     }
 

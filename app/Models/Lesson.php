@@ -14,4 +14,5 @@ class Lesson extends Model
     public function module() { return $this->belongsTo(CourseModule::class); }
     public function course() { return $this->belongsTo(Course::class); }
     public function progress() { return $this->hasMany(StudentProgress::class); }
+    public function quiz() { return $this->hasOne(\App\Models\Quiz::class, 'lesson_id'); }
 }

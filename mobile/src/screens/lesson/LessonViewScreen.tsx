@@ -84,7 +84,11 @@ function AttachmentButton({ url, lessonTitle }: { url: string; lessonTitle: stri
       onPress={handleDownload}
       disabled={downloading}
     >
-      <Text style={S.attachmentIcon}>{done ? '✅' : downloading ? '⏳' : '📎'}</Text>
+      {downloading ? (
+        <ActivityIndicator size="small" color={Colors.primary} />
+      ) : (
+        <Ionicons name={done ? 'checkmark-circle' : 'attach-outline'} size={20} color={done ? Colors.success : Colors.primary} />
+      )}
       <Text style={[S.attachmentText, done && { color: Colors.success }]}>
         {done ? 'Downloaded' : downloading ? 'Downloading…' : 'Download Attachment'}
       </Text>
@@ -219,10 +223,11 @@ export default function LessonViewScreen({ route, navigation }: Props) {
     enabled: !!lesson,
   });
 
-  // Track progress every 30s while screen is open
+  // Track progress every 30s; restore server-saved watch time on mount
   const progressRef = useRef(0);
   useEffect(() => {
-    if (!lesson?.video_url) return;
+    if (!lesson) return;
+    progressRef.current = lesson.progress?.watch_time_seconds ?? 0;
     const timer = setInterval(() => {
       progressRef.current += 30;
       apiClient.post(API.LESSON_PROGRESS(lessonId), {
@@ -230,7 +235,7 @@ export default function LessonViewScreen({ route, navigation }: Props) {
       }).catch(() => {});
     }, 30_000);
     return () => clearInterval(timer);
-  }, [lesson?.video_url, lessonId]);
+  }, [lesson?.id, lessonId]);
 
   const { mutate: markComplete, isPending: completing } = useMutation({
     mutationFn: () => apiClient.post(API.LESSON_COMPLETE(lessonId)),
@@ -262,7 +267,7 @@ export default function LessonViewScreen({ route, navigation }: Props) {
       {/* ── Header ── */}
       <View style={S.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <Text style={S.backBtn}>‹ Back</Text>
+          <Ionicons name="arrow-back" size={22} color={Colors.primary} />
         </TouchableOpacity>
         <View style={S.headerActions}>
           <TouchableOpacity onPress={() => setShowNotes(v => !v)} style={S.headerIconBtn}>
@@ -353,7 +358,15 @@ export default function LessonViewScreen({ route, navigation }: Props) {
             <Ionicons name="chevron-forward" size={18} color={lessonNav?.next ? Colors.primary : Colors.gray300} />
           </TouchableOpacity>
         </View>
-        {!lesson.progress?.is_completed ? (
+        {lesson.type === 'quiz' && lesson.quiz_id ? (
+          <TouchableOpacity
+            style={S.quizBtn}
+            onPress={() => navigation.navigate('QuizView', { quizId: lesson.quiz_id!, courseSlug: route.params.courseSlug })}
+          >
+            <Ionicons name="help-circle-outline" size={18} color={Colors.white} style={{ marginRight: 6 }} />
+            <Text style={S.completeBtnText}>Start Quiz</Text>
+          </TouchableOpacity>
+        ) : !lesson.progress?.is_completed ? (
           <TouchableOpacity
             style={[S.completeBtn, completing && S.completeBtnDisabled]}
             onPress={() => markComplete()}
@@ -386,7 +399,6 @@ const S = StyleSheet.create({
 
   // Header
   header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing[4], paddingTop: Spacing[12], paddingBottom: Spacing[3], backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  backBtn:        { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium },
   headerActions:  { flexDirection: 'row', gap: 4 },
   headerIconBtn:  { padding: 6 },
 
@@ -407,7 +419,6 @@ const S = StyleSheet.create({
 
   // Attachment
   attachmentBtn:  { flexDirection: 'row', alignItems: 'center', gap: Spacing[2], backgroundColor: Colors.gray100, borderRadius: Radii.lg, padding: Spacing[4], marginBottom: Spacing[4] },
-  attachmentIcon: { fontSize: 18 },
   attachmentText: { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium },
 
   // Footer
@@ -423,4 +434,5 @@ const S = StyleSheet.create({
   completeBtnText:     { color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
   completedBadge:      { backgroundColor: Colors.success, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
   completedText:       { color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
+  quizBtn:             { backgroundColor: Colors.navy, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
 });

@@ -9,6 +9,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Validation\Rules\Password;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -282,5 +283,34 @@ class AuthApiController extends Controller
         }
 
         return $data;
+    }
+
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $request->validate(['email' => 'required|email']);
+        PasswordBroker::sendResetLink($request->only('email'));
+        return $this->success([], message: 'If that email is registered, a reset link has been sent.');
+    }
+
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'token'    => 'required|string',
+            'email'    => 'required|email',
+            'password' => ['required', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+        ]);
+
+        $status = PasswordBroker::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill(['password' => $password])->save();
+            }
+        );
+
+        if ($status === PasswordBroker::PASSWORD_RESET) {
+            return $this->success([], message: 'Password has been reset successfully.');
+        }
+
+        return $this->error(__($status), 422);
     }
 }

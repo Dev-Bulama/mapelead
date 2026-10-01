@@ -6,6 +6,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { apiClient } from '@/api/client';
 import { extractApiError } from '@/api/client';
+import { API } from '@/api/endpoints';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 import type { AuthStackParamList } from '@/types';
 
@@ -22,7 +23,7 @@ export default function ForgotPasswordScreen({ navigation }: Props) {
     setError(null);
     setLoading(true);
     try {
-      await apiClient.post('/auth/forgot-password', { email: email.trim().toLowerCase() });
+      await apiClient.post(API.AUTH_FORGOT_PASSWORD, { email: email.trim().toLowerCase() });
       setSent(true);
     } catch (err) {
       setError(extractApiError(err));

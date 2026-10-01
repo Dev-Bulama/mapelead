@@ -37,9 +37,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
     // ── Auth ───────────────────────────────────────────────────────────────────
     Route::prefix('auth')->group(function () {
-        Route::post('/login',    [AuthApiController::class, 'login']);
-        Route::post('/register', [AuthApiController::class, 'register']);
-        Route::post('/logout',   [AuthApiController::class, 'logout'])->middleware('auth:sanctum');
+        Route::post('/login',            [AuthApiController::class, 'login']);
+        Route::post('/register',         [AuthApiController::class, 'register']);
+        Route::post('/logout',           [AuthApiController::class, 'logout'])->middleware('auth:sanctum');
+        Route::post('/forgot-password',  [AuthApiController::class, 'forgotPassword'])->middleware('throttle:password-reset');
+        Route::post('/reset-password',   [AuthApiController::class, 'resetPassword'])->middleware('throttle:password-reset');
 
         // 2FA management (requires authentication)
         Route::middleware('auth:sanctum')->group(function () {

@@ -392,12 +392,11 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
         {enrollment ? (
           <TouchableOpacity
             style={styles.ctaBtn}
-            onPress={() =>
-              navigation.navigate('LessonView', {
-                lessonId: course.modules?.[0]?.lessons?.[0]?.id ?? 0,
-                courseSlug: slug,
-              })
-            }
+            onPress={() => {
+              const firstLesson = course.modules?.flatMap(m => m.lessons ?? []).find(l => l.id);
+              if (!firstLesson) { Alert.alert('No lessons', 'This course has no lessons yet.'); return; }
+              navigation.navigate('LessonView', { lessonId: firstLesson.id, courseSlug: slug });
+            }}
           >
             <Text style={styles.ctaBtnText}>Continue Learning →</Text>
           </TouchableOpacity>
