@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
@@ -109,7 +110,11 @@ export default function ProfileEditScreen({ navigation }: Props) {
               </View>
             )}
             <View style={s.avatarEditBadge}>
-              {uploading ? <ActivityIndicator size="small" color={Colors.white} /> : <Text>📷</Text>}
+              {uploading ? (
+                <ActivityIndicator size="small" color={Colors.white} />
+              ) : (
+                <Ionicons name="camera-outline" size={14} color={Colors.white} />
+              )}
             </View>
           </TouchableOpacity>
           <Text style={s.avatarHint}>Tap to change photo</Text>
@@ -125,7 +130,8 @@ export default function ProfileEditScreen({ navigation }: Props) {
 
         {/* Change password link */}
         <TouchableOpacity style={s.changePasswordBtn} onPress={() => navigation.navigate('Security')}>
-          <Text style={s.changePasswordText}>🔒 Change Password</Text>
+          <Ionicons name="lock-closed-outline" size={16} color={Colors.primary} style={{ marginRight: 8 }} />
+          <Text style={s.changePasswordText}>Change Password</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -175,6 +181,6 @@ const s = StyleSheet.create({
   fieldLabel:       { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.medium, color: Colors.gray700, marginBottom: Spacing[1] },
   input:            { borderWidth: 1, borderColor: Colors.gray300, borderRadius: Radii.lg, paddingHorizontal: Spacing[4], paddingVertical: Spacing[3], fontSize: Typography.sizes.base, color: Colors.textPrimary },
   inputMultiline:   { minHeight: 80, paddingTop: Spacing[3] },
-  changePasswordBtn:{ backgroundColor: Colors.white, borderRadius: Radii.xl, padding: Spacing[4], alignItems: 'center', ...Shadows.sm },
+  changePasswordBtn:{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.white, borderRadius: Radii.xl, padding: Spacing[4], ...Shadows.sm },
   changePasswordText:{ fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium },
 });

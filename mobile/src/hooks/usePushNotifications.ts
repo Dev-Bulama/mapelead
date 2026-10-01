@@ -54,12 +54,24 @@ export function usePushNotifications() {
   const navigation      = useNavigation<Nav>();
   const listenerRef     = useRef<Notifications.EventSubscription | null>(null);
   const responseRef     = useRef<Notifications.EventSubscription | null>(null);
+  const tokenRef        = useRef<string | null>(null);
+
+  // De-register token on logout
+  const prevAuthRef = useRef<boolean>(isAuthenticated);
+  useEffect(() => {
+    if (prevAuthRef.current && !isAuthenticated && tokenRef.current) {
+      apiClient.delete('/device-token', { data: { token: tokenRef.current } }).catch(() => {});
+      tokenRef.current = null;
+    }
+    prevAuthRef.current = isAuthenticated;
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
 
     registerForPushNotifications().then((token) => {
       if (!token) return;
+      tokenRef.current = token;
       apiClient.post('/device-token', {
         token,
         platform: Platform.OS as 'ios' | 'android',
@@ -79,6 +91,13 @@ export function usePushNotifications() {
         navigation.navigate('Notifications');
       } else if (data?.screen === 'CourseDetail' && typeof data.slug === 'string') {
         navigation.navigate('CourseDetail', { slug: data.slug });
+      } else if (data?.screen === 'SupportTicketDetail' && typeof data.ticketId === 'number') {
+        navigation.navigate('SupportTicketDetail', { ticketId: data.ticketId });
+      } else if (data?.screen === 'LessonView' && typeof data.lessonId === 'number') {
+        navigation.navigate('LessonView', {
+          lessonId:   data.lessonId,
+          courseSlug: typeof data.courseSlug === 'string' ? data.courseSlug : '',
+        });
       }
     });
 

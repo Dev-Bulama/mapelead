@@ -46,8 +46,8 @@ export default function PaymentHistoryScreen({ navigation }: Props) {
   return (
     <View style={S.screen}>
       <View style={S.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={S.back}>‹ Back</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 50 }}>
+          <Ionicons name="arrow-back" size={22} color={Colors.primary} />
         </TouchableOpacity>
         <Text style={S.title}>Payment History</Text>
         <View style={{ width: 50 }} />
@@ -113,7 +113,7 @@ function PaymentRow({ payment }: { payment: Payment }) {
 const S = StyleSheet.create({
   screen:        { flex: 1, backgroundColor: Colors.surface },
   header:        { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: Colors.white, paddingHorizontal: Spacing[4], paddingTop: 56, paddingBottom: Spacing[3], borderBottomWidth: 1, borderBottomColor: Colors.gray100 },
-  back:          { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium, width: 50 },
+  back:          { width: 50 },
   title:         { fontSize: Typography.sizes.lg, fontWeight: Typography.weights.semibold, color: Colors.textPrimary },
   summaryCard:   { margin: Spacing[4], backgroundColor: Colors.navy, borderRadius: Radii['2xl'], padding: Spacing[5], alignItems: 'center' },
   summaryLabel:  { fontSize: Typography.sizes.sm, color: 'rgba(255,255,255,0.7)' },
