@@ -196,6 +196,11 @@ const N = StyleSheet.create({
 
 // ── Main Screen ────────────────────────────────────────────────────────────────
 
+interface LessonNav {
+  prev: { id: number; title: string } | null;
+  next: { id: number; title: string } | null;
+}
+
 export default function LessonViewScreen({ route, navigation }: Props) {
   const { lessonId } = route.params;
   const qc = useQueryClient();
@@ -205,6 +210,13 @@ export default function LessonViewScreen({ route, navigation }: Props) {
     queryKey: ['lesson', lessonId],
     queryFn: () =>
       apiClient.get<ApiResponse<Lesson>>(API.LESSON(lessonId)).then((r) => r.data.data),
+  });
+
+  const { data: lessonNav } = useQuery({
+    queryKey: ['lesson-nav', lessonId],
+    queryFn: () =>
+      apiClient.get<ApiResponse<LessonNav>>(API.LESSON_NAVIGATION(lessonId)).then((r) => r.data.data),
+    enabled: !!lesson,
   });
 
   // Track progress every 30s while screen is open
@@ -314,24 +326,52 @@ export default function LessonViewScreen({ route, navigation }: Props) {
           />
         )}
 
-        <View style={{ height: 120 }} />
+        <View style={{ height: 160 }} />
       </ScrollView>
 
       {/* ── Footer ── */}
       <View style={S.footer}>
+        <View style={S.footerNav}>
+          <TouchableOpacity
+            style={[S.navBtn, !lessonNav?.prev && S.navBtnDisabled]}
+            onPress={() => lessonNav?.prev && navigation.replace('LessonView', { lessonId: lessonNav.prev.id, courseSlug: route.params.courseSlug })}
+            disabled={!lessonNav?.prev}
+          >
+            <Ionicons name="chevron-back" size={18} color={lessonNav?.prev ? Colors.primary : Colors.gray300} />
+            <Text style={[S.navBtnText, !lessonNav?.prev && S.navBtnTextDisabled]} numberOfLines={1}>
+              {lessonNav?.prev ? lessonNav.prev.title : 'First lesson'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[S.navBtn, S.navBtnRight, !lessonNav?.next && S.navBtnDisabled]}
+            onPress={() => lessonNav?.next && navigation.replace('LessonView', { lessonId: lessonNav.next.id, courseSlug: route.params.courseSlug })}
+            disabled={!lessonNav?.next}
+          >
+            <Text style={[S.navBtnText, !lessonNav?.next && S.navBtnTextDisabled]} numberOfLines={1}>
+              {lessonNav?.next ? lessonNav.next.title : 'Last lesson'}
+            </Text>
+            <Ionicons name="chevron-forward" size={18} color={lessonNav?.next ? Colors.primary : Colors.gray300} />
+          </TouchableOpacity>
+        </View>
         {!lesson.progress?.is_completed ? (
           <TouchableOpacity
             style={[S.completeBtn, completing && S.completeBtnDisabled]}
             onPress={() => markComplete()}
             disabled={completing}
           >
-            <Text style={S.completeBtnText}>
-              {completing ? 'Saving…' : '✓ Mark as Complete'}
-            </Text>
+            {completing ? (
+              <ActivityIndicator size="small" color={Colors.white} />
+            ) : (
+              <>
+                <Ionicons name="checkmark-circle-outline" size={18} color={Colors.white} style={{ marginRight: 6 }} />
+                <Text style={S.completeBtnText}>Mark as Complete</Text>
+              </>
+            )}
           </TouchableOpacity>
         ) : (
           <View style={S.completedBadge}>
-            <Text style={S.completedText}>✅ Lesson Completed</Text>
+            <Ionicons name="checkmark-circle" size={18} color={Colors.white} style={{ marginRight: 6 }} />
+            <Text style={S.completedText}>Lesson Completed</Text>
           </View>
         )}
       </View>
@@ -371,10 +411,16 @@ const S = StyleSheet.create({
   attachmentText: { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium },
 
   // Footer
-  footer:         { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing[4], backgroundColor: Colors.white, borderTopWidth: 1, borderTopColor: Colors.border, ...Shadows.md },
-  completeBtn:    { backgroundColor: Colors.primary, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center' },
+  footer:              { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing[4], backgroundColor: Colors.white, borderTopWidth: 1, borderTopColor: Colors.border, ...Shadows.md },
+  footerNav:           { flexDirection: 'row', gap: Spacing[2], marginBottom: Spacing[3] },
+  navBtn:              { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.surface, borderRadius: Radii.lg, paddingHorizontal: Spacing[3], paddingVertical: Spacing[2] },
+  navBtnRight:         { justifyContent: 'flex-end' },
+  navBtnDisabled:      { opacity: 0.4 },
+  navBtnText:          { flex: 1, fontSize: Typography.sizes.xs, color: Colors.primary, fontWeight: Typography.weights.medium },
+  navBtnTextDisabled:  { color: Colors.gray400 },
+  completeBtn:         { backgroundColor: Colors.primary, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
   completeBtnDisabled: { opacity: 0.6 },
-  completeBtnText:{ color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
-  completedBadge: { backgroundColor: Colors.success, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center' },
-  completedText:  { color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
+  completeBtnText:     { color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
+  completedBadge:      { backgroundColor: Colors.success, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
+  completedText:       { color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
 });

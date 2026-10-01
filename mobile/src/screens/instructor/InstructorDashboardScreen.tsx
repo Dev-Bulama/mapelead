@@ -6,10 +6,13 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 import type { ApiResponse, RootStackParamList } from '@/types';
+
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -85,10 +88,10 @@ export default function InstructorDashboardScreen() {
 
       {/* Stats */}
       <View style={S.statsRow}>
-        <StatCard icon="📚" label="Courses"  value={stats?.total_courses   ?? 0} />
-        <StatCard icon="✅" label="Published" value={stats?.published       ?? 0} />
-        <StatCard icon="👥" label="Students"  value={stats?.total_students  ?? 0} />
-        <StatCard icon="📝" label="Reviews"   value={stats?.pending_reviews ?? 0} />
+        <StatCard icon="book-outline"              label="Courses"   value={stats?.total_courses   ?? 0} />
+        <StatCard icon="checkmark-circle-outline"  label="Published" value={stats?.published       ?? 0} />
+        <StatCard icon="people-outline"            label="Students"  value={stats?.total_students  ?? 0} />
+        <StatCard icon="document-text-outline"     label="Reviews"   value={stats?.pending_reviews ?? 0} />
       </View>
 
       {/* My Courses */}
@@ -106,7 +109,7 @@ export default function InstructorDashboardScreen() {
                 <Image source={{ uri: course.thumbnail_url }} style={S.thumb} />
               ) : (
                 <View style={[S.thumb, S.thumbFallback]}>
-                  <Text style={{ fontSize: 22 }}>📚</Text>
+                  <Ionicons name="book-outline" size={22} color={Colors.gray400} />
                 </View>
               )}
               <View style={S.courseInfo}>
@@ -130,7 +133,7 @@ export default function InstructorDashboardScreen() {
           {(data!.recent_enrollments).map(enr => (
             <View key={enr.id} style={S.enrollRow}>
               <View style={S.enrollAvatar}>
-                <Text style={{ fontSize: 16 }}>👤</Text>
+                <Ionicons name="person-outline" size={18} color={Colors.gray400} />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={S.enrollName}>{enr.user.full_name}</Text>
@@ -156,7 +159,7 @@ export default function InstructorDashboardScreen() {
 
       {(data?.courses ?? []).length === 0 && (
         <View style={S.empty}>
-          <Text style={{ fontSize: 40 }}>📭</Text>
+          <Ionicons name="file-tray-outline" size={48} color={Colors.gray300} />
           <Text style={S.emptyText}>No courses yet</Text>
           <Text style={S.emptySub}>Your courses will appear here once created by the admin</Text>
         </View>
@@ -167,10 +170,10 @@ export default function InstructorDashboardScreen() {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: string; label: string; value: number }) {
+function StatCard({ icon, label, value }: { icon: IoniconsName; label: string; value: number }) {
   return (
     <View style={S.statCard}>
-      <Text style={{ fontSize: 18 }}>{icon}</Text>
+      <Ionicons name={icon} size={20} color={Colors.primary} />
       <Text style={S.statValue}>{value}</Text>
       <Text style={S.statLabel}>{label}</Text>
     </View>

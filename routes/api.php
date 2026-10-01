@@ -79,6 +79,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('/lessons/{lessonId}/note',           [LessonApiController::class, 'saveNote']);
         Route::delete('/lessons/{lessonId}/note',         [LessonApiController::class, 'deleteNote']);
         Route::get('/notes',                              [LessonApiController::class, 'getNotes']);
+        Route::get('/lessons/{lessonId}/navigation',      [LessonApiController::class, 'navigation']);
 
         // Quizzes
         Route::get('/quizzes/{quizId}',           [QuizApiController::class, 'show']);
@@ -94,6 +95,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::get('/certificates',                              [CertificateApiController::class, 'index']);
         Route::get('/certificates/{certificateId}',              [CertificateApiController::class, 'show']);
         Route::get('/courses/{courseId}/certificate-eligibility', [CertificateApiController::class, 'checkEligibility']);
+        Route::post('/courses/{courseId}/certificate/claim',      [CertificateApiController::class, 'claim']);
 
         // Notifications
         Route::get('/notifications',               [NotificationApiController::class, 'index']);

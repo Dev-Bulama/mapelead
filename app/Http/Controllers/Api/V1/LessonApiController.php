@@ -233,4 +233,40 @@ class LessonApiController extends Controller
             ])->values()
         );
     }
+
+    public function navigation(Request $request, int $lessonId): JsonResponse
+    {
+        $lesson = Lesson::find($lessonId);
+        if (!$lesson) {
+            return $this->error('Lesson not found', 404);
+        }
+
+        $user = $request->user();
+
+        $enrollment = Enrollment::where('user_id', $user->id)
+            ->where('course_id', $lesson->course_id)
+            ->where('payment_status', 'paid')
+            ->first();
+
+        if (!$enrollment) {
+            return $this->error('Not enrolled', 403);
+        }
+
+        $allLessons = Lesson::where('course_id', $lesson->course_id)
+            ->where('is_published', true)
+            ->with('module:id,sort_order')
+            ->get()
+            ->sortBy(fn($l) => [$l->module?->sort_order ?? 0, $l->sort_order ?? 0])
+            ->values();
+
+        $index = $allLessons->search(fn($l) => $l->id === $lessonId);
+
+        $prev = ($index !== false && $index > 0) ? $allLessons[$index - 1] : null;
+        $next = ($index !== false && $index < $allLessons->count() - 1) ? $allLessons[$index + 1] : null;
+
+        return $this->success([
+            'prev' => $prev ? ['id' => $prev->id, 'title' => $prev->title] : null,
+            'next' => $next ? ['id' => $next->id, 'title' => $next->title] : null,
+        ]);
+    }
 }

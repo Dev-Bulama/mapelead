@@ -6,6 +6,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 import { coursesApi, CourseFilters } from '@/api/courses';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 import type { Course, CourseCategory, RootStackParamList, MainTabParamList } from '@/types';
@@ -73,7 +74,7 @@ export default function ExploreScreen() {
       {/* Search + filter row */}
       <View style={S.searchRow}>
         <View style={S.searchBox}>
-          <Text style={S.searchIcon}>🔍</Text>
+          <Ionicons name="search-outline" size={16} color={Colors.gray400} style={{ marginRight: Spacing[1] }} />
           <TextInput
             style={S.searchInput}
             value={search}
@@ -88,8 +89,14 @@ export default function ExploreScreen() {
           style={[S.filterBtn, activeFilterCount > 0 && S.filterBtnActive]}
           onPress={() => setFilterModal(true)}
         >
+          <Ionicons
+            name="options-outline"
+            size={15}
+            color={activeFilterCount > 0 ? Colors.white : Colors.textSecondary}
+            style={{ marginRight: 4 }}
+          />
           <Text style={[S.filterBtnText, activeFilterCount > 0 && { color: Colors.white }]}>
-            {activeFilterCount > 0 ? `Filter (${activeFilterCount})` : '⚙ Filter'}
+            {activeFilterCount > 0 ? `Filter (${activeFilterCount})` : 'Filter'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -124,12 +131,14 @@ export default function ExploreScreen() {
         <View style={S.activeFilters}>
           {levelFilter && (
             <TouchableOpacity style={S.chip} onPress={() => setLevelFilter(null)}>
-              <Text style={S.chipText}>{levelFilter} ×</Text>
+              <Text style={S.chipText}>{levelFilter}</Text>
+              <Ionicons name="close-circle-outline" size={13} color={Colors.primary} />
             </TouchableOpacity>
           )}
           {priceFilter && (
             <TouchableOpacity style={S.chip} onPress={() => setPriceFilter(null)}>
-              <Text style={S.chipText}>{priceFilter} ×</Text>
+              <Text style={S.chipText}>{priceFilter}</Text>
+              <Ionicons name="close-circle-outline" size={13} color={Colors.primary} />
             </TouchableOpacity>
           )}
           <TouchableOpacity onPress={clearFilters}>
@@ -154,7 +163,7 @@ export default function ExploreScreen() {
           )}
           ListEmptyComponent={
             <View style={S.emptyWrap}>
-              <Text style={{ fontSize: 36 }}>🔍</Text>
+              <Ionicons name="search-outline" size={48} color={Colors.gray300} />
               <Text style={S.empty}>No courses found</Text>
               <Text style={S.emptySub}>Try adjusting your search or filters</Text>
             </View>
@@ -225,7 +234,7 @@ function CourseRow({ course, onPress }: { course: Course; onPress: () => void })
         <Image source={{ uri: course.thumbnail_url }} style={S.thumbnail} />
       ) : (
         <View style={[S.thumbnail, S.thumbnailFallback]}>
-          <Text style={{ fontSize: 22 }}>📚</Text>
+          <Ionicons name="book-outline" size={22} color={Colors.gray400} />
         </View>
       )}
       <View style={S.info}>
@@ -248,7 +257,7 @@ const S = StyleSheet.create({
   searchBox:            { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.gray100, borderRadius: Radii.lg, paddingHorizontal: Spacing[3] },
   searchIcon:           { fontSize: 14, marginRight: Spacing[1] },
   searchInput:          { flex: 1, paddingVertical: Spacing[3], fontSize: Typography.sizes.base, color: Colors.textPrimary },
-  filterBtn:            { paddingHorizontal: Spacing[3], paddingVertical: Spacing[3], borderRadius: Radii.lg, backgroundColor: Colors.gray100 },
+  filterBtn:            { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing[3], paddingVertical: Spacing[3], borderRadius: Radii.lg, backgroundColor: Colors.gray100 },
   filterBtnActive:      { backgroundColor: Colors.primary },
   filterBtnText:        { fontSize: Typography.sizes.sm, color: Colors.textSecondary, fontWeight: Typography.weights.medium },
   pills:                { padding: Spacing[3], gap: Spacing[2] },
@@ -257,7 +266,7 @@ const S = StyleSheet.create({
   pillText:             { fontSize: Typography.sizes.sm, color: Colors.textSecondary, fontWeight: Typography.weights.medium },
   pillTextActive:       { color: Colors.white },
   activeFilters:        { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing[4], paddingBottom: Spacing[2], gap: Spacing[2], flexWrap: 'wrap' },
-  chip:                 { backgroundColor: 'rgba(30,58,219,0.1)', borderRadius: Radii.full, paddingHorizontal: Spacing[3], paddingVertical: 4 },
+  chip:                 { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(30,58,219,0.1)', borderRadius: Radii.full, paddingHorizontal: Spacing[3], paddingVertical: 4 },
   chipText:             { fontSize: Typography.sizes.xs, color: Colors.primary, fontWeight: Typography.weights.medium },
   clearAll:             { fontSize: Typography.sizes.xs, color: Colors.error, fontWeight: Typography.weights.medium },
   list:                 { padding: Spacing[4] },

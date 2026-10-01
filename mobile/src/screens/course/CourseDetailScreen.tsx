@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import { coursesApi } from '@/api/courses';
 import { enrollmentsApi } from '@/api/enrollments';
 import { apiClient, extractApiError } from '@/api/client';
@@ -57,6 +58,31 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
     ).then(r => r.data.data),
     enabled: !!course && !!user,
     staleTime: 60_000,
+  });
+
+  const { data: certEligibility, refetch: refetchEligibility } = useQuery({
+    queryKey: ['cert-eligibility', slug],
+    queryFn:  () => apiClient.get<ApiResponse<{ eligible: boolean; reasons: string[] }>>(
+      API.CERTIFICATE_ELIGIBILITY(course?.id ?? 0)
+    ).then(r => r.data.data),
+    enabled: !!course && !!enrollment && (course.has_certificate ?? false),
+  });
+
+  const { data: ownedCert, refetch: refetchCert } = useQuery({
+    queryKey: ['my-cert', slug],
+    queryFn:  () => apiClient.get<ApiResponse<any[]>>(API.CERTIFICATES)
+      .then(r => r.data.data.find((c: any) => c.course?.slug === slug) ?? null),
+    enabled: !!enrollment && (course?.has_certificate ?? false),
+  });
+
+  const { mutate: claimCertificate, isPending: claiming } = useMutation({
+    mutationFn: () => apiClient.post(API.CERTIFICATE_CLAIM(course!.id)),
+    onSuccess: () => {
+      refetchCert();
+      refetchEligibility();
+      Alert.alert('Certificate Issued!', 'Your certificate has been issued. View it in the Certificates tab.');
+    },
+    onError: (err) => Alert.alert('Not eligible', extractApiError(err)),
   });
 
   const { mutate: submitReview, isPending: submittingReview } = useMutation({
@@ -165,9 +191,11 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
                         }
                       }}
                     >
-                      <Text style={styles.lessonIcon}>
-                        {lesson.type === 'video' ? '▶' : lesson.type === 'quiz' ? '❓' : '📄'}
-                      </Text>
+                      <Ionicons
+                        name={lesson.type === 'video' ? 'play-circle-outline' : lesson.type === 'quiz' ? 'help-circle-outline' : 'document-text-outline'}
+                        size={16}
+                        color={Colors.gray500}
+                      />
                       <Text style={styles.lessonTitle} numberOfLines={1}>{lesson.title}</Text>
                       {lesson.is_free_preview && (
                         <Text style={styles.freeTag}>Free</Text>
@@ -223,17 +251,66 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
 
             {enrollment && !myReview && (
               <TouchableOpacity style={styles.writeReviewBtn} onPress={() => setReviewModal(true)}>
-                <Text style={styles.writeReviewText}>✍️  Write a Review</Text>
+                <Ionicons name="create-outline" size={16} color={Colors.primary} style={{ marginRight: 6 }} />
+                <Text style={styles.writeReviewText}>Write a Review</Text>
               </TouchableOpacity>
             )}
             {myReview && (
               <View style={styles.alreadyReviewed}>
+                <Ionicons
+                  name={myReview.is_approved ? 'checkmark-circle-outline' : 'time-outline'}
+                  size={14}
+                  color={Colors.textMuted}
+                  style={{ marginRight: 4 }}
+                />
                 <Text style={styles.alreadyReviewedText}>
-                  {myReview.is_approved ? '✓ Your review is published' : '⏳ Your review is pending approval'}
+                  {myReview.is_approved ? 'Your review is published' : 'Your review is pending approval'}
                 </Text>
               </View>
             )}
           </View>
+
+          {/* Certificate claim */}
+          {enrollment && course?.has_certificate && (
+            <View style={styles.section}>
+              <View style={styles.certSection}>
+                <View style={styles.certIcon}>
+                  <Ionicons name="ribbon" size={28} color={Colors.primary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.certTitle}>Certificate of Completion</Text>
+                  {ownedCert ? (
+                    <Text style={styles.certSubtitle}>
+                      Issued {ownedCert.issued_at
+                        ? new Date(ownedCert.issued_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+                        : ''}
+                    </Text>
+                  ) : certEligibility?.eligible ? (
+                    <Text style={styles.certSubtitle}>You have completed this course!</Text>
+                  ) : (
+                    <Text style={styles.certSubtitle}>Complete all lessons to earn your certificate</Text>
+                  )}
+                </View>
+                {ownedCert ? (
+                  <View style={styles.certBadge}>
+                    <Ionicons name="checkmark-circle" size={14} color={Colors.success} />
+                    <Text style={styles.certBadgeText}>Earned</Text>
+                  </View>
+                ) : certEligibility?.eligible ? (
+                  <TouchableOpacity
+                    style={[styles.claimBtn, claiming && { opacity: 0.6 }]}
+                    onPress={() => claimCertificate()}
+                    disabled={claiming}
+                  >
+                    {claiming
+                      ? <ActivityIndicator size="small" color={Colors.white} />
+                      : <Text style={styles.claimBtnText}>Claim</Text>
+                    }
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -245,7 +322,7 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
             <View style={styles.modalTitleRow}>
               <Text style={styles.modalTitle}>Write a Review</Text>
               <TouchableOpacity onPress={() => setReviewModal(false)}>
-                <Text style={{ fontSize: 24, color: Colors.gray400 }}>×</Text>
+                <Ionicons name="close" size={24} color={Colors.gray400} />
               </TouchableOpacity>
             </View>
 
@@ -382,9 +459,9 @@ const styles = StyleSheet.create({
   reviewStars:         { fontSize: 12, color: '#f59e0b' },
   reviewTitle:         { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.semibold, color: Colors.textPrimary, marginBottom: 4 },
   reviewBody:          { fontSize: Typography.sizes.sm, color: Colors.textSecondary, lineHeight: 20 },
-  writeReviewBtn:      { borderWidth: 1.5, borderColor: Colors.primary, borderRadius: Radii.lg, paddingVertical: Spacing[3], alignItems: 'center', marginTop: Spacing[2] },
+  writeReviewBtn:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: Colors.primary, borderRadius: Radii.lg, paddingVertical: Spacing[3], marginTop: Spacing[2] },
   writeReviewText:     { color: Colors.primary, fontWeight: Typography.weights.semibold },
-  alreadyReviewed:     { backgroundColor: Colors.surface, borderRadius: Radii.lg, paddingVertical: Spacing[3], alignItems: 'center', marginTop: Spacing[2] },
+  alreadyReviewed:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface, borderRadius: Radii.lg, paddingVertical: Spacing[3], marginTop: Spacing[2] },
   alreadyReviewedText: { fontSize: Typography.sizes.sm, color: Colors.textMuted },
 
   // Review modal
@@ -402,4 +479,14 @@ const styles = StyleSheet.create({
   submitBtn:     { backgroundColor: Colors.primary, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center', marginTop: Spacing[5] },
   submitBtnDisabled: { opacity: 0.6 },
   submitBtnText: { color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
+
+  // Certificate section
+  certSection:   { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface, borderRadius: Radii.xl, padding: Spacing[4], gap: Spacing[3] },
+  certIcon:      { width: 52, height: 52, borderRadius: Radii.full, backgroundColor: '#fef9c3', alignItems: 'center', justifyContent: 'center' },
+  certTitle:     { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.semibold, color: Colors.textPrimary },
+  certSubtitle:  { fontSize: Typography.sizes.xs, color: Colors.textMuted, marginTop: 2 },
+  certBadge:     { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#dcfce7', borderRadius: Radii.full, paddingHorizontal: Spacing[2], paddingVertical: 4 },
+  certBadgeText: { fontSize: Typography.sizes.xs, color: Colors.success, fontWeight: Typography.weights.semibold },
+  claimBtn:      { backgroundColor: Colors.primary, borderRadius: Radii.lg, paddingHorizontal: Spacing[4], paddingVertical: Spacing[2] },
+  claimBtnText:  { color: Colors.white, fontSize: Typography.sizes.sm, fontWeight: Typography.weights.bold },
 });

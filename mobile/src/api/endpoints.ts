@@ -77,4 +77,10 @@ export const API = {
   // Reviews
   COURSE_REVIEWS:     (courseId: number) => `/courses/${courseId}/reviews`,
   COURSE_MY_REVIEW:   (courseId: number) => `/courses/${courseId}/my-review`,
+
+  // Lesson navigation
+  LESSON_NAVIGATION:  (id: number) => `/lessons/${id}/navigation`,
+
+  // Certificate claim
+  CERTIFICATE_CLAIM:  (courseId: number) => `/courses/${courseId}/certificate/claim`,
 } as const;

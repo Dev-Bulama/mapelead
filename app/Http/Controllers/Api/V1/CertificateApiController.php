@@ -85,6 +85,41 @@ class CertificateApiController extends Controller
         ]);
     }
 
+    public function claim(Request $request, int $courseId): JsonResponse
+    {
+        $user = $request->user();
+
+        $enrollment = Enrollment::where('user_id', $user->id)
+            ->where('course_id', $courseId)
+            ->where('payment_status', 'paid')
+            ->first();
+
+        if (!$enrollment) {
+            return $this->error('Enrollment not found', 404);
+        }
+
+        $existing = Certificate::where('user_id', $user->id)
+            ->where('course_id', $courseId)
+            ->first();
+
+        if ($existing) {
+            return $this->success($this->formatCertificate($existing, detailed: true), message: 'Certificate already issued');
+        }
+
+        $result = $this->certificateService->isEligible($enrollment);
+
+        if (!$result['eligible']) {
+            return $this->error(
+                'Not eligible: ' . implode(', ', $result['reasons'] ?? ['Complete all lessons first']),
+                422
+            );
+        }
+
+        $certificate = $this->certificateService->issue($enrollment);
+
+        return $this->success($this->formatCertificate($certificate, detailed: true), message: 'Certificate issued successfully');
+    }
+
     private function formatCertificate(Certificate $certificate, bool $detailed = false): array
     {
         $data = [
