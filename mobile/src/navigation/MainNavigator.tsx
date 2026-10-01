@@ -30,6 +30,8 @@ import InstructorGradingScreen    from '@/screens/instructor/InstructorGradingSc
 import CourseAssignmentsScreen    from '@/screens/course/CourseAssignmentsScreen';
 import BookmarksScreen            from '@/screens/main/BookmarksScreen';
 import NotesScreen                from '@/screens/main/NotesScreen';
+import SupportTicketsScreen       from '@/screens/main/SupportTicketsScreen';
+import SupportTicketDetailScreen  from '@/screens/main/SupportTicketDetailScreen';
 
 const Tab   = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -96,6 +98,8 @@ export default function MainNavigator() {
       <Stack.Screen name="CourseAssignments"  component={CourseAssignmentsScreen}  options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="Bookmarks"          component={BookmarksScreen}           options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="Notes"              component={NotesScreen}               options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="SupportTickets"     component={SupportTicketsScreen}      options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="SupportTicketDetail" component={SupportTicketDetailScreen} options={{ animation: 'slide_from_right' }} />
     </Stack.Navigator>
   );
 }

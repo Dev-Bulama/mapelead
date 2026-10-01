@@ -165,7 +165,7 @@ function CourseCard({ course, onPress }: { course: Course; onPress: () => void }
         <Image source={{ uri: course.thumbnail_url }} style={CC.thumb} />
       ) : (
         <View style={[CC.thumb, { backgroundColor: Colors.gray200, alignItems: 'center', justifyContent: 'center' }]}>
-          <Text style={{ fontSize: 28 }}>📚</Text>
+          <Ionicons name="book-outline" size={28} color={Colors.gray400} />
         </View>
       )}
       <View style={CC.info}>
@@ -192,16 +192,12 @@ const CC = StyleSheet.create({
 });
 
 // ── Category Chip ────────────────────────────────────────────────────────────
-const CAT_ICONS: Record<string, string> = {
-  programming: '💻', design: '🎨', business: '💼', marketing: '📣',
-  data: '📊', finance: '💰', science: '🔬', language: '🌐', default: '📖',
-};
 function CategoryChip({ cat, onPress }: { cat: CourseCategory; onPress: () => void }) {
-  const key = cat.name.toLowerCase().split(' ')[0];
-  const icon = CAT_ICONS[key] ?? CAT_ICONS.default;
   return (
     <TouchableOpacity style={Cat.chip} onPress={onPress} activeOpacity={0.75}>
-      <View style={Cat.iconWrap}><Text style={{ fontSize: 22 }}>{icon}</Text></View>
+      <View style={Cat.iconWrap}>
+        <Ionicons name="grid-outline" size={22} color={Colors.primary} />
+      </View>
       <Text style={Cat.label} numberOfLines={1}>{cat.name}</Text>
     </TouchableOpacity>
   );
@@ -240,6 +236,12 @@ export default function HomeScreen() {
     queryFn:  () => enrollmentsApi.myCourses().then(r => r.data.data),
   });
 
+  const { data: streakData } = useQuery({
+    queryKey: ['streak'],
+    queryFn:  () => apiClient.get<{ success: boolean; data: { current_streak: number } }>(API.STREAK).then(r => r.data.data),
+    staleTime: 60_000,
+  });
+
   const inProgress = (enrollments as Enrollment[] | undefined)?.filter(e => e.status === 'active' && e.progress_percent < 100) ?? [];
   const certs      = (enrollments as Enrollment[] | undefined)?.filter(e => e.status === 'completed') ?? [];
   const avgProgress = inProgress.length > 0
@@ -269,7 +271,7 @@ export default function HomeScreen() {
 
         {/* Search bar */}
         <View style={S.searchWrap}>
-          <Text style={S.searchIcon}>🔍</Text>
+          <Ionicons name="search-outline" size={16} color={Colors.gray400} style={{ marginRight: Spacing[2] }} />
           <TextInput
             style={S.searchInput}
             value={search} onChangeText={setSearch}
@@ -286,7 +288,7 @@ export default function HomeScreen() {
           overallProgress={avgProgress}
           inProgressCount={inProgress.length}
           certificatesCount={certs.length}
-          streakDays={0}
+          streakDays={streakData?.current_streak ?? 0}
         />
 
         {/* Instructor shortcut */}
@@ -296,12 +298,12 @@ export default function HomeScreen() {
             onPress={() => navigation.navigate('InstructorDashboard')}
             activeOpacity={0.8}
           >
-            <Text style={{ fontSize: 22 }}>🎓</Text>
+            <Ionicons name="school-outline" size={22} color={Colors.white} />
             <View style={{ flex: 1 }}>
               <Text style={S.instructorBannerTitle}>Instructor Panel</Text>
               <Text style={S.instructorBannerSub}>View your courses and student activity</Text>
             </View>
-            <Text style={{ fontSize: 20, color: 'rgba(255,255,255,0.7)' }}>›</Text>
+            <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.7)" />
           </TouchableOpacity>
         )}
 
@@ -310,7 +312,9 @@ export default function HomeScreen() {
           <View style={S.section}>
             <View style={S.sectionHeader}>
               <Text style={S.sectionTitle}>Continue Learning</Text>
-              <TouchableOpacity><Text style={S.seeAll}>See all</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate('Main', { screen: 'MyLearning' } as any)}>
+                <Text style={S.seeAll}>See all</Text>
+              </TouchableOpacity>
             </View>
             {inProgress.slice(0, 2).map((e: Enrollment) => (
               <TouchableOpacity
@@ -322,7 +326,7 @@ export default function HomeScreen() {
                 <View style={S.continueThumbnail}>
                   {e.course?.thumbnail_url
                     ? <Image source={{ uri: e.course.thumbnail_url }} style={{ width: '100%', height: '100%' }} />
-                    : <Text style={{ fontSize: 24 }}>📚</Text>}
+                    : <Ionicons name="book-outline" size={24} color={Colors.gray400} />}
                 </View>
                 <View style={S.continueInfo}>
                   <Text style={S.continueTitle} numberOfLines={2}>{e.course?.title}</Text>
@@ -340,7 +344,9 @@ export default function HomeScreen() {
         <View style={S.section}>
           <View style={S.sectionHeader}>
             <Text style={S.sectionTitle}>Popular Courses</Text>
-            <TouchableOpacity><Text style={S.seeAll}>See all</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Main', { screen: 'Explore' } as any)}>
+              <Text style={S.seeAll}>See all</Text>
+            </TouchableOpacity>
           </View>
           {featLoading ? (
             <ActivityIndicator color={Colors.primary} style={{ marginTop: Spacing[4] }} />
@@ -368,7 +374,10 @@ export default function HomeScreen() {
               keyExtractor={item => String(item.id)}
               horizontal showsHorizontalScrollIndicator={false}
               renderItem={({ item }) => (
-                <CategoryChip cat={item} onPress={() => {}} />
+                <CategoryChip
+                  cat={item}
+                  onPress={() => navigation.navigate('Main', { screen: 'Explore', params: { query: item.slug } } as any)}
+                />
               )}
             />
           </View>
@@ -386,7 +395,6 @@ const S = StyleSheet.create({
 
   // Search
   searchWrap:    { flexDirection: 'row', alignItems: 'center', marginHorizontal: Spacing[4], marginTop: Spacing[4], backgroundColor: Colors.white, borderRadius: Radii.xl, paddingHorizontal: Spacing[4], ...Shadows.sm },
-  searchIcon:    { fontSize: 16, marginRight: Spacing[2] },
   searchInput:   { flex: 1, paddingVertical: 12, fontSize: Typography.sizes.base, color: Colors.textPrimary },
 
   // Sections

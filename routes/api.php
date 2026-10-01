@@ -117,6 +117,13 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('/courses/{courseId}/reviews',   [CourseReviewApiController::class, 'store']);
         Route::delete('/courses/{courseId}/reviews', [CourseReviewApiController::class, 'destroy']);
 
+        // ── Support Tickets ────────────────────────────────────────────────────
+        Route::get('/tickets',                    [\App\Http\Controllers\Api\V1\SupportTicketApiController::class, 'index']);
+        Route::post('/tickets',                   [\App\Http\Controllers\Api\V1\SupportTicketApiController::class, 'store']);
+        Route::get('/tickets/{ticketId}',         [\App\Http\Controllers\Api\V1\SupportTicketApiController::class, 'show']);
+        Route::post('/tickets/{ticketId}/reply',  [\App\Http\Controllers\Api\V1\SupportTicketApiController::class, 'reply']);
+        Route::post('/tickets/{ticketId}/close',  [\App\Http\Controllers\Api\V1\SupportTicketApiController::class, 'close']);
+
         // ── Instructor routes ──────────────────────────────────────────────────
         Route::prefix('instructor')->middleware('role:instructor')->group(function () {
             Route::get('/dashboard',                              [InstructorApiController::class, 'dashboard']);

@@ -242,6 +242,30 @@ export interface Assignment {
   submission: AssignmentSubmission | null;
 }
 
+// ── Support Tickets ───────────────────────────────────────────────────────────
+
+export interface TicketReply {
+  id: number;
+  message: string;
+  is_staff: boolean;
+  author: { full_name: string; avatar_url: string | null } | null;
+  created_at: string;
+}
+
+export interface SupportTicket {
+  id: number;
+  ticket_number: string | null;
+  subject: string;
+  description: string;
+  category: string | null;
+  priority: 'low' | 'normal' | 'high' | 'urgent';
+  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  created_at: string;
+  updated_at: string;
+  resolved_at: string | null;
+  replies?: TicketReply[];
+}
+
 // ── Navigation ────────────────────────────────────────────────────────────────
 
 export type AuthStackParamList = {
@@ -277,4 +301,6 @@ export type RootStackParamList = {
   InstructorGrading:   { submissionId: number };
   Bookmarks:           undefined;
   Notes:               undefined;
+  SupportTickets:      undefined;
+  SupportTicketDetail: { ticketId: number };
 };

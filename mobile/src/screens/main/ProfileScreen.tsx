@@ -49,7 +49,7 @@ export default function ProfileScreen() {
             </View>
           )}
           <View style={S.avatarEdit}>
-            <Text style={{ fontSize: 11 }}>✏️</Text>
+            <Ionicons name="pencil" size={11} color={Colors.textSecondary} />
           </View>
         </TouchableOpacity>
 
@@ -72,9 +72,9 @@ export default function ProfileScreen() {
 
       {/* ── Stats ── */}
       <View style={S.statsRow}>
-        <StatTile icon="📚" label="Enrolled" value={String(stats?.enrollments_count ?? user?.enrollments_count ?? 0)} />
-        <StatTile icon="🎓" label="Completed" value={String(stats?.completed_courses ?? user?.completed_courses ?? 0)} />
-        <StatTile icon="🔥" label="Day Streak" value={String(stats?.streak_days ?? 0)} />
+        <StatTile icon="book-outline" label="Enrolled" value={String(stats?.enrollments_count ?? user?.enrollments_count ?? 0)} />
+        <StatTile icon="ribbon-outline" label="Completed" value={String(stats?.completed_courses ?? user?.completed_courses ?? 0)} />
+        <StatTile icon="flame-outline" label="Day Streak" value={String(stats?.streak_days ?? 0)} />
       </View>
 
       {/* ── Menu ── */}
@@ -111,8 +111,8 @@ export default function ProfileScreen() {
       <View style={S.section}>
         <Text style={S.sectionLabel}>Support</Text>
         <View style={S.menuCard}>
-          <MenuItem icon="help-circle-outline" label="Help & Support" onPress={() => {}} />
-          <MenuItem icon="star-outline"        label="Rate the App"   onPress={() => {}} last />
+          <MenuItem icon="chatbubble-ellipses-outline" label="Support Tickets" onPress={() => navigation.navigate('SupportTickets')} />
+          <MenuItem icon="star-outline"                label="Rate the App"    onPress={() => {}} last />
         </View>
       </View>
 
@@ -126,10 +126,10 @@ export default function ProfileScreen() {
   );
 }
 
-function StatTile({ icon, label, value }: { icon: string; label: string; value: string }) {
+function StatTile({ icon, label, value }: { icon: IoniconsName; label: string; value: string }) {
   return (
     <View style={S.stat}>
-      <Text style={{ fontSize: 20 }}>{icon}</Text>
+      <Ionicons name={icon} size={22} color={Colors.primary} />
       <Text style={S.statValue}>{value}</Text>
       <Text style={S.statLabel}>{label}</Text>
     </View>

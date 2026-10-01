@@ -24,6 +24,7 @@ const TYPE_ICONS: Record<string, IoniconsName> = {
   certificate:  'ribbon-outline',
   grade:        'star-outline',
   announcement: 'megaphone-outline',
+  support:      'chatbubble-ellipses-outline',
   default:      'notifications-outline',
 };
 
@@ -59,6 +60,11 @@ export default function NotificationsScreen() {
       }
       if (lessonMatch) {
         navigation.navigate('LessonView', { lessonId: Number(lessonMatch[1]), courseSlug: '' });
+        return;
+      }
+      const ticketMatch = notif.url.match(/\/tickets\/(\d+)/);
+      if (ticketMatch) {
+        navigation.navigate('SupportTicketDetail', { ticketId: Number(ticketMatch[1]) });
         return;
       }
       if (notif.url.startsWith('http')) {
@@ -139,7 +145,7 @@ function NotifRow({ notif, onTap }: { notif: Notification; onTap: () => void }) 
         <Text style={S.message} numberOfLines={2}>{notif.message}</Text>
         <Text style={S.time}>{relativeTime(notif.created_at)}</Text>
       </View>
-      {notif.url ? <Text style={S.chevron}>›</Text> : null}
+      {notif.url ? <Ionicons name="chevron-forward" size={16} color={Colors.gray300} style={{ alignSelf: 'center', marginLeft: Spacing[2] }} /> : null}
     </TouchableOpacity>
   );
 }
@@ -165,5 +171,4 @@ const S = StyleSheet.create({
   notifTitleUnread:{ color: Colors.textPrimary, fontWeight: Typography.weights.semibold },
   message:        { fontSize: Typography.sizes.sm, color: Colors.textSecondary, lineHeight: 18, marginBottom: 4 },
   time:           { fontSize: Typography.sizes.xs, color: Colors.textMuted },
-  chevron:        { fontSize: 20, color: Colors.gray300, marginLeft: Spacing[2], alignSelf: 'center' },
 });

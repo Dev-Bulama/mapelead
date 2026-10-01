@@ -85,4 +85,10 @@ export const API = {
 
   // Certificate claim
   CERTIFICATE_CLAIM:  (courseId: number) => `/courses/${courseId}/certificate/claim`,
+
+  // Support Tickets
+  SUPPORT_TICKETS:       '/tickets',
+  SUPPORT_TICKET:        (id: number) => `/tickets/${id}`,
+  SUPPORT_TICKET_REPLY:  (id: number) => `/tickets/${id}/reply`,
+  SUPPORT_TICKET_CLOSE:  (id: number) => `/tickets/${id}/close`,
 } as const;
