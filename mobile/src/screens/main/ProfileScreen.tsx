@@ -109,6 +109,13 @@ export default function ProfileScreen() {
       </View>
 
       <View style={S.section}>
+        <Text style={S.sectionLabel}>Preferences</Text>
+        <View style={S.menuCard}>
+          <MenuItem icon="settings-outline" label="App Settings" onPress={() => navigation.navigate('AppSettings')} last />
+        </View>
+      </View>
+
+      <View style={S.section}>
         <Text style={S.sectionLabel}>Support</Text>
         <View style={S.menuCard}>
           <MenuItem icon="chatbubble-ellipses-outline" label="Support Tickets" onPress={() => navigation.navigate('SupportTickets')} />

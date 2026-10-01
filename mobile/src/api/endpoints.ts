@@ -93,4 +93,7 @@ export const API = {
   SUPPORT_TICKET:        (id: number) => `/tickets/${id}`,
   SUPPORT_TICKET_REPLY:  (id: number) => `/tickets/${id}/reply`,
   SUPPORT_TICKET_CLOSE:  (id: number) => `/tickets/${id}/close`,
+
+  // Device token (push notifications)
+  DEVICE_TOKEN:          '/device-token',
 } as const;

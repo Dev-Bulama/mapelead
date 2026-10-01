@@ -6,8 +6,9 @@ import { useAuthStore, selectIsAuthenticated } from '@/stores/authStore';
 import { Colors } from '@/theme';
 import type { RootStackParamList } from '@/types';
 
-import AuthNavigator from './AuthNavigator';
-import MainNavigator from './MainNavigator';
+import AuthNavigator    from './AuthNavigator';
+import MainNavigator    from './MainNavigator';
+import OnboardingScreen from '@/screens/onboarding/OnboardingScreen';
 
 const Root = createNativeStackNavigator<RootStackParamList>();
 
@@ -38,7 +39,8 @@ const linking: LinkingOptions<RootStackParamList> = {
 
 export default function RootNavigator() {
   const { initialize, isInitialized } = useAuthStore();
-  const isAuthenticated = useAuthStore(selectIsAuthenticated);
+  const isAuthenticated   = useAuthStore(selectIsAuthenticated);
+  const onboardingDone    = useAuthStore((s) => s.onboardingDone);
 
   useEffect(() => {
     initialize();
@@ -56,7 +58,11 @@ export default function RootNavigator() {
     <NavigationContainer linking={linking}>
       <Root.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
         {isAuthenticated ? (
-          <Root.Screen name="Main" component={MainNavigator} />
+          onboardingDone ? (
+            <Root.Screen name="Main" component={MainNavigator} />
+          ) : (
+            <Root.Screen name="Onboarding" component={OnboardingScreen} />
+          )
         ) : (
           <Root.Screen name="Auth" component={AuthNavigator} />
         )}

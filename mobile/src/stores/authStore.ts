@@ -5,19 +5,21 @@ import { secureStorage } from '@/utils/secureStorage';
 import type { LoginPayload, RegisterPayload, User } from '@/types';
 
 interface AuthState {
-  user:           User | null;
-  token:          string | null;
-  isLoading:      boolean;
-  isInitialized:  boolean;
-  error:          string | null;
+  user:            User | null;
+  token:           string | null;
+  isLoading:       boolean;
+  isInitialized:   boolean;
+  error:           string | null;
+  onboardingDone:  boolean;
 
   // Actions
-  initialize:     () => Promise<void>;
-  login:          (payload: LoginPayload) => Promise<void>;
-  register:       (payload: RegisterPayload) => Promise<void>;
-  logout:         () => Promise<void>;
-  refreshUser:    () => Promise<void>;
-  clearError:     () => void;
+  initialize:          () => Promise<void>;
+  login:               (payload: LoginPayload) => Promise<void>;
+  register:            (payload: RegisterPayload) => Promise<void>;
+  logout:              () => Promise<void>;
+  refreshUser:         () => Promise<void>;
+  clearError:          () => void;
+  markOnboardingDone:  () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => {
@@ -27,25 +29,27 @@ export const useAuthStore = create<AuthState>((set, get) => {
   });
 
   return {
-    user:          null,
-    token:         null,
-    isLoading:     false,
-    isInitialized: false,
-    error:         null,
+    user:           null,
+    token:          null,
+    isLoading:      false,
+    isInitialized:  false,
+    error:          null,
+    onboardingDone: false,
 
     initialize: async () => {
       try {
-        const [token, user] = await Promise.all([
+        const [token, user, onboardingDone] = await Promise.all([
           secureStorage.getToken(),
           secureStorage.getUser<User>(),
+          secureStorage.getOnboardingDone(),
         ]);
 
         if (token && user) {
-          set({ token, user, isInitialized: true });
+          set({ token, user, onboardingDone, isInitialized: true });
           // Silently refresh user data in background
           get().refreshUser().catch(() => {/* ignore on init */});
         } else {
-          set({ isInitialized: true });
+          set({ onboardingDone, isInitialized: true });
         }
       } catch {
         set({ isInitialized: true });
@@ -108,6 +112,11 @@ export const useAuthStore = create<AuthState>((set, get) => {
     },
 
     clearError: () => set({ error: null }),
+
+    markOnboardingDone: async () => {
+      await secureStorage.setOnboardingDone();
+      set({ onboardingDone: true });
+    },
   };
 });
 

@@ -286,6 +286,8 @@ export type MainTabParamList = {
 export type RootStackParamList = {
   Auth:                undefined;
   Main:                undefined;
+  Onboarding:          undefined;
+  AppSettings:         undefined;
   CourseDetail:        { slug: string };
   LessonView:          { lessonId: number; courseSlug: string };
   QuizView:            { quizId: number; courseSlug: string };

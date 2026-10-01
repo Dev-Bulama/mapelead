@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { apiClient } from '@/api/client';
+import { API } from '@/api/endpoints';
 import { useAuthStore, selectIsAuthenticated } from '@/stores/authStore';
 import type { RootStackParamList } from '@/types';
 
@@ -60,7 +61,7 @@ export function usePushNotifications() {
   const prevAuthRef = useRef<boolean>(isAuthenticated);
   useEffect(() => {
     if (prevAuthRef.current && !isAuthenticated && tokenRef.current) {
-      apiClient.delete('/device-token', { data: { token: tokenRef.current } }).catch(() => {});
+      apiClient.delete(API.DEVICE_TOKEN, { data: { token: tokenRef.current } }).catch(() => {});
       tokenRef.current = null;
     }
     prevAuthRef.current = isAuthenticated;
@@ -72,7 +73,7 @@ export function usePushNotifications() {
     registerForPushNotifications().then((token) => {
       if (!token) return;
       tokenRef.current = token;
-      apiClient.post('/device-token', {
+      apiClient.post(API.DEVICE_TOKEN, {
         token,
         platform: Platform.OS as 'ios' | 'android',
         app_version: Constants.expoConfig?.version,
