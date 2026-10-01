@@ -65,6 +65,8 @@ export const API = {
   INSTRUCTOR_DASHBOARD:    '/instructor/dashboard',
   INSTRUCTOR_COURSES:      '/instructor/courses',
   INSTRUCTOR_SUBMISSIONS:  '/instructor/submissions',
+  INSTRUCTOR_SUBMISSION:   (id: number) => `/instructor/submissions/${id}`,
+  INSTRUCTOR_GRADE:        (id: number) => `/instructor/submissions/${id}/grade`,
 
   // Admin
   ADMIN_INSTRUCTOR_CODES:  '/admin/instructor-codes',

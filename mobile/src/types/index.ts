@@ -218,6 +218,30 @@ export interface Certificate {
   verification_url?: string;
 }
 
+// ── Assignments ────────────────────────────────────────────────────────────────
+
+export interface AssignmentSubmission {
+  id: number;
+  status: 'pending' | 'submitted' | 'graded';
+  score: number | null;
+  feedback: string | null;
+  passed: boolean;
+  submitted_at: string;
+  graded_at: string | null;
+}
+
+export interface Assignment {
+  id: number;
+  title: string;
+  description: string | null;
+  max_score: number;
+  pass_score: number;
+  is_required: boolean;
+  allowed_types: string[];
+  max_file_mb: number;
+  submission: AssignmentSubmission | null;
+}
+
 // ── Navigation ────────────────────────────────────────────────────────────────
 
 export type AuthStackParamList = {
@@ -241,6 +265,7 @@ export type RootStackParamList = {
   LessonView:          { lessonId: number; courseSlug: string };
   QuizView:            { quizId: number; courseSlug: string };
   AssignmentView:      { assignmentId: number; courseSlug: string };
+  CourseAssignments:   { courseId: number; courseSlug: string; courseTitle: string };
   ProfileEdit:         undefined;
   Notifications:       undefined;
   Certificates:        undefined;
@@ -249,6 +274,7 @@ export type RootStackParamList = {
   LearningStats:       undefined;
   PaymentWebView:      { url: string; reference: string };
   InstructorDashboard: undefined;
+  InstructorGrading:   { submissionId: number };
   Bookmarks:           undefined;
   Notes:               undefined;
 };

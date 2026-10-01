@@ -89,7 +89,7 @@ export default function QuizScreen({ route, navigation }: Props) {
   const handleSubmit = useCallback(() => {
     if (submitting) return;
     const unanswered = quiz?.questions.filter((q) => !answers[q.id]).length ?? 0;
-    if (unanswered > 0 && !timeLeft === null) {
+    if (unanswered > 0 && timeLeft === null) {
       Alert.alert(
         `${unanswered} unanswered`,
         'You have unanswered questions. Submit anyway?',

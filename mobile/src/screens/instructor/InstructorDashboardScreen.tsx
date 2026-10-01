@@ -149,10 +149,18 @@ export default function InstructorDashboardScreen() {
         <View style={S.section}>
           <Text style={S.sectionTitle}>Pending Submissions</Text>
           {(data!.pending_submissions).map(sub => (
-            <View key={sub.id} style={S.submissionRow}>
-              <Text style={S.submissionTitle}>{sub.assignment.title}</Text>
-              <Text style={S.submissionMeta}>by {sub.user.full_name}</Text>
-            </View>
+            <TouchableOpacity
+              key={sub.id}
+              style={S.submissionRow}
+              onPress={() => navigation.navigate('InstructorGrading', { submissionId: sub.id })}
+              activeOpacity={0.75}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={S.submissionTitle}>{sub.assignment.title}</Text>
+                <Text style={S.submissionMeta}>by {sub.user.full_name}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={Colors.gray300} />
+            </TouchableOpacity>
           ))}
         </View>
       )}
@@ -209,7 +217,7 @@ const S = StyleSheet.create({
   enrollAvatar:    { width: 38, height: 38, borderRadius: 19, backgroundColor: Colors.gray100, alignItems: 'center', justifyContent: 'center' },
   enrollName:      { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.semibold, color: Colors.textPrimary },
   enrollCourse:    { fontSize: Typography.sizes.xs, color: Colors.textMuted, marginTop: 2 },
-  submissionRow:   { backgroundColor: Colors.white, borderRadius: Radii.lg, padding: Spacing[3], marginBottom: Spacing[2], borderLeftWidth: 3, borderLeftColor: Colors.primary, ...Shadows.sm },
+  submissionRow:   { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.white, borderRadius: Radii.lg, padding: Spacing[3], marginBottom: Spacing[2], borderLeftWidth: 3, borderLeftColor: Colors.primary, ...Shadows.sm },
   submissionTitle: { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.semibold, color: Colors.textPrimary },
   submissionMeta:  { fontSize: Typography.sizes.xs, color: Colors.textMuted, marginTop: 2 },
   empty:           { alignItems: 'center', paddingVertical: Spacing[10], paddingHorizontal: Spacing[8] },

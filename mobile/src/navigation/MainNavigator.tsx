@@ -26,6 +26,8 @@ import PaymentHistoryScreen    from '@/screens/main/PaymentHistoryScreen';
 import LearningStatsScreen     from '@/screens/main/LearningStatsScreen';
 import PaymentWebViewScreen       from '@/screens/payment/PaymentWebViewScreen';
 import InstructorDashboardScreen  from '@/screens/instructor/InstructorDashboardScreen';
+import InstructorGradingScreen    from '@/screens/instructor/InstructorGradingScreen';
+import CourseAssignmentsScreen    from '@/screens/course/CourseAssignmentsScreen';
 import BookmarksScreen            from '@/screens/main/BookmarksScreen';
 import NotesScreen                from '@/screens/main/NotesScreen';
 
@@ -90,6 +92,8 @@ export default function MainNavigator() {
       <Stack.Screen name="LearningStats"  component={LearningStatsScreen}  options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="PaymentWebView"      component={PaymentWebViewScreen}      options={{ animation: 'slide_from_bottom', gestureEnabled: false }} />
       <Stack.Screen name="InstructorDashboard" component={InstructorDashboardScreen} options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="InstructorGrading"  component={InstructorGradingScreen}  options={{ animation: 'slide_from_right' }} />
+      <Stack.Screen name="CourseAssignments"  component={CourseAssignmentsScreen}  options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="Bookmarks"          component={BookmarksScreen}           options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="Notes"              component={NotesScreen}               options={{ animation: 'slide_from_right' }} />
     </Stack.Navigator>

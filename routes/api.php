@@ -119,9 +119,11 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
 
         // ── Instructor routes ──────────────────────────────────────────────────
         Route::prefix('instructor')->middleware('role:instructor')->group(function () {
-            Route::get('/dashboard',    [InstructorApiController::class, 'dashboard']);
-            Route::get('/courses',      [InstructorApiController::class, 'courses']);
-            Route::get('/submissions',  [InstructorApiController::class, 'submissions']);
+            Route::get('/dashboard',                              [InstructorApiController::class, 'dashboard']);
+            Route::get('/courses',                               [InstructorApiController::class, 'courses']);
+            Route::get('/submissions',                           [InstructorApiController::class, 'submissions']);
+            Route::get('/submissions/{submissionId}',            [InstructorApiController::class, 'showSubmission']);
+            Route::put('/submissions/{submissionId}/grade',      [InstructorApiController::class, 'gradeSubmission']);
         });
 
         // ── Admin routes ───────────────────────────────────────────────────────

@@ -109,4 +109,86 @@ class InstructorApiController extends Controller
 
         return $this->success($submissions);
     }
+
+    public function showSubmission(Request $request, int $submissionId): JsonResponse
+    {
+        $instructor = $this->getInstructor($request);
+        if (!$instructor) {
+            return $this->error('Instructor profile not found.', 404);
+        }
+
+        $submission = AssignmentSubmission::whereHas('assignment.course', function ($q) use ($instructor) {
+            $q->where('instructor_id', $instructor->id);
+        })
+            ->with(['assignment', 'user:id,full_name,email,avatar_url'])
+            ->find($submissionId);
+
+        if (!$submission) {
+            return $this->error('Submission not found', 404);
+        }
+
+        return $this->success([
+            'id'           => $submission->id,
+            'status'       => $submission->status,
+            'notes'        => $submission->notes,
+            'file_name'    => $submission->file_name,
+            'has_file'     => !empty($submission->file_path),
+            'score'        => $submission->score,
+            'feedback'     => $submission->feedback,
+            'passed'       => $submission->score !== null ? $submission->passed() : null,
+            'submitted_at' => $submission->submitted_at?->toDateTimeString(),
+            'graded_at'    => $submission->graded_at?->toDateTimeString(),
+            'user'         => [
+                'id'         => $submission->user->id,
+                'full_name'  => $submission->user->full_name,
+                'email'      => $submission->user->email,
+                'avatar_url' => $submission->user->avatar_url,
+            ],
+            'assignment'   => $submission->assignment ? [
+                'id'          => $submission->assignment->id,
+                'title'       => $submission->assignment->title,
+                'description' => $submission->assignment->description,
+                'max_score'   => $submission->assignment->max_score,
+                'pass_score'  => $submission->assignment->pass_score,
+            ] : null,
+        ]);
+    }
+
+    public function gradeSubmission(Request $request, int $submissionId): JsonResponse
+    {
+        $instructor = $this->getInstructor($request);
+        if (!$instructor) {
+            return $this->error('Instructor profile not found.', 404);
+        }
+
+        $submission = AssignmentSubmission::whereHas('assignment.course', function ($q) use ($instructor) {
+            $q->where('instructor_id', $instructor->id);
+        })->find($submissionId);
+
+        if (!$submission) {
+            return $this->error('Submission not found', 404);
+        }
+
+        $request->validate([
+            'score'    => 'required|numeric|min:0',
+            'feedback' => 'nullable|string|max:2000',
+        ]);
+
+        $submission->update([
+            'score'      => $request->score,
+            'feedback'   => $request->feedback,
+            'status'     => 'graded',
+            'graded_by'  => $request->user()->id,
+            'graded_at'  => now(),
+        ]);
+
+        return $this->success([
+            'id'         => $submission->id,
+            'status'     => $submission->status,
+            'score'      => $submission->score,
+            'feedback'   => $submission->feedback,
+            'passed'     => $submission->passed(),
+            'graded_at'  => $submission->graded_at?->toDateTimeString(),
+        ], message: 'Submission graded successfully');
+    }
 }

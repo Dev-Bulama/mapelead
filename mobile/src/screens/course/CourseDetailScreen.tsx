@@ -270,6 +270,25 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
             )}
           </View>
 
+          {/* Assignments link */}
+          {enrollment && (
+            <View style={styles.section}>
+              <TouchableOpacity
+                style={styles.assignmentsBtn}
+                onPress={() => navigation.navigate('CourseAssignments', {
+                  courseId: course.id,
+                  courseSlug: slug,
+                  courseTitle: course.title,
+                })}
+                activeOpacity={0.75}
+              >
+                <Ionicons name="clipboard-outline" size={20} color={Colors.primary} />
+                <Text style={styles.assignmentsBtnText}>View Assignments</Text>
+                <Ionicons name="chevron-forward" size={18} color={Colors.primary} />
+              </TouchableOpacity>
+            </View>
+          )}
+
           {/* Certificate claim */}
           {enrollment && course?.has_certificate && (
             <View style={styles.section}>
@@ -479,6 +498,10 @@ const styles = StyleSheet.create({
   submitBtn:     { backgroundColor: Colors.primary, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center', marginTop: Spacing[5] },
   submitBtnDisabled: { opacity: 0.6 },
   submitBtnText: { color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
+
+  // Assignments button
+  assignmentsBtn:     { flexDirection: 'row', alignItems: 'center', gap: Spacing[3], backgroundColor: Colors.surface, borderRadius: Radii.xl, padding: Spacing[4] },
+  assignmentsBtnText: { flex: 1, fontSize: Typography.sizes.base, fontWeight: Typography.weights.semibold, color: Colors.primary },
 
   // Certificate section
   certSection:   { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.surface, borderRadius: Radii.xl, padding: Spacing[4], gap: Spacing[3] },
