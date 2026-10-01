@@ -10,6 +10,7 @@ export interface CourseFilters {
   min_price?: number;
   max_price?: number;
   free_only?: boolean;
+  is_free?:   boolean;
   has_certificate?: boolean;
   sort?: 'popular' | 'newest' | 'price_low' | 'price_high' | 'rating';
   page?: number;

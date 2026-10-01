@@ -222,17 +222,18 @@ export type MainTabParamList = {
 };
 
 export type RootStackParamList = {
-  Auth:            undefined;
-  Main:            undefined;
-  CourseDetail:    { slug: string };
-  LessonView:      { lessonId: number; courseSlug: string };
-  QuizView:        { quizId: number; courseSlug: string };
-  AssignmentView:  { assignmentId: number; courseSlug: string };
-  ProfileEdit:     undefined;
-  Notifications:   undefined;
-  Certificates:    undefined;
-  Security:        undefined;
-  PaymentHistory:  undefined;
-  LearningStats:   undefined;
-  PaymentWebView:  { url: string; reference: string };
+  Auth:                undefined;
+  Main:                undefined;
+  CourseDetail:        { slug: string };
+  LessonView:          { lessonId: number; courseSlug: string };
+  QuizView:            { quizId: number; courseSlug: string };
+  AssignmentView:      { assignmentId: number; courseSlug: string };
+  ProfileEdit:         undefined;
+  Notifications:       undefined;
+  Certificates:        undefined;
+  Security:            undefined;
+  PaymentHistory:      undefined;
+  LearningStats:       undefined;
+  PaymentWebView:      { url: string; reference: string };
+  InstructorDashboard: undefined;
 };

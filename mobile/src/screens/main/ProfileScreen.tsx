@@ -77,6 +77,15 @@ export default function ProfileScreen() {
       </View>
 
       {/* ── Menu ── */}
+      {isInstructor && (
+        <View style={S.section}>
+          <Text style={S.sectionLabel}>Instructor</Text>
+          <View style={S.menuCard}>
+            <MenuItem icon="🎓" label="Instructor Dashboard" onPress={() => navigation.navigate('InstructorDashboard')} last />
+          </View>
+        </View>
+      )}
+
       <View style={S.section}>
         <Text style={S.sectionLabel}>Account</Text>
         <View style={S.menuCard}>

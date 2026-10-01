@@ -60,4 +60,12 @@ export const API = {
   // Progress & Streaks
   COURSE_PROGRESS:         (courseId: number) => `/courses/${courseId}/progress`,
   STREAK:                  '/streak',
+
+  // Instructor
+  INSTRUCTOR_DASHBOARD:    '/instructor/dashboard',
+  INSTRUCTOR_COURSES:      '/instructor/courses',
+  INSTRUCTOR_SUBMISSIONS:  '/instructor/submissions',
+
+  // Admin
+  ADMIN_INSTRUCTOR_CODES:  '/admin/instructor-codes',
 } as const;

@@ -23,7 +23,8 @@ import ProfileEditScreen       from '@/screens/main/ProfileEditScreen';
 import SecurityScreen          from '@/screens/main/SecurityScreen';
 import PaymentHistoryScreen    from '@/screens/main/PaymentHistoryScreen';
 import LearningStatsScreen     from '@/screens/main/LearningStatsScreen';
-import PaymentWebViewScreen    from '@/screens/payment/PaymentWebViewScreen';
+import PaymentWebViewScreen       from '@/screens/payment/PaymentWebViewScreen';
+import InstructorDashboardScreen  from '@/screens/instructor/InstructorDashboardScreen';
 
 const Tab   = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -77,7 +78,8 @@ export default function MainNavigator() {
       <Stack.Screen name="Certificates"   component={CertificatesScreen}   options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="PaymentHistory" component={PaymentHistoryScreen} options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="LearningStats"  component={LearningStatsScreen}  options={{ animation: 'slide_from_right' }} />
-      <Stack.Screen name="PaymentWebView" component={PaymentWebViewScreen} options={{ animation: 'slide_from_bottom', gestureEnabled: false }} />
+      <Stack.Screen name="PaymentWebView"      component={PaymentWebViewScreen}      options={{ animation: 'slide_from_bottom', gestureEnabled: false }} />
+      <Stack.Screen name="InstructorDashboard" component={InstructorDashboardScreen} options={{ animation: 'slide_from_right' }} />
     </Stack.Navigator>
   );
 }

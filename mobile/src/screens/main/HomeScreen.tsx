@@ -9,6 +9,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { coursesApi } from '@/api/courses';
 import { enrollmentsApi } from '@/api/enrollments';
+import { apiClient } from '@/api/client';
+import { API } from '@/api/endpoints';
 import { useAuthStore, selectUser } from '@/stores/authStore';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 import type { RootStackParamList, Course, Enrollment, CourseCategory } from '@/types';
@@ -211,9 +213,16 @@ const Cat = StyleSheet.create({
 
 // ── Main Screen ────────────────────────────────────────────────────────────────
 export default function HomeScreen() {
-  const navigation = useNavigation<Nav>();
-  const user       = useAuthStore(selectUser);
+  const navigation  = useNavigation<Nav>();
+  const user        = useAuthStore(selectUser);
   const [search, setSearch] = useState('');
+  const isInstructor = user?.roles?.includes('instructor') ?? false;
+
+  const { data: unreadData } = useQuery({
+    queryKey:  ['notifications', 'unread-count'],
+    queryFn:   () => apiClient.get<{ success: boolean; data: { count: number } }>(API.NOTIFICATIONS_UNREAD).then(r => r.data.data),
+    staleTime: 30_000,
+  });
 
   const { data: featured, isLoading: featLoading } = useQuery({
     queryKey: ['courses', 'featured'],
@@ -244,7 +253,7 @@ export default function HomeScreen() {
     <View style={S.screen}>
       <HomeHeader
         userName={user?.first_name ?? 'Learner'}
-        notifCount={3}
+        notifCount={unreadData?.count ?? 0}
         onBell={() => navigation.navigate('Notifications')}
       />
 
@@ -271,6 +280,22 @@ export default function HomeScreen() {
           certificatesCount={certs.length}
           streakDays={0}
         />
+
+        {/* Instructor shortcut */}
+        {isInstructor && (
+          <TouchableOpacity
+            style={S.instructorBanner}
+            onPress={() => navigation.navigate('InstructorDashboard')}
+            activeOpacity={0.8}
+          >
+            <Text style={{ fontSize: 22 }}>🎓</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={S.instructorBannerTitle}>Instructor Panel</Text>
+              <Text style={S.instructorBannerSub}>View your courses and student activity</Text>
+            </View>
+            <Text style={{ fontSize: 20, color: 'rgba(255,255,255,0.7)' }}>›</Text>
+          </TouchableOpacity>
+        )}
 
         {/* Continue Learning */}
         {inProgress.length > 0 && (
@@ -361,6 +386,11 @@ const S = StyleSheet.create({
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing[3] },
   sectionTitle:  { fontSize: Typography.sizes.md, fontWeight: Typography.weights.semibold, color: Colors.textPrimary },
   seeAll:        { fontSize: Typography.sizes.sm, color: Colors.primary, fontWeight: Typography.weights.medium },
+
+  // Instructor banner
+  instructorBanner:      { flexDirection: 'row', alignItems: 'center', marginHorizontal: Spacing[4], marginTop: Spacing[4], backgroundColor: Colors.primary, borderRadius: Radii.xl, padding: Spacing[4], gap: Spacing[3], ...Shadows.md },
+  instructorBannerTitle: { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.bold, color: Colors.white },
+  instructorBannerSub:   { fontSize: Typography.sizes.xs, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
 
   // Continue learning card
   continueCard:  { flexDirection: 'row', backgroundColor: Colors.white, borderRadius: Radii.xl, padding: Spacing[3], marginBottom: Spacing[3], gap: Spacing[3], ...Shadows.sm },

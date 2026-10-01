@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\V1\ProfileApiController;
 use App\Http\Controllers\Api\V1\DeviceTokenApiController;
 use App\Http\Controllers\Api\V1\ProgressApiController;
 use App\Http\Controllers\Api\V1\QuizApiController;
+use App\Http\Controllers\Api\V1\InstructorApiController;
+use App\Http\Controllers\Api\V1\Admin\InstructorCodeController;
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
 
@@ -96,5 +98,19 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         // Device tokens (push notifications)
         Route::post('/device-token',    [DeviceTokenApiController::class, 'register']);
         Route::delete('/device-token',  [DeviceTokenApiController::class, 'unregister']);
+
+        // ── Instructor routes ──────────────────────────────────────────────────
+        Route::prefix('instructor')->middleware('role:instructor')->group(function () {
+            Route::get('/dashboard',    [InstructorApiController::class, 'dashboard']);
+            Route::get('/courses',      [InstructorApiController::class, 'courses']);
+            Route::get('/submissions',  [InstructorApiController::class, 'submissions']);
+        });
+
+        // ── Admin routes ───────────────────────────────────────────────────────
+        Route::prefix('admin')->middleware('role:super_admin|admin')->group(function () {
+            Route::get('/instructor-codes',           [InstructorCodeController::class, 'index']);
+            Route::post('/instructor-codes',          [InstructorCodeController::class, 'store']);
+            Route::delete('/instructor-codes/{instructorCode}', [InstructorCodeController::class, 'destroy']);
+        });
     });
 });
