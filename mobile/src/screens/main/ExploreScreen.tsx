@@ -255,7 +255,6 @@ const S = StyleSheet.create({
   screen:               { flex: 1, backgroundColor: Colors.surface },
   searchRow:            { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.white, padding: Spacing[4], paddingTop: Spacing[10], borderBottomWidth: 1, borderBottomColor: Colors.border, gap: Spacing[2] },
   searchBox:            { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.gray100, borderRadius: Radii.lg, paddingHorizontal: Spacing[3] },
-  searchIcon:           { fontSize: 14, marginRight: Spacing[1] },
   searchInput:          { flex: 1, paddingVertical: Spacing[3], fontSize: Typography.sizes.base, color: Colors.textPrimary },
   filterBtn:            { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing[3], paddingVertical: Spacing[3], borderRadius: Radii.lg, backgroundColor: Colors.gray100 },
   filterBtnActive:      { backgroundColor: Colors.primary },

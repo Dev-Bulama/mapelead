@@ -6,6 +6,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as DocumentPicker from 'expo-document-picker';
+import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { extractApiError } from '@/api/client';
@@ -13,6 +14,29 @@ import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 import type { ApiResponse, RootStackParamList } from '@/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AssignmentView'>;
+
+const MIME_MAP: Record<string, string> = {
+  pdf:  'application/pdf',
+  doc:  'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xls:  'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  ppt:  'application/vnd.ms-powerpoint',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  txt:  'text/plain',
+  zip:  'application/zip',
+  png:  'image/png',
+  jpg:  'image/jpeg',
+  jpeg: 'image/jpeg',
+  mp4:  'video/mp4',
+};
+
+const STATUS_COLORS: Record<string, string> = {
+  submitted: '#d97706',
+  graded:    '#10b981',
+  pending:   '#6b7280',
+  failed:    '#ef4444',
+};
 
 interface Assignment {
   id: number; title: string; description: string | null; instructions: string | null;
@@ -63,7 +87,7 @@ export default function AssignmentScreen({ route, navigation }: Props) {
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: assignment?.allowed_types?.length
-          ? assignment.allowed_types.map((t) => `application/${t}`)
+          ? assignment.allowed_types.map((t) => MIME_MAP[t.toLowerCase()] ?? `application/${t}`)
           : '*/*',
         copyToCacheDirectory: true,
       });
@@ -99,8 +123,8 @@ export default function AssignmentScreen({ route, navigation }: Props) {
   return (
     <View style={s.flex}>
       <View style={s.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={s.backLink}>‹ Back</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 60 }}>
+          <Ionicons name="arrow-back" size={22} color={Colors.primary} />
         </TouchableOpacity>
         <Text style={s.headerTitle} numberOfLines={1}>{assignment.title}</Text>
         <View style={{ width: 60 }} />
@@ -130,12 +154,15 @@ export default function AssignmentScreen({ route, navigation }: Props) {
         {assignment.submission && (
           <View style={[s.card, s.submissionCard]}>
             <Text style={s.submissionTitle}>Your Submission</Text>
-            <StatusRow label="Status" value={assignment.submission.status} />
+            <StatusRow label="Status" value={assignment.submission.status} isStatus />
             {assignment.submission.score !== null && (
               <StatusRow label="Score" value={`${assignment.submission.score} / ${assignment.max_score}`} />
             )}
             {assignment.submission.passed && (
-              <Text style={s.passedTag}>✅ Passed</Text>
+              <View style={s.passedTag}>
+                <Ionicons name="checkmark-circle" size={14} color="#10b981" style={{ marginRight: 4 }} />
+                <Text style={s.passedTagText}>Passed</Text>
+              </View>
             )}
             {assignment.submission.feedback && (
               <View style={s.feedbackBox}>
@@ -173,9 +200,8 @@ export default function AssignmentScreen({ route, navigation }: Props) {
 
             <Text style={s.fieldLabel}>Attach File (optional)</Text>
             <TouchableOpacity style={s.filePickerBtn} onPress={pickFile}>
-              <Text style={s.filePickerText}>
-                {file ? `📎 ${file.name}` : '+ Choose file'}
-              </Text>
+              <Ionicons name={file ? 'attach-outline' : 'add-circle-outline'} size={16} color={Colors.primary} style={{ marginRight: 6 }} />
+              <Text style={s.filePickerText}>{file ? file.name : 'Choose file'}</Text>
             </TouchableOpacity>
             {file && (
               <TouchableOpacity onPress={() => setFile(null)}>
@@ -197,11 +223,12 @@ export default function AssignmentScreen({ route, navigation }: Props) {
   );
 }
 
-function StatusRow({ label, value }: { label: string; value: string }) {
+function StatusRow({ label, value, isStatus = false }: { label: string; value: string; isStatus?: boolean }) {
+  const color = isStatus ? (STATUS_COLORS[value] ?? Colors.textPrimary) : Colors.textPrimary;
   return (
     <View style={s.statusRow}>
       <Text style={s.statusLabel}>{label}:</Text>
-      <Text style={s.statusValue}>{value}</Text>
+      <Text style={[s.statusValue, { color }]}>{value}</Text>
     </View>
   );
 }
@@ -210,7 +237,7 @@ const s = StyleSheet.create({
   flex:             { flex: 1, backgroundColor: Colors.surface },
   center:           { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header:           { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: Spacing[12], paddingHorizontal: Spacing[4], paddingBottom: Spacing[3], backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  backLink:         { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium, width: 60 },
+  backLink:         { width: 60 },
   headerTitle:      { flex: 1, fontSize: Typography.sizes.base, fontWeight: Typography.weights.semibold, color: Colors.textPrimary, textAlign: 'center' },
   scroll:           { padding: Spacing[4] },
   card:             { backgroundColor: Colors.white, borderRadius: Radii.xl, padding: Spacing[4], marginBottom: Spacing[4], ...Shadows.sm },
@@ -229,7 +256,8 @@ const s = StyleSheet.create({
   statusRow:        { flexDirection: 'row', marginBottom: Spacing[2] },
   statusLabel:      { fontSize: Typography.sizes.sm, color: Colors.textMuted, width: 60 },
   statusValue:      { fontSize: Typography.sizes.sm, color: Colors.textPrimary, fontWeight: Typography.weights.medium, textTransform: 'capitalize' },
-  passedTag:        { fontSize: Typography.sizes.sm, color: Colors.success, fontWeight: Typography.weights.semibold, marginVertical: Spacing[2] },
+  passedTag:        { flexDirection: 'row', alignItems: 'center', marginVertical: Spacing[2] },
+  passedTagText:    { fontSize: Typography.sizes.sm, color: '#10b981', fontWeight: Typography.weights.semibold },
   feedbackBox:      { backgroundColor: Colors.surface, borderRadius: Radii.lg, padding: Spacing[3], marginTop: Spacing[2] },
   feedbackTitle:    { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.semibold, color: Colors.textPrimary, marginBottom: Spacing[1] },
   feedbackText:     { fontSize: Typography.sizes.sm, color: Colors.textSecondary },
@@ -237,8 +265,8 @@ const s = StyleSheet.create({
   formTitle:        { fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold, color: Colors.textPrimary, marginBottom: Spacing[4] },
   fieldLabel:       { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.medium, color: Colors.gray700, marginBottom: Spacing[1] },
   notesInput:       { borderWidth: 1, borderColor: Colors.gray300, borderRadius: Radii.lg, paddingHorizontal: Spacing[4], paddingTop: Spacing[3], fontSize: Typography.sizes.base, color: Colors.textPrimary, minHeight: 120, marginBottom: Spacing[4] },
-  filePickerBtn:    { borderWidth: 1.5, borderColor: Colors.primary, borderStyle: 'dashed', borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center', marginBottom: Spacing[2] },
-  filePickerText:   { color: Colors.primary, fontSize: Typography.sizes.base, fontWeight: Typography.weights.medium },
+  filePickerBtn:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: Colors.primary, borderStyle: 'dashed', borderRadius: Radii.lg, paddingVertical: Spacing[4], marginBottom: Spacing[2] },
+  filePickerText:   { color: Colors.primary, fontSize: Typography.sizes.base, fontWeight: Typography.weights.medium, flex: 1 },
   removeFile:       { color: Colors.error, fontSize: Typography.sizes.sm, textAlign: 'center', marginBottom: Spacing[3] },
   submitBtn:        { backgroundColor: Colors.primary, borderRadius: Radii.lg, paddingVertical: Spacing[4], alignItems: 'center', marginTop: Spacing[4] },
   submitBtnDisabled:{ opacity: 0.6 },

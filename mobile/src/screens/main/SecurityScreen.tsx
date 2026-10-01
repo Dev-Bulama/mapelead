@@ -4,6 +4,7 @@ import {
   StyleSheet, ScrollView, KeyboardAvoidingView, Platform,
   Alert, ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -38,7 +39,7 @@ function PwdField({ label, value, onChangeText, show, onToggle, placeholder }: {
           secureTextEntry={!show}
         />
         <TouchableOpacity onPress={onToggle} style={S.eyeBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <Text style={{ fontSize: 18 }}>{show ? '🙈' : '👁️'}</Text>
+          <Ionicons name={show ? 'eye-off-outline' : 'eye-outline'} size={18} color={Colors.gray400} />
         </TouchableOpacity>
       </View>
     </View>
@@ -132,8 +133,8 @@ export default function SecurityScreen({ navigation }: Props) {
     <KeyboardAvoidingView style={S.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       {/* Header */}
       <View style={S.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={S.back}>‹ Back</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 50 }}>
+          <Ionicons name="arrow-back" size={22} color={Colors.primary} />
         </TouchableOpacity>
         <Text style={S.headerTitle}>Security</Text>
         <View style={{ width: 50 }} />
@@ -143,7 +144,10 @@ export default function SecurityScreen({ navigation }: Props) {
 
         {/* ── Change Password ── */}
         <View style={S.card}>
-          <Text style={S.sectionTitle}>🔒 Change Password</Text>
+          <View style={S.sectionTitleRow}>
+            <Ionicons name="lock-closed-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
+            <Text style={S.sectionTitle}>Change Password</Text>
+          </View>
           <Text style={S.sectionSub}>Choose a strong password to keep your account secure</Text>
 
           <PwdField label="Current Password"      value={current}  onChangeText={setCurrent}  show={show.current}  onToggle={toggleShow('current')} />
@@ -166,7 +170,10 @@ export default function SecurityScreen({ navigation }: Props) {
         <View style={[S.card, { marginTop: Spacing[4] }]}>
           <View style={S.twoFAHeader}>
             <View style={{ flex: 1 }}>
-              <Text style={S.sectionTitle}>🔑 Two-Factor Authentication</Text>
+              <View style={S.sectionTitleRow}>
+                <Ionicons name="key-outline" size={18} color={Colors.primary} style={{ marginRight: 6 }} />
+                <Text style={S.sectionTitle}>Two-Factor Authentication</Text>
+              </View>
               <Text style={S.sectionSub}>
                 {is2FAEnabled
                   ? 'Your account has an extra layer of security.'
@@ -198,7 +205,7 @@ export default function SecurityScreen({ navigation }: Props) {
                   secureTextEntry={!showDisablePwd}
                 />
                 <TouchableOpacity onPress={() => setShowDisablePwd(v => !v)} style={S.eyeBtn}>
-                  <Text style={{ fontSize: 18 }}>{showDisablePwd ? '🙈' : '👁️'}</Text>
+                  <Ionicons name={showDisablePwd ? 'eye-off-outline' : 'eye-outline'} size={18} color={Colors.gray400} />
                 </TouchableOpacity>
               </View>
               <View style={S.disableActions}>
@@ -293,7 +300,8 @@ const S = StyleSheet.create({
   headerTitle:  { fontSize: Typography.sizes.lg, fontWeight: Typography.weights.semibold, color: Colors.textPrimary },
   scroll:       { padding: Spacing[4] },
   card:         { backgroundColor: Colors.white, borderRadius: Radii.xl, padding: Spacing[5], ...Shadows.sm, marginBottom: Spacing[4] },
-  sectionTitle: { fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold, color: Colors.textPrimary, marginBottom: 4 },
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  sectionTitle: { fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   sectionSub:   { fontSize: Typography.sizes.sm, color: Colors.textSecondary, marginBottom: Spacing[4] },
   field:        { marginBottom: Spacing[4] },
   label:        { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.medium, color: Colors.textSecondary, marginBottom: 6 },

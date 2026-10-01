@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, StyleSheet,
-  ActivityIndicator, Share, Linking, Alert,
+  ActivityIndicator, Share, Linking, Alert, RefreshControl,
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,7 +11,7 @@ import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 import type { ApiResponse, Certificate } from '@/types';
 
 export default function CertificatesScreen() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch, isRefetching } = useQuery({
     queryKey: ['certificates'],
     queryFn: () =>
       apiClient.get<ApiResponse<Certificate[]>>(API.CERTIFICATES).then((r) => r.data.data),
@@ -19,6 +19,18 @@ export default function CertificatesScreen() {
 
   if (isLoading) {
     return <View style={S.center}><ActivityIndicator color={Colors.primary} size="large" /></View>;
+  }
+
+  if (isError) {
+    return (
+      <View style={S.center}>
+        <Ionicons name="cloud-offline-outline" size={52} color={Colors.gray300} />
+        <Text style={S.emptyTitle}>Could not load certificates</Text>
+        <TouchableOpacity style={S.retryBtn} onPress={() => refetch()}>
+          <Text style={S.retryBtnText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
   }
 
   return (
@@ -39,6 +51,7 @@ export default function CertificatesScreen() {
           data={data}
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={S.list}
+          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={Colors.primary} />}
           renderItem={({ item }) => <CertCard cert={item} />}
         />
       )}
@@ -88,7 +101,7 @@ function CertCard({ cert }: { cert: Certificate }) {
 
       {/* Actions */}
       <View style={S.actions}>
-        <TouchableOpacity style={S.actionBtn} onPress={handleView}>
+        <TouchableOpacity style={[S.actionBtn, S.viewBtn]} onPress={handleView}>
           <Ionicons name="document-text-outline" size={16} color={Colors.white} />
         </TouchableOpacity>
         <TouchableOpacity style={[S.actionBtn, S.shareBtn]} onPress={handleShare}>
@@ -117,5 +130,8 @@ const S = StyleSheet.create({
   issuedAt:     { fontSize: 10, color: Colors.textMuted, marginTop: 2 },
   actions:      { flexDirection: 'column', gap: 6, marginLeft: Spacing[2] },
   actionBtn:    { width: 34, height: 34, borderRadius: 10, backgroundColor: Colors.gray100, alignItems: 'center', justifyContent: 'center' },
+  viewBtn:      { backgroundColor: Colors.navy },
   shareBtn:     { backgroundColor: Colors.primary },
+  retryBtn:     { marginTop: Spacing[4], backgroundColor: Colors.primary, borderRadius: Radii.xl, paddingHorizontal: Spacing[6], paddingVertical: Spacing[3] },
+  retryBtnText: { color: Colors.white, fontWeight: Typography.weights.semibold },
 });

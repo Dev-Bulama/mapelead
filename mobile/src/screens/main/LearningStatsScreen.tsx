@@ -110,8 +110,8 @@ export default function LearningStatsScreen({ navigation }: Props) {
   return (
     <View style={S.screen}>
       <View style={S.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={S.back}>‹ Back</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 50 }}>
+          <Ionicons name="arrow-back" size={22} color={Colors.primary} />
         </TouchableOpacity>
         <Text style={S.title}>Learning Stats</Text>
         <View style={{ width: 50 }} />
@@ -124,7 +124,7 @@ export default function LearningStatsScreen({ navigation }: Props) {
 
           {/* Streak hero */}
           <View style={S.streakHero}>
-            <Text style={S.fireIcon}>🔥</Text>
+            <Ionicons name="flame" size={44} color={Colors.cyan} style={{ marginBottom: Spacing[2] }} />
             <Text style={S.streakCount}>{currentStreak}</Text>
             <Text style={S.streakLabel}>Day Streak</Text>
             {currentStreak > 0 && (
@@ -196,11 +196,10 @@ const S = StyleSheet.create({
   screen:       { flex: 1, backgroundColor: Colors.surface },
   center:       { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: Colors.white, paddingHorizontal: Spacing[4], paddingTop: 56, paddingBottom: Spacing[3], borderBottomWidth: 1, borderBottomColor: Colors.gray100 },
-  back:         { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium, width: 50 },
+  back:         { width: 50 },
   title:        { fontSize: Typography.sizes.lg, fontWeight: Typography.weights.semibold, color: Colors.textPrimary },
   scroll:       { padding: Spacing[4] },
   streakHero:   { backgroundColor: Colors.navy, borderRadius: Radii['2xl'], padding: Spacing[6], alignItems: 'center', marginBottom: Spacing[4] },
-  fireIcon:     { fontSize: 44, marginBottom: Spacing[2] },
   streakCount:  { fontSize: 64, fontWeight: Typography.weights.extrabold, color: Colors.white, lineHeight: 72 },
   streakLabel:  { fontSize: Typography.sizes.base, color: 'rgba(255,255,255,0.7)', marginTop: 4 },
   streakMsg:    { fontSize: Typography.sizes.sm, color: Colors.cyan, marginTop: Spacing[2], fontWeight: Typography.weights.medium },

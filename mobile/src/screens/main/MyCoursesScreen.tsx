@@ -45,6 +45,12 @@ export default function MyCoursesScreen() {
           <Text style={styles.emptySubtitle}>
             Explore courses and enroll to get started
           </Text>
+          <TouchableOpacity
+            style={styles.exploreBtn}
+            onPress={() => navigation.navigate('Main', { screen: 'Explore' } as any)}
+          >
+            <Text style={styles.exploreBtnText}>Explore Courses</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -109,6 +115,8 @@ const styles = StyleSheet.create({
   empty:            { flex: 1, justifyContent: 'center', alignItems: 'center', padding: Spacing[8], gap: Spacing[4] },
   emptyTitle:       { fontSize: Typography.sizes.xl, fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   emptySubtitle:    { fontSize: Typography.sizes.base, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing[2] },
+  exploreBtn:       { marginTop: Spacing[4], backgroundColor: Colors.primary, borderRadius: Radii.xl, paddingHorizontal: Spacing[6], paddingVertical: Spacing[3] },
+  exploreBtnText:   { color: Colors.white, fontWeight: Typography.weights.semibold, fontSize: Typography.sizes.base },
   card:             { flexDirection: 'row', backgroundColor: Colors.white, borderRadius: Radii.xl, marginBottom: Spacing[4], overflow: 'hidden', ...Shadows.sm },
   thumbnail:        { width: 100, height: 90 },
   thumbnailFallback:{ backgroundColor: Colors.gray200 },

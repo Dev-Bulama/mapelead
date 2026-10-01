@@ -4,9 +4,13 @@ import {
   ActivityIndicator, Alert, Linking,
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
+import type { RootStackParamList } from '@/types';
+
+type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export const DOWNLOADS_DIR = (FileSystem.documentDirectory ?? '') + 'mapelead_downloads/';
 
@@ -76,6 +80,7 @@ function fileIcon(name: string): IoniconsName {
 }
 
 export default function DownloadsScreen() {
+  const navigation = useNavigation<Nav>();
   const [files,   setFiles]   = useState<DownloadedFile[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -130,6 +135,12 @@ export default function DownloadsScreen() {
           <Text style={S.emptyText}>
             Tap "Download Attachment" on any lesson to save it here for offline viewing.
           </Text>
+          <TouchableOpacity
+            style={S.browseBtn}
+            onPress={() => navigation.navigate('Main', { screen: 'MyLearning' } as any)}
+          >
+            <Text style={S.browseBtnText}>Go to My Courses</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -169,6 +180,8 @@ const S = StyleSheet.create({
   empty:      { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing[8], gap: Spacing[4] },
   emptyTitle: { fontSize: Typography.sizes.xl, fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   emptyText:  { fontSize: Typography.sizes.sm, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing[2], lineHeight: 22 },
+  browseBtn:  { marginTop: Spacing[4], backgroundColor: Colors.primary, borderRadius: Radii.xl, paddingHorizontal: Spacing[6], paddingVertical: Spacing[3] },
+  browseBtnText: { color: Colors.white, fontWeight: Typography.weights.semibold, fontSize: Typography.sizes.base },
   list:       { padding: Spacing[4], gap: Spacing[3] },
   card:       { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.white, borderRadius: Radii.xl, padding: Spacing[4], gap: Spacing[3], ...Shadows.sm },
   iconWrap:   { width: 50, height: 50, borderRadius: 12, backgroundColor: Colors.gray100, alignItems: 'center', justifyContent: 'center' },
