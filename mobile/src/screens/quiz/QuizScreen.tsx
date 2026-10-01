@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { extractApiError } from '@/api/client';
@@ -37,10 +38,19 @@ export default function QuizScreen({ route, navigation }: Props) {
   const [result,        setResult]         = useState<SubmitResult | null>(null);
   const startedAt = useRef<Date>(new Date());
 
+  interface QuizAttempt { id: number; attempt_number: number; score_percent: number; passed: boolean; completed_at: string | null }
+
   const { data: quiz, isLoading } = useQuery({
     queryKey: ['quiz', quizId],
     queryFn: () =>
       apiClient.get<ApiResponse<QuizData>>(API.QUIZ(quizId)).then((r) => r.data.data),
+  });
+
+  const { data: attemptHistory } = useQuery({
+    queryKey: ['quiz-attempts', quizId],
+    queryFn: () =>
+      apiClient.get<ApiResponse<QuizAttempt[]>>(API.QUIZ_ATTEMPTS(quizId)).then((r) => r.data.data),
+    enabled: !!quiz && quiz.attempts_taken > 0,
   });
 
   // Timer
@@ -137,7 +147,12 @@ export default function QuizScreen({ route, navigation }: Props) {
     return (
       <View style={s.flex}>
         <View style={[s.resultHero, result.passed ? s.resultPass : s.resultFail]}>
-          <Text style={s.resultEmoji}>{result.passed ? '🎉' : '📚'}</Text>
+          <Ionicons
+            name={result.passed ? 'trophy-outline' : 'book-outline'}
+            size={52}
+            color={Colors.white}
+            style={{ marginBottom: Spacing[2] }}
+          />
           <Text style={s.resultTitle}>{result.passed ? 'You Passed!' : 'Not quite yet'}</Text>
           <Text style={s.resultScore}>{result.score_percent.toFixed(0)}%</Text>
           <Text style={s.resultMeta}>
@@ -200,7 +215,7 @@ export default function QuizScreen({ route, navigation }: Props) {
         </View>
         <ScrollView contentContainerStyle={s.preCenterScroll}>
           <View style={s.preCard}>
-            <Text style={s.preEmoji}>📝</Text>
+            <Ionicons name="help-circle-outline" size={52} color={Colors.primary} style={{ marginBottom: Spacing[3] }} />
             <Text style={s.preTitle}>{quiz.title}</Text>
             {quiz.description && <Text style={s.preDesc}>{quiz.description}</Text>}
             <View style={s.preStats}>
@@ -214,7 +229,21 @@ export default function QuizScreen({ route, navigation }: Props) {
             )}
             {quiz.has_passed && (
               <View style={s.passedBadge}>
-                <Text style={s.passedBadgeText}>✅ You have already passed this quiz</Text>
+                <Ionicons name="checkmark-circle" size={16} color={Colors.success} style={{ marginRight: 6 }} />
+                <Text style={s.passedBadgeText}>You have already passed this quiz</Text>
+              </View>
+            )}
+            {attemptHistory && attemptHistory.length > 0 && (
+              <View style={s.historyBox}>
+                <Text style={s.historyTitle}>Previous Attempts</Text>
+                {attemptHistory.map((a) => (
+                  <View key={a.id} style={s.historyRow}>
+                    <Text style={s.historyAttempt}>Attempt {a.attempt_number}</Text>
+                    <Text style={[s.historyScore, { color: a.passed ? Colors.success : Colors.error }]}>
+                      {a.score_percent.toFixed(0)}% {a.passed ? '✓' : '✗'}
+                    </Text>
+                  </View>
+                ))}
               </View>
             )}
             <TouchableOpacity
@@ -330,7 +359,6 @@ const s = StyleSheet.create({
   backLink:           { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium },
   preCenterScroll:    { flexGrow: 1, justifyContent: 'center', padding: Spacing[4] },
   preCard:            { backgroundColor: Colors.white, borderRadius: Radii['2xl'], padding: Spacing[6], ...Shadows.md, alignItems: 'center' },
-  preEmoji:           { fontSize: 48, marginBottom: Spacing[4] },
   preTitle:           { fontSize: Typography.sizes.xl, fontWeight: Typography.weights.bold, color: Colors.textPrimary, textAlign: 'center', marginBottom: Spacing[2] },
   preDesc:            { fontSize: Typography.sizes.sm, color: Colors.textSecondary, textAlign: 'center', marginBottom: Spacing[4] },
   preStats:           { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: Spacing[3], marginBottom: Spacing[4] },
@@ -338,8 +366,13 @@ const s = StyleSheet.create({
   preStatValue:       { fontSize: Typography.sizes.lg, fontWeight: Typography.weights.bold, color: Colors.primary },
   preStatLabel:       { fontSize: Typography.sizes.xs, color: Colors.textMuted, marginTop: 2 },
   preAttempt:         { fontSize: Typography.sizes.sm, color: Colors.textMuted, marginBottom: Spacing[3] },
-  passedBadge:        { backgroundColor: '#f0fdf4', borderRadius: Radii.lg, padding: Spacing[3], marginBottom: Spacing[4] },
+  passedBadge:        { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f0fdf4', borderRadius: Radii.lg, padding: Spacing[3], marginBottom: Spacing[4] },
   passedBadgeText:    { color: Colors.success, fontSize: Typography.sizes.sm, fontWeight: Typography.weights.medium },
+  historyBox:         { width: '100%', backgroundColor: Colors.surface, borderRadius: Radii.lg, padding: Spacing[3], marginBottom: Spacing[4] },
+  historyTitle:       { fontSize: Typography.sizes.xs, fontWeight: Typography.weights.bold, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: Spacing[2] },
+  historyRow:         { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: Spacing[2], borderBottomWidth: 1, borderBottomColor: Colors.gray100 },
+  historyAttempt:     { fontSize: Typography.sizes.sm, color: Colors.textSecondary },
+  historyScore:       { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.semibold },
   startBtn:           { backgroundColor: Colors.primary, borderRadius: Radii.lg, paddingVertical: Spacing[4], paddingHorizontal: Spacing[8], marginTop: Spacing[2] },
   startBtnText:       { color: Colors.white, fontSize: Typography.sizes.base, fontWeight: Typography.weights.bold },
 
@@ -381,7 +414,6 @@ const s = StyleSheet.create({
   resultHero:         { alignItems: 'center', paddingVertical: Spacing[8], paddingHorizontal: Spacing[4] },
   resultPass:         { backgroundColor: Colors.success },
   resultFail:         { backgroundColor: Colors.primary },
-  resultEmoji:        { fontSize: 48, marginBottom: Spacing[3] },
   resultTitle:        { fontSize: Typography.sizes['2xl'], fontWeight: Typography.weights.bold, color: Colors.white },
   resultScore:        { fontSize: 64, fontWeight: Typography.weights.extrabold, color: Colors.white, lineHeight: 72, marginVertical: Spacing[2] },
   resultMeta:         { fontSize: Typography.sizes.base, color: 'rgba(255,255,255,0.85)' },

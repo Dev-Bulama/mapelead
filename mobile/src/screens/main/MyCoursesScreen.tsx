@@ -16,7 +16,7 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 export default function MyCoursesScreen() {
   const navigation = useNavigation<Nav>();
 
-  const { data, isLoading, refetch } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['enrollments'],
     queryFn:  () => enrollmentsApi.myCourses().then((r) => r.data.data),
   });
@@ -25,6 +25,18 @@ export default function MyCoursesScreen() {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={styles.center}>
+        <Ionicons name="cloud-offline-outline" size={52} color={Colors.gray300} />
+        <Text style={[styles.emptyTitle, { marginTop: 12 }]}>Could not load courses</Text>
+        <TouchableOpacity style={styles.exploreBtn} onPress={() => refetch()}>
+          <Text style={styles.exploreBtnText}>Retry</Text>
+        </TouchableOpacity>
       </View>
     );
   }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, TextInput,
-  StyleSheet, ActivityIndicator, Alert, Image,
+  StyleSheet, ActivityIndicator, Alert, Image, Linking,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -19,6 +19,7 @@ interface SubmissionDetail {
   status: string;
   notes: string | null;
   file_name: string | null;
+  file_url: string | null;
   has_file: boolean;
   score: number | null;
   feedback: string | null;
@@ -45,13 +46,15 @@ export default function InstructorGradingScreen({ route, navigation }: Props) {
     queryFn: () =>
       apiClient.get<ApiResponse<SubmissionDetail>>(API.INSTRUCTOR_SUBMISSION(submissionId))
         .then(r => r.data.data),
-    onSuccess: (data) => {
-      if (data.score !== null && !edited) {
-        setScore(String(data.score));
-        setFeedback(data.feedback ?? '');
-      }
-    },
-  } as any);
+  });
+
+  // Pre-fill form once data arrives (replaces deprecated onSuccess)
+  React.useEffect(() => {
+    if (sub?.score !== null && sub?.score !== undefined && !edited) {
+      setScore(String(sub.score));
+      setFeedback(sub.feedback ?? '');
+    }
+  }, [sub?.id]);
 
   const { mutate: grade, isPending: grading } = useMutation({
     mutationFn: () => apiClient.put(API.INSTRUCTOR_GRADE(submissionId), {
@@ -90,8 +93,8 @@ export default function InstructorGradingScreen({ route, navigation }: Props) {
   return (
     <View style={S.screen}>
       <View style={S.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={S.back}>‹ Back</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 60 }}>
+          <Ionicons name="arrow-back" size={22} color={Colors.primary} />
         </TouchableOpacity>
         <Text style={S.headerTitle}>Grade Submission</Text>
         <View style={{ width: 60 }} />
@@ -148,10 +151,17 @@ export default function InstructorGradingScreen({ route, navigation }: Props) {
             <Text style={S.noNotes}>No written notes</Text>
           )}
           {sub.has_file && (
-            <View style={S.fileRow}>
+            <TouchableOpacity
+              style={S.fileRow}
+              onPress={() => sub.file_url && Linking.openURL(sub.file_url).catch(() => Alert.alert('Error', 'Could not open file.'))}
+              disabled={!sub.file_url}
+            >
               <Ionicons name="attach-outline" size={16} color={Colors.primary} />
               <Text style={S.fileName}>{sub.file_name ?? 'Attachment'}</Text>
-            </View>
+              {sub.file_url && (
+                <Ionicons name="open-outline" size={14} color={Colors.primary} style={{ marginLeft: 'auto' }} />
+              )}
+            </TouchableOpacity>
           )}
           {!sub.notes && !sub.has_file && (
             <Text style={S.noNotes}>No content submitted</Text>
@@ -223,7 +233,6 @@ const S = StyleSheet.create({
   screen:           { flex: 1, backgroundColor: Colors.surface },
   center:           { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header:           { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: Colors.white, paddingHorizontal: Spacing[4], paddingTop: 56, paddingBottom: Spacing[3], borderBottomWidth: 1, borderBottomColor: Colors.gray100 },
-  back:             { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium, width: 60 },
   headerTitle:      { fontSize: Typography.sizes.lg, fontWeight: Typography.weights.semibold, color: Colors.textPrimary },
   scroll:           { padding: Spacing[4] },
   card:             { backgroundColor: Colors.white, borderRadius: Radii.xl, padding: Spacing[4], marginBottom: Spacing[4], ...Shadows.sm },

@@ -133,6 +133,7 @@ class InstructorApiController extends Controller
             'notes'        => $submission->notes,
             'file_name'    => $submission->file_name,
             'has_file'     => !empty($submission->file_path),
+            'file_url'     => $submission->file_path ? asset('storage/' . $submission->file_path) : null,
             'score'        => $submission->score,
             'feedback'     => $submission->feedback,
             'passed'       => $submission->score !== null ? $submission->passed() : null,
@@ -169,8 +170,9 @@ class InstructorApiController extends Controller
             return $this->error('Submission not found', 404);
         }
 
+        $maxScore = $submission->assignment?->max_score ?? 9999;
         $request->validate([
-            'score'    => 'required|numeric|min:0',
+            'score'    => "required|numeric|min:0|max:{$maxScore}",
             'feedback' => 'nullable|string|max:2000',
         ]);
 
