@@ -36,6 +36,13 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
         Route::post('/login',    [AuthApiController::class, 'login']);
         Route::post('/register', [AuthApiController::class, 'register']);
         Route::post('/logout',   [AuthApiController::class, 'logout'])->middleware('auth:sanctum');
+
+        // 2FA management (requires authentication)
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::get('/2fa/setup',    [AuthApiController::class, 'twoFactorSetup']);
+            Route::post('/2fa/enable',  [AuthApiController::class, 'twoFactorEnable']);
+            Route::delete('/2fa/disable', [AuthApiController::class, 'twoFactorDisable']);
+        });
     });
 
     // ── Protected (Sanctum token required) ────────────────────────────────────

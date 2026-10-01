@@ -7,6 +7,7 @@ export interface User {
   full_name: string;
   email: string;
   phone: string | null;
+  bio?: string | null;
   avatar_url: string | null;
   email_verified: boolean;
   two_factor_enabled: boolean;
@@ -215,7 +216,7 @@ export type AuthStackParamList = {
 
 export type MainTabParamList = {
   Home:       undefined;
-  Explore:    undefined;
+  Explore:    { query?: string } | undefined;
   MyLearning: undefined;
   Downloads:  undefined;
   Profile:    undefined;

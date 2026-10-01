@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, FlatList, TouchableOpacity, Image,
   StyleSheet, ActivityIndicator, ScrollView, Modal,
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { coursesApi, CourseFilters } from '@/api/courses';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
-import type { Course, CourseCategory, RootStackParamList } from '@/types';
+import type { Course, CourseCategory, RootStackParamList, MainTabParamList } from '@/types';
 
-type Nav = NativeStackNavigationProp<RootStackParamList>;
+type Nav   = NativeStackNavigationProp<RootStackParamList>;
+type Route = RouteProp<MainTabParamList, 'Explore'>;
 
 const LEVELS = ['beginner', 'intermediate', 'advanced'] as const;
 type Level = typeof LEVELS[number];
@@ -26,8 +27,15 @@ function useDebounce<T>(value: T, delay: number): T {
 
 export default function ExploreScreen() {
   const navigation = useNavigation<Nav>();
-  const [search, setSearch]                     = useState('');
+  const route      = useRoute<Route>();
+
+  const [search, setSearch]                     = useState(route.params?.query ?? '');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Sync if navigated to with a new query
+  useEffect(() => {
+    if (route.params?.query) setSearch(route.params.query);
+  }, [route.params?.query]);
   const [levelFilter, setLevelFilter]           = useState<Level | null>(null);
   const [priceFilter, setPriceFilter]           = useState<'free' | 'paid' | null>(null);
   const [filterModal, setFilterModal]           = useState(false);

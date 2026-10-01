@@ -246,7 +246,14 @@ export default function HomeScreen() {
     : 0;
 
   const handleSearchSubmit = () => {
-    if (search.trim()) navigation.navigate('CourseDetail', { slug: search.trim() });
+    if (search.trim()) {
+      // Navigate to the Explore tab inside the Main tab stack
+      navigation.navigate('Main', {
+        screen: 'Main',
+        params: { screen: 'Explore', params: { query: search.trim() } },
+      } as any);
+      setSearch('');
+    }
   };
 
   return (

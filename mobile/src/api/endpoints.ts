@@ -68,4 +68,9 @@ export const API = {
 
   // Admin
   ADMIN_INSTRUCTOR_CODES:  '/admin/instructor-codes',
+
+  // 2FA
+  TWO_FA_SETUP:    '/auth/2fa/setup',
+  TWO_FA_ENABLE:   '/auth/2fa/enable',
+  TWO_FA_DISABLE:  '/auth/2fa/disable',
 } as const;

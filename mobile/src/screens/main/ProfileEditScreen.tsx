@@ -24,7 +24,7 @@ export default function ProfileEditScreen({ navigation }: Props) {
     first_name:    user?.first_name ?? '',
     last_name:     user?.last_name  ?? '',
     phone:         user?.phone      ?? '',
-    bio:           (user as any)?.bio ?? '',
+    bio:           user?.bio ?? '',
   });
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
 
@@ -124,7 +124,7 @@ export default function ProfileEditScreen({ navigation }: Props) {
         </View>
 
         {/* Change password link */}
-        <TouchableOpacity style={s.changePasswordBtn}>
+        <TouchableOpacity style={s.changePasswordBtn} onPress={() => navigation.navigate('Security')}>
           <Text style={s.changePasswordText}>🔒 Change Password</Text>
         </TouchableOpacity>
       </ScrollView>

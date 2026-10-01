@@ -164,6 +164,100 @@ class AuthApiController extends Controller
         return $this->success([], message: 'Password changed successfully');
     }
 
+    public function twoFactorSetup(Request $request): JsonResponse
+    {
+        $user      = $request->user();
+        $google2fa = new Google2FA();
+
+        // Generate a new secret (not yet saved — user must verify first)
+        $secret = $google2fa->generateSecretKey();
+
+        $otpauthUrl = $google2fa->getQRCodeUrl(
+            config('app.name', 'MAPELEAD'),
+            $user->email,
+            $secret
+        );
+
+        $qrSvg = '';
+        try {
+            $renderer = new \BaconQrCode\Renderer\Image\SvgImageBackEnd();
+            $writer   = new \BaconQrCode\Writer(
+                new \BaconQrCode\Renderer\ImageRenderer(
+                    new \BaconQrCode\Renderer\RendererStyle\RendererStyle(200),
+                    $renderer
+                )
+            );
+            $qrSvg = $writer->writeString($otpauthUrl);
+        } catch (\Throwable) {
+            // If QR generation fails, return the URL for manual use
+        }
+
+        // Store pending secret in session/cache keyed by user id (valid for 10 min)
+        \Illuminate\Support\Facades\Cache::put(
+            '2fa_pending:' . $user->id,
+            $secret,
+            now()->addMinutes(10)
+        );
+
+        return $this->success([
+            'manual_entry_key' => $secret,
+            'otpauth_url'      => $otpauthUrl,
+            'qr_code_svg'      => $qrSvg,
+        ]);
+    }
+
+    public function twoFactorEnable(Request $request): JsonResponse
+    {
+        $request->validate(['totp_code' => 'required|string|size:6']);
+
+        $user      = $request->user();
+        $secret    = \Illuminate\Support\Facades\Cache::get('2fa_pending:' . $user->id);
+
+        if (!$secret) {
+            return $this->error('Setup session expired. Please restart 2FA setup.', 422);
+        }
+
+        $google2fa = new Google2FA();
+        if (!$google2fa->verifyKey($secret, $request->totp_code)) {
+            return $this->error('Invalid code. Please check your authenticator app and try again.', 422);
+        }
+
+        $user->update([
+            'two_factor_secret'  => encrypt($secret),
+            'two_factor_enabled' => true,
+        ]);
+
+        \Illuminate\Support\Facades\Cache::forget('2fa_pending:' . $user->id);
+
+        return $this->success(
+            $this->formatUser($user),
+            200,
+            'Two-factor authentication enabled successfully'
+        );
+    }
+
+    public function twoFactorDisable(Request $request): JsonResponse
+    {
+        $request->validate(['password' => 'required|string']);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->password, $user->password)) {
+            return $this->error('Incorrect password.', 422);
+        }
+
+        $user->update([
+            'two_factor_secret'  => null,
+            'two_factor_enabled' => false,
+        ]);
+
+        return $this->success(
+            $this->formatUser($user),
+            200,
+            'Two-factor authentication disabled'
+        );
+    }
+
     private function formatUser(User $user, bool $detailed = false): array
     {
         $data = [
@@ -173,6 +267,7 @@ class AuthApiController extends Controller
             'full_name'          => $user->full_name,
             'email'              => $user->email,
             'phone'              => $user->phone,
+            'bio'                => $user->bio,
             'avatar_url'         => $user->avatar_url,
             'email_verified'     => !is_null($user->email_verified_at),
             'two_factor_enabled' => (bool) $user->two_factor_enabled,
