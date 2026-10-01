@@ -4,6 +4,7 @@ import {
   ActivityIndicator, Share, Linking, Alert,
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
@@ -29,7 +30,7 @@ export default function CertificatesScreen() {
 
       {!data?.length ? (
         <View style={S.empty}>
-          <Text style={S.emptyIcon}>🏆</Text>
+          <Ionicons name="ribbon-outline" size={56} color={Colors.gray300} />
           <Text style={S.emptyTitle}>No certificates yet</Text>
           <Text style={S.emptySubtitle}>Complete a course to earn your first certificate</Text>
         </View>
@@ -71,9 +72,9 @@ function CertCard({ cert }: { cert: Certificate }) {
 
   return (
     <View style={S.card}>
-      {/* Trophy badge */}
+      {/* Certificate badge */}
       <View style={S.badge}>
-        <Text style={{ fontSize: 26 }}>🏆</Text>
+        <Ionicons name="ribbon" size={26} color={Colors.primary} />
       </View>
 
       {/* Info */}
@@ -88,10 +89,10 @@ function CertCard({ cert }: { cert: Certificate }) {
       {/* Actions */}
       <View style={S.actions}>
         <TouchableOpacity style={S.actionBtn} onPress={handleView}>
-          <Text style={S.actionIcon}>📄</Text>
+          <Ionicons name="document-text-outline" size={16} color={Colors.white} />
         </TouchableOpacity>
         <TouchableOpacity style={[S.actionBtn, S.shareBtn]} onPress={handleShare}>
-          <Text style={S.actionIcon}>↗</Text>
+          <Ionicons name="share-outline" size={16} color={Colors.white} />
         </TouchableOpacity>
       </View>
     </View>
@@ -104,8 +105,7 @@ const S = StyleSheet.create({
   title:        { fontSize: Typography.sizes['2xl'], fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   subtitle:     { fontSize: Typography.sizes.sm, color: Colors.textSecondary, marginTop: 2 },
   center:       { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  empty:        { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: Spacing[8] },
-  emptyIcon:    { fontSize: 56, marginBottom: Spacing[4] },
+  empty:        { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: Spacing[8], gap: Spacing[4] },
   emptyTitle:   { fontSize: Typography.sizes.xl, fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   emptySubtitle:{ fontSize: Typography.sizes.sm, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing[2] },
   list:         { padding: Spacing[4], gap: Spacing[3] },
@@ -118,5 +118,4 @@ const S = StyleSheet.create({
   actions:      { flexDirection: 'column', gap: 6, marginLeft: Spacing[2] },
   actionBtn:    { width: 34, height: 34, borderRadius: 10, backgroundColor: Colors.gray100, alignItems: 'center', justifyContent: 'center' },
   shareBtn:     { backgroundColor: Colors.primary },
-  actionIcon:   { fontSize: 15 },
 });

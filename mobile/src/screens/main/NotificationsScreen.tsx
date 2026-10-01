@@ -6,6 +6,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
@@ -14,15 +15,16 @@ import type { ApiResponse, Notification, RootStackParamList } from '@/types';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const TYPE_ICONS: Record<string, string> = {
-  course:       '📚',
-  assignment:   '📋',
-  quiz:         '🧠',
-  payment:      '💳',
-  certificate:  '🏆',
-  grade:        '⭐',
-  announcement: '📢',
-  default:      '🔔',
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+const TYPE_ICONS: Record<string, IoniconsName> = {
+  course:       'book-outline',
+  assignment:   'clipboard-outline',
+  quiz:         'help-circle-outline',
+  payment:      'card-outline',
+  certificate:  'ribbon-outline',
+  grade:        'star-outline',
+  announcement: 'megaphone-outline',
+  default:      'notifications-outline',
 };
 
 export default function NotificationsScreen() {
@@ -91,7 +93,7 @@ export default function NotificationsScreen() {
 
       {!data?.length ? (
         <View style={S.empty}>
-          <Text style={S.emptyIcon}>🔔</Text>
+          <Ionicons name="notifications-outline" size={52} color={Colors.gray300} />
           <Text style={S.emptyTitle}>All caught up!</Text>
           <Text style={S.emptyText}>No notifications yet. Keep learning!</Text>
         </View>
@@ -128,7 +130,7 @@ function NotifRow({ notif, onTap }: { notif: Notification; onTap: () => void }) 
     >
       {!notif.is_read && <View style={S.unreadDot} />}
       <View style={S.iconWrap}>
-        <Text style={{ fontSize: 22 }}>{icon}</Text>
+        <Ionicons name={icon} size={20} color={Colors.primary} />
       </View>
       <View style={S.content}>
         <Text style={[S.notifTitle, !notif.is_read && S.notifTitleUnread]} numberOfLines={1}>
@@ -151,8 +153,7 @@ const S = StyleSheet.create({
   markAllBtn:     { backgroundColor: Colors.gray100, borderRadius: Radii.full, paddingHorizontal: Spacing[3], paddingVertical: 6 },
   markAllText:    { fontSize: Typography.sizes.xs, color: Colors.primary, fontWeight: Typography.weights.semibold },
   list:           { padding: Spacing[4], gap: Spacing[2] },
-  empty:          { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing[8] },
-  emptyIcon:      { fontSize: 52, marginBottom: Spacing[4] },
+  empty:          { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing[8], gap: Spacing[3] },
   emptyTitle:     { fontSize: Typography.sizes.xl, fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   emptyText:      { fontSize: Typography.sizes.sm, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing[2] },
   card:           { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: Colors.white, borderRadius: Radii.xl, padding: Spacing[4], ...Shadows.sm, position: 'relative' },

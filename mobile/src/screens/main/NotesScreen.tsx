@@ -6,6 +6,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
@@ -61,8 +62,8 @@ export default function NotesScreen() {
   return (
     <View style={S.screen}>
       <View style={S.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={S.back}>‹ Back</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={S.backBtn}>
+          <Ionicons name="chevron-back" size={22} color={Colors.primary} />
         </TouchableOpacity>
         <Text style={S.headerTitle}>My Notes</Text>
         <Text style={S.count}>{(data ?? []).length}</Text>
@@ -91,14 +92,14 @@ export default function NotesScreen() {
                 <Text style={S.goToLesson}>Go to lesson →</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleDelete(item)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                <Text style={S.deleteBtn}>🗑</Text>
+                <Ionicons name="trash-outline" size={17} color={Colors.error} />
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
         )}
         ListEmptyComponent={
           <View style={S.empty}>
-            <Text style={{ fontSize: 44 }}>📝</Text>
+            <Ionicons name="document-text-outline" size={52} color={Colors.gray300} />
             <Text style={S.emptyTitle}>No notes yet</Text>
             <Text style={S.emptySub}>Take notes while studying lessons and find them all here</Text>
           </View>
@@ -118,7 +119,7 @@ export default function NotesScreen() {
             <View style={S.modalTitleRow}>
               <Text style={S.modalLessonTitle} numberOfLines={2}>{selectedNote?.lesson?.title}</Text>
               <TouchableOpacity onPress={() => setSelectedNote(null)}>
-                <Text style={{ fontSize: 24, color: Colors.gray400 }}>×</Text>
+                <Ionicons name="close" size={24} color={Colors.gray400} />
               </TouchableOpacity>
             </View>
             <Text style={S.modalDate}>{formatDate(selectedNote?.updated_at ?? '')}</Text>
@@ -139,7 +140,7 @@ const S = StyleSheet.create({
   screen:           { flex: 1, backgroundColor: Colors.surface },
   center:           { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header:           { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing[4], paddingTop: Spacing[12], paddingBottom: Spacing[3], backgroundColor: Colors.white, borderBottomWidth: 1, borderBottomColor: Colors.gray100 },
-  back:             { fontSize: Typography.sizes.base, color: Colors.primary, fontWeight: Typography.weights.medium, width: 60 },
+  backBtn:          { width: 40, alignItems: 'flex-start' },
   headerTitle:      { fontSize: Typography.sizes.lg, fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   count:            { fontSize: Typography.sizes.sm, color: Colors.textMuted, width: 60, textAlign: 'right' },
   list:             { padding: Spacing[4] },
@@ -150,7 +151,6 @@ const S = StyleSheet.create({
   preview:          { fontSize: Typography.sizes.sm, color: Colors.textSecondary, lineHeight: 20 },
   cardFooter:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: Spacing[3] },
   goToLesson:       { fontSize: Typography.sizes.xs, color: Colors.primary, fontWeight: Typography.weights.medium },
-  deleteBtn:        { fontSize: 16 },
   empty:            { alignItems: 'center', paddingTop: Spacing[12], gap: Spacing[3] },
   emptyTitle:       { fontSize: Typography.sizes.lg, fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   emptySub:         { fontSize: Typography.sizes.sm, color: Colors.textMuted, textAlign: 'center', paddingHorizontal: Spacing[8] },

@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
@@ -24,11 +25,12 @@ interface Payment {
   course: { title: string; slug: string } | null;
 }
 
-const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string; icon: string }> = {
-  paid:     { color: Colors.success, bg: '#dcfce7', label: 'Paid',     icon: '✅' },
-  pending:  { color: '#d97706',      bg: '#fef3c7', label: 'Pending',  icon: '⏳' },
-  failed:   { color: Colors.error,   bg: '#fee2e2', label: 'Failed',   icon: '❌' },
-  refunded: { color: Colors.gray500, bg: Colors.gray100, label: 'Refunded', icon: '↩️' },
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string; icon: IoniconsName }> = {
+  paid:     { color: Colors.success, bg: '#dcfce7', label: 'Paid',     icon: 'checkmark-circle' },
+  pending:  { color: '#d97706',      bg: '#fef3c7', label: 'Pending',  icon: 'time' },
+  failed:   { color: Colors.error,   bg: '#fee2e2', label: 'Failed',   icon: 'close-circle' },
+  refunded: { color: Colors.gray500, bg: Colors.gray100, label: 'Refunded', icon: 'return-down-back-outline' },
 };
 
 export default function PaymentHistoryScreen({ navigation }: Props) {
@@ -63,7 +65,7 @@ export default function PaymentHistoryScreen({ navigation }: Props) {
         <View style={S.center}><ActivityIndicator color={Colors.primary} size="large" /></View>
       ) : !payments.length ? (
         <View style={S.empty}>
-          <Text style={S.emptyIcon}>💳</Text>
+          <Ionicons name="card-outline" size={52} color={Colors.gray300} />
           <Text style={S.emptyTitle}>No transactions yet</Text>
           <Text style={S.emptyText}>Your payment history will appear here after you enroll in a paid course.</Text>
         </View>
@@ -93,7 +95,8 @@ function PaymentRow({ payment }: { payment: Payment }) {
         <View>
           <Text style={S.amount}>{formatCurrency(payment.amount)}</Text>
           <View style={[S.statusBadge, { backgroundColor: cfg.bg }]}>
-            <Text style={[S.statusText, { color: cfg.color }]}>{cfg.icon} {cfg.label}</Text>
+            <Ionicons name={cfg.icon} size={11} color={cfg.color} />
+            <Text style={[S.statusText, { color: cfg.color }]}>{cfg.label}</Text>
           </View>
         </View>
       </View>
@@ -117,8 +120,7 @@ const S = StyleSheet.create({
   summaryAmount: { fontSize: Typography.sizes['3xl'], fontWeight: Typography.weights.extrabold, color: Colors.white, marginTop: 4 },
   summaryNote:   { fontSize: Typography.sizes.xs, color: 'rgba(255,255,255,0.6)', marginTop: 6 },
   center:        { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  empty:         { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: Spacing[8] },
-  emptyIcon:     { fontSize: 52, marginBottom: Spacing[4] },
+  empty:         { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: Spacing[8], gap: Spacing[4] },
   emptyTitle:    { fontSize: Typography.sizes.xl, fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   emptyText:     { fontSize: Typography.sizes.sm, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing[2], lineHeight: 22 },
   list:          { padding: Spacing[4], gap: Spacing[3] },
@@ -127,7 +129,7 @@ const S = StyleSheet.create({
   courseTitle:   { fontSize: Typography.sizes.base, fontWeight: Typography.weights.semibold, color: Colors.textPrimary, lineHeight: 20, marginBottom: 4 },
   ref:           { fontSize: Typography.sizes.xs, color: Colors.textMuted },
   amount:        { fontSize: Typography.sizes.lg, fontWeight: Typography.weights.bold, color: Colors.textPrimary, textAlign: 'right', marginBottom: 4 },
-  statusBadge:   { borderRadius: Radii.full, paddingHorizontal: 8, paddingVertical: 3, alignSelf: 'flex-end' },
+  statusBadge:   { flexDirection: 'row', alignItems: 'center', gap: 4, borderRadius: Radii.full, paddingHorizontal: 8, paddingVertical: 3, alignSelf: 'flex-end' },
   statusText:    { fontSize: 10, fontWeight: Typography.weights.semibold },
   cardBottom:    { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: Colors.gray100, paddingTop: Spacing[3] },
   dateText:      { fontSize: Typography.sizes.xs, color: Colors.textMuted },

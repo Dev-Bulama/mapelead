@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
@@ -69,10 +70,12 @@ const Cal = StyleSheet.create({
 
 // ── Stat tile ─────────────────────────────────────────────────────────────────
 
-function StatTile({ icon, value, label, color = Colors.primary }: { icon: string; value: string | number; label: string; color?: string }) {
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+
+function StatTile({ icon, value, label, color = Colors.primary }: { icon: IoniconsName; value: string | number; label: string; color?: string }) {
   return (
     <View style={Tile.wrap}>
-      <Text style={{ fontSize: 26 }}>{icon}</Text>
+      <Ionicons name={icon} size={26} color={color} />
       <Text style={[Tile.value, { color }]}>{value}</Text>
       <Text style={Tile.label}>{label}</Text>
     </View>
@@ -135,15 +138,15 @@ export default function LearningStatsScreen({ navigation }: Props) {
           <View style={S.section}>
             <Text style={S.sectionTitle}>Overview</Text>
             <View style={S.statsGrid}>
-              <StatTile icon="📚" value={stats?.enrollments_count ?? 0} label="Enrolled" />
-              <StatTile icon="🎓" value={stats?.completed_courses ?? 0} label="Completed" color={Colors.success} />
+              <StatTile icon="book-outline" value={stats?.enrollments_count ?? 0} label="Enrolled" />
+              <StatTile icon="checkmark-circle-outline" value={stats?.completed_courses ?? 0} label="Completed" color={Colors.success} />
             </View>
             <View style={[S.statsGrid, { marginTop: Spacing[3] }]}>
-              <StatTile icon="📅" value={totalStudyDays} label="Study Days (30d)" color={Colors.cyan} />
-              <StatTile icon="⏱️" value={`${totalMinutes}m`} label="Study Time (30d)" color={Colors.primary} />
+              <StatTile icon="calendar-outline" value={totalStudyDays} label="Study Days (30d)" color={Colors.cyan} />
+              <StatTile icon="time-outline" value={`${totalMinutes}m`} label="Study Time (30d)" color={Colors.primary} />
             </View>
             <View style={[S.statsGrid, { marginTop: Spacing[3] }]}>
-              <StatTile icon="🏆" value={longestStreak} label="Longest Streak" color="#d97706" />
+              <StatTile icon="trophy-outline" value={longestStreak} label="Longest Streak" color="#d97706" />
             </View>
           </View>
 

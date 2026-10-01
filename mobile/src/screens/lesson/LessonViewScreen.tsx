@@ -7,6 +7,7 @@ import { WebView } from 'react-native-webview';
 import { downloadAttachment } from '@/screens/main/DownloadsScreen';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { extractApiError } from '@/api/client';
@@ -153,7 +154,7 @@ function NotesPanel({ lessonId, initialNote }: { lessonId: number; initialNote: 
   return (
     <View style={N.panel}>
       <View style={N.header}>
-        <Text style={N.title}>📝 My Notes</Text>
+        <Text style={N.title}>My Notes</Text>
         {text.length > 0 && (
           <TouchableOpacity onPress={() => deleteNote()} disabled={deleting}>
             <Text style={N.deleteBtn}>{deleting ? '…' : 'Delete'}</Text>
@@ -253,10 +254,10 @@ export default function LessonViewScreen({ route, navigation }: Props) {
         </TouchableOpacity>
         <View style={S.headerActions}>
           <TouchableOpacity onPress={() => setShowNotes(v => !v)} style={S.headerIconBtn}>
-            <Text style={{ fontSize: 20 }}>📝</Text>
+            <Ionicons name={showNotes ? 'document-text' : 'document-text-outline'} size={21} color={Colors.white} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => toggleBookmark()} style={S.headerIconBtn}>
-            <Text style={{ fontSize: 20 }}>{lesson.is_bookmarked ? '🔖' : '📌'}</Text>
+            <Ionicons name={lesson.is_bookmarked ? 'bookmark' : 'bookmark-outline'} size={21} color={Colors.white} />
           </TouchableOpacity>
         </View>
       </View>

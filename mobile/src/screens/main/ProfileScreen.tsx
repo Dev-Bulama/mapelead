@@ -5,6 +5,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
+import { Ionicons } from '@expo/vector-icons';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { useAuthStore, selectUser } from '@/stores/authStore';
@@ -81,7 +82,7 @@ export default function ProfileScreen() {
         <View style={S.section}>
           <Text style={S.sectionLabel}>Instructor</Text>
           <View style={S.menuCard}>
-            <MenuItem icon="🎓" label="Instructor Dashboard" onPress={() => navigation.navigate('InstructorDashboard')} last />
+            <MenuItem icon="school-outline" label="Instructor Dashboard" onPress={() => navigation.navigate('InstructorDashboard')} last />
           </View>
         </View>
       )}
@@ -89,29 +90,29 @@ export default function ProfileScreen() {
       <View style={S.section}>
         <Text style={S.sectionLabel}>Account</Text>
         <View style={S.menuCard}>
-          <MenuItem icon="✏️" label="Edit Profile"    onPress={() => navigation.navigate('ProfileEdit')} />
-          <MenuItem icon="🔒" label="Security"        onPress={() => navigation.navigate('Security')} />
-          <MenuItem icon="🔔" label="Notifications"   onPress={() => navigation.navigate('Notifications')} last />
+          <MenuItem icon="create-outline"        label="Edit Profile"  onPress={() => navigation.navigate('ProfileEdit')} />
+          <MenuItem icon="lock-closed-outline"   label="Security"      onPress={() => navigation.navigate('Security')} />
+          <MenuItem icon="notifications-outline" label="Notifications" onPress={() => navigation.navigate('Notifications')} last />
         </View>
       </View>
 
       <View style={S.section}>
         <Text style={S.sectionLabel}>Learning</Text>
         <View style={S.menuCard}>
-          <MenuItem icon="📊" label="Learning Stats"  onPress={() => navigation.navigate('LearningStats')} />
-          <MenuItem icon="🏆" label="My Certificates" onPress={() => navigation.navigate('Certificates')} />
-          <MenuItem icon="🔖" label="Bookmarks"       onPress={() => navigation.navigate('Bookmarks')} />
-          <MenuItem icon="📝" label="My Notes"        onPress={() => navigation.navigate('Notes')} />
-          <MenuItem icon="💳" label="Payment History" onPress={() => navigation.navigate('PaymentHistory')} />
-          <MenuItem icon="📥" label="Downloads"       onPress={() => {}} last />
+          <MenuItem icon="stats-chart-outline"   label="Learning Stats"  onPress={() => navigation.navigate('LearningStats')} />
+          <MenuItem icon="ribbon-outline"        label="My Certificates" onPress={() => navigation.navigate('Certificates')} />
+          <MenuItem icon="bookmark-outline"      label="Bookmarks"       onPress={() => navigation.navigate('Bookmarks')} />
+          <MenuItem icon="document-text-outline" label="My Notes"        onPress={() => navigation.navigate('Notes')} />
+          <MenuItem icon="card-outline"          label="Payment History" onPress={() => navigation.navigate('PaymentHistory')} />
+          <MenuItem icon="cloud-download-outline" label="Downloads"      onPress={() => {}} last />
         </View>
       </View>
 
       <View style={S.section}>
         <Text style={S.sectionLabel}>Support</Text>
         <View style={S.menuCard}>
-          <MenuItem icon="❓" label="Help & Support"  onPress={() => {}} />
-          <MenuItem icon="⭐" label="Rate the App"    onPress={() => {}} last />
+          <MenuItem icon="help-circle-outline" label="Help & Support" onPress={() => {}} />
+          <MenuItem icon="star-outline"        label="Rate the App"   onPress={() => {}} last />
         </View>
       </View>
 
@@ -135,16 +136,20 @@ function StatTile({ icon, label, value }: { icon: string; label: string; value: 
   );
 }
 
-function MenuItem({ icon, label, onPress, last = false }: { icon: string; label: string; onPress: () => void; last?: boolean }) {
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+
+function MenuItem({ icon, label, onPress, last = false }: { icon: IoniconsName; label: string; onPress: () => void; last?: boolean }) {
   return (
     <TouchableOpacity
       style={[S.menuItem, last && S.menuItemLast]}
       onPress={onPress}
       activeOpacity={0.6}
     >
-      <Text style={S.menuIcon}>{icon}</Text>
+      <View style={S.menuIconWrap}>
+        <Ionicons name={icon} size={18} color={Colors.primary} />
+      </View>
       <Text style={S.menuLabel}>{label}</Text>
-      <Text style={S.chevron}>›</Text>
+      <Ionicons name="chevron-forward" size={16} color={Colors.gray300} />
     </TouchableOpacity>
   );
 }
@@ -177,9 +182,8 @@ const S = StyleSheet.create({
   menuCard:       { backgroundColor: Colors.white, borderRadius: Radii.xl, overflow: 'hidden', ...Shadows.sm },
   menuItem:       { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing[4], paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: Colors.gray100 },
   menuItemLast:   { borderBottomWidth: 0 },
-  menuIcon:       { fontSize: 18, width: 30 },
+  menuIconWrap:   { width: 30, alignItems: 'flex-start' },
   menuLabel:      { flex: 1, fontSize: Typography.sizes.base, color: Colors.textPrimary },
-  chevron:        { fontSize: 20, color: Colors.gray300 },
 
   // Logout
   logoutBtn:      { marginHorizontal: Spacing[4], marginTop: Spacing[2], backgroundColor: Colors.white, borderRadius: Radii.xl, padding: Spacing[4], alignItems: 'center', borderWidth: 1.5, borderColor: Colors.error, ...Shadows.sm },

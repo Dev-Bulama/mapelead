@@ -1,7 +1,8 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing } from '@/theme';
 import type { MainTabParamList, RootStackParamList } from '@/types';
 
@@ -31,17 +32,24 @@ import NotesScreen                from '@/screens/main/NotesScreen';
 const Tab   = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const TAB_ICONS: Record<string, string> = {
-  Home:       '🏠',
-  Explore:    '🔍',
-  MyLearning: '📚',
-  Downloads:  '📥',
-  Profile:    '👤',
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+const TAB_ICONS: Record<string, { on: IoniconsName; off: IoniconsName }> = {
+  Home:       { on: 'home',               off: 'home-outline' },
+  Explore:    { on: 'search',             off: 'search-outline' },
+  MyLearning: { on: 'book',               off: 'book-outline' },
+  Downloads:  { on: 'arrow-down-circle',  off: 'arrow-down-circle-outline' },
+  Profile:    { on: 'person',             off: 'person-outline' },
 };
 
 function TabIcon({ name, focused }: { name: string; focused: boolean }) {
+  const cfg = TAB_ICONS[name];
+  if (!cfg) return null;
   return (
-    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>{TAB_ICONS[name] ?? '●'}</Text>
+    <Ionicons
+      name={focused ? cfg.on : cfg.off}
+      size={22}
+      color={focused ? Colors.primary : Colors.gray400}
+    />
   );
 }
 

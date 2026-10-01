@@ -7,6 +7,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 import { coursesApi } from '@/api/courses';
 import { enrollmentsApi } from '@/api/enrollments';
 import { apiClient } from '@/api/client';
@@ -67,12 +68,12 @@ function HomeHeader({ userName, notifCount, onBell }: { userName: string; notifC
       </View>
       <View style={H.actions}>
         <TouchableOpacity style={H.bellWrap} onPress={onBell}>
-          <Text style={H.bellIcon}>🔔</Text>
+          <Ionicons name={notifCount > 0 ? 'notifications' : 'notifications-outline'} size={22} color={Colors.white} />
           {notifCount > 0 && (
             <View style={H.badge}><Text style={H.badgeText}>{notifCount > 9 ? '9+' : notifCount}</Text></View>
           )}
         </TouchableOpacity>
-        <View style={H.avatar}><Text style={{ fontSize: 16 }}>👤</Text></View>
+        <View style={H.avatar}><Ionicons name="person-outline" size={18} color={Colors.white} /></View>
       </View>
     </View>
   );

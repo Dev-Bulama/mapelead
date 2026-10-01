@@ -6,6 +6,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Ionicons } from '@expo/vector-icons';
 import { enrollmentsApi } from '@/api/enrollments';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 import type { Enrollment, RootStackParamList } from '@/types';
@@ -39,7 +40,7 @@ export default function MyCoursesScreen() {
 
       {paid.length === 0 ? (
         <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>📚</Text>
+          <Ionicons name="book-outline" size={52} color={Colors.gray300} />
           <Text style={styles.emptyTitle}>No courses yet</Text>
           <Text style={styles.emptySubtitle}>
             Explore courses and enroll to get started
@@ -105,8 +106,7 @@ const styles = StyleSheet.create({
   subtitle:         { fontSize: Typography.sizes.sm, color: Colors.textSecondary, marginTop: Spacing[1] },
   center:           { flex: 1, justifyContent: 'center', alignItems: 'center' },
   list:             { padding: Spacing[4] },
-  empty:            { flex: 1, justifyContent: 'center', alignItems: 'center', padding: Spacing[8] },
-  emptyIcon:        { fontSize: 48, marginBottom: Spacing[4] },
+  empty:            { flex: 1, justifyContent: 'center', alignItems: 'center', padding: Spacing[8], gap: Spacing[4] },
   emptyTitle:       { fontSize: Typography.sizes.xl, fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   emptySubtitle:    { fontSize: Typography.sizes.base, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing[2] },
   card:             { flexDirection: 'row', backgroundColor: Colors.white, borderRadius: Radii.xl, marginBottom: Spacing[4], overflow: 'hidden', ...Shadows.sm },

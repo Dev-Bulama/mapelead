@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 
 export const DOWNLOADS_DIR = (FileSystem.documentDirectory ?? '') + 'mapelead_downloads/';
@@ -60,17 +61,18 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function fileIcon(name: string): string {
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+function fileIcon(name: string): IoniconsName {
   const ext = name.split('.').pop()?.toLowerCase() ?? '';
-  if (['pdf'].includes(ext))             return '📄';
-  if (['mp4', 'mov', 'avi'].includes(ext)) return '🎬';
-  if (['mp3', 'wav', 'aac'].includes(ext)) return '🎵';
-  if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) return '🖼️';
-  if (['zip', 'rar', '7z'].includes(ext)) return '🗜️';
-  if (['ppt', 'pptx'].includes(ext))     return '📊';
-  if (['doc', 'docx'].includes(ext))     return '📝';
-  if (['xls', 'xlsx'].includes(ext))     return '📈';
-  return '📎';
+  if (ext === 'pdf')                           return 'document-text-outline';
+  if (['mp4','mov','avi'].includes(ext))       return 'videocam-outline';
+  if (['mp3','wav','aac','m4a'].includes(ext)) return 'musical-notes-outline';
+  if (['jpg','jpeg','png','gif','webp'].includes(ext)) return 'image-outline';
+  if (['zip','rar','7z','tar','gz'].includes(ext))     return 'archive-outline';
+  if (['ppt','pptx'].includes(ext))            return 'easel-outline';
+  if (['doc','docx'].includes(ext))            return 'document-outline';
+  if (['xls','xlsx','csv'].includes(ext))      return 'grid-outline';
+  return 'attach-outline';
 }
 
 export default function DownloadsScreen() {
@@ -123,7 +125,7 @@ export default function DownloadsScreen() {
         <View style={S.center}><ActivityIndicator color={Colors.primary} size="large" /></View>
       ) : !files.length ? (
         <View style={S.empty}>
-          <Text style={S.emptyIcon}>📥</Text>
+          <Ionicons name="cloud-download-outline" size={56} color={Colors.gray300} />
           <Text style={S.emptyTitle}>No downloads yet</Text>
           <Text style={S.emptyText}>
             Tap "Download Attachment" on any lesson to save it here for offline viewing.
@@ -137,7 +139,7 @@ export default function DownloadsScreen() {
           renderItem={({ item }) => (
             <TouchableOpacity style={S.card} onPress={() => handleOpen(item)} activeOpacity={0.75}>
               <View style={S.iconWrap}>
-                <Text style={{ fontSize: 28 }}>{fileIcon(item.name)}</Text>
+                <Ionicons name={fileIcon(item.name)} size={26} color={Colors.primary} />
               </View>
               <View style={S.info}>
                 <Text style={S.fileName} numberOfLines={2}>{item.name}</Text>
@@ -148,7 +150,7 @@ export default function DownloadsScreen() {
                 onPress={() => handleDelete(item)}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <Text style={S.deleteIcon}>🗑️</Text>
+                <Ionicons name="trash-outline" size={18} color={Colors.error} />
               </TouchableOpacity>
             </TouchableOpacity>
           )}
@@ -164,8 +166,7 @@ const S = StyleSheet.create({
   title:      { fontSize: Typography.sizes['2xl'], fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   subtitle:   { fontSize: Typography.sizes.sm, color: Colors.textSecondary, marginTop: 2 },
   center:     { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  empty:      { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing[8] },
-  emptyIcon:  { fontSize: 56, marginBottom: Spacing[4] },
+  empty:      { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing[8], gap: Spacing[4] },
   emptyTitle: { fontSize: Typography.sizes.xl, fontWeight: Typography.weights.bold, color: Colors.textPrimary },
   emptyText:  { fontSize: Typography.sizes.sm, color: Colors.textSecondary, textAlign: 'center', marginTop: Spacing[2], lineHeight: 22 },
   list:       { padding: Spacing[4], gap: Spacing[3] },
@@ -175,5 +176,4 @@ const S = StyleSheet.create({
   fileName:   { fontSize: Typography.sizes.sm, fontWeight: Typography.weights.semibold, color: Colors.textPrimary, lineHeight: 18, marginBottom: 4 },
   meta:       { fontSize: Typography.sizes.xs, color: Colors.textMuted },
   deleteBtn:  { padding: 4 },
-  deleteIcon: { fontSize: 18 },
 });
