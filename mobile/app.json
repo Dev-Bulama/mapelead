@@ -11,13 +11,17 @@
       "resizeMode": "contain",
       "backgroundColor": "#0d1b3e"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "scheme": "mapelead",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "org.mapelead.app",
       "buildNumber": "1",
-      "associatedDomains": ["applinks:mapelead.org"]
+      "associatedDomains": [
+        "applinks:mapelead.org"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -29,13 +33,28 @@
       "intentFilters": [
         {
           "action": "VIEW",
-          "data": [{ "scheme": "mapelead" }],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "data": [
+            {
+              "scheme": "mapelead"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         },
         {
           "action": "VIEW",
-          "data": [{ "scheme": "https", "host": "mapelead.org" }],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "data": [
+            {
+              "scheme": "https",
+              "host": "mapelead.org"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -67,7 +86,11 @@
       ]
     ],
     "extra": {
-      "apiBaseUrl": "https://mapelead.org/api/v1"
-    }
+      "apiBaseUrl": "https://mapelead.org/api/v1",
+      "eas": {
+        "projectId": "c9145f99-b378-4ee0-91a2-813e90dba729"
+      }
+    },
+    "owner": "skillscore-it-solutions"
   }
 }
