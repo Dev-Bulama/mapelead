@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet, Linking } from 'react-native';
-import { NavigationContainer, LinkingOptions } from '@react-navigation/native';
+import { NavigationContainer, LinkingOptions, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuthStore, selectIsAuthenticated } from '@/stores/authStore';
 import { Colors } from '@/theme';
 import type { RootStackParamList } from '@/types';
+
+export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 import AuthNavigator    from './AuthNavigator';
 import MainNavigator    from './MainNavigator';
@@ -55,7 +57,7 @@ export default function RootNavigator() {
   }
 
   return (
-    <NavigationContainer linking={linking}>
+    <NavigationContainer ref={navigationRef} linking={linking}>
       <Root.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
         {isAuthenticated ? (
           onboardingDone ? (

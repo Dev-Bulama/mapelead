@@ -2,14 +2,11 @@ import { useEffect, useRef } from 'react';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
+import { navigationRef } from '@/navigation/RootNavigator';
 import { useAuthStore, selectIsAuthenticated } from '@/stores/authStore';
 import type { RootStackParamList } from '@/types';
-
-type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -52,7 +49,6 @@ async function registerForPushNotifications(): Promise<string | null> {
 
 export function usePushNotifications() {
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
-  const navigation      = useNavigation<Nav>();
   const listenerRef     = useRef<Notifications.EventSubscription | null>(null);
   const responseRef     = useRef<Notifications.EventSubscription | null>(null);
   const tokenRef        = useRef<string | null>(null);
@@ -87,15 +83,16 @@ export function usePushNotifications() {
 
     // Tapped notification → navigate
     responseRef.current = Notifications.addNotificationResponseReceivedListener((response) => {
+      if (!navigationRef.isReady()) return;
       const data = response.notification.request.content.data as Record<string, unknown>;
       if (data?.screen === 'Notifications') {
-        navigation.navigate('Notifications');
+        navigationRef.navigate('Notifications');
       } else if (data?.screen === 'CourseDetail' && typeof data.slug === 'string') {
-        navigation.navigate('CourseDetail', { slug: data.slug });
+        navigationRef.navigate('CourseDetail', { slug: data.slug });
       } else if (data?.screen === 'SupportTicketDetail' && typeof data.ticketId === 'number') {
-        navigation.navigate('SupportTicketDetail', { ticketId: data.ticketId });
+        navigationRef.navigate('SupportTicketDetail', { ticketId: data.ticketId });
       } else if (data?.screen === 'LessonView' && typeof data.lessonId === 'number') {
-        navigation.navigate('LessonView', {
+        navigationRef.navigate('LessonView', {
           lessonId:   data.lessonId,
           courseSlug: typeof data.courseSlug === 'string' ? data.courseSlug : '',
         });
