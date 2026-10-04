@@ -6,40 +6,30 @@ import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { navigationRef } from '@/navigation/RootNavigator';
 import { useAuthStore, selectIsAuthenticated } from '@/stores/authStore';
-import type { RootStackParamList } from '@/types';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
 
 async function registerForPushNotifications(): Promise<string | null> {
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#1e3adb',
-    });
-  }
-
-  const { status: existing } = await Notifications.getPermissionsAsync();
-  let finalStatus = existing;
-
-  if (existing !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== 'granted') return null;
-
-  const projectId = Constants.expoConfig?.extra?.eas?.projectId
-    ?? Constants.expoConfig?.extra?.projectId;
-
   try {
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name:             'default',
+        importance:       Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor:       '#1e3adb',
+      });
+    }
+
+    const { status: existing } = await Notifications.getPermissionsAsync();
+    let finalStatus = existing;
+    if (existing !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') return null;
+
+    const projectId =
+      Constants.expoConfig?.extra?.eas?.projectId ??
+      Constants.expoConfig?.extra?.projectId;
+
     const token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
     return token;
   } catch {
@@ -52,9 +42,22 @@ export function usePushNotifications() {
   const listenerRef     = useRef<Notifications.EventSubscription | null>(null);
   const responseRef     = useRef<Notifications.EventSubscription | null>(null);
   const tokenRef        = useRef<string | null>(null);
+  const prevAuthRef     = useRef<boolean>(isAuthenticated);
+
+  // Set up notification handler once on mount
+  useEffect(() => {
+    try {
+      Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge:  true,
+        }),
+      });
+    } catch {}
+  }, []);
 
   // De-register token on logout
-  const prevAuthRef = useRef<boolean>(isAuthenticated);
   useEffect(() => {
     if (prevAuthRef.current && !isAuthenticated && tokenRef.current) {
       apiClient.delete(API.DEVICE_TOKEN, { data: { token: tokenRef.current } }).catch(() => {});
@@ -71,17 +74,13 @@ export function usePushNotifications() {
       tokenRef.current = token;
       apiClient.post(API.DEVICE_TOKEN, {
         token,
-        platform: Platform.OS as 'ios' | 'android',
+        platform:    Platform.OS as 'ios' | 'android',
         app_version: Constants.expoConfig?.version,
       }).catch(() => {});
     });
 
-    // Foreground notification listener
-    listenerRef.current = Notifications.addNotificationReceivedListener(() => {
-      // Badge / in-app toasts handled by the handler above
-    });
+    listenerRef.current = Notifications.addNotificationReceivedListener(() => {});
 
-    // Tapped notification → navigate
     responseRef.current = Notifications.addNotificationResponseReceivedListener((response) => {
       if (!navigationRef.isReady()) return;
       const data = response.notification.request.content.data as Record<string, unknown>;
@@ -103,5 +102,5 @@ export function usePushNotifications() {
       listenerRef.current?.remove();
       responseRef.current?.remove();
     };
-  }, [isAuthenticated, navigation]);
+  }, [isAuthenticated]);
 }

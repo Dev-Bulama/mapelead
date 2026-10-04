@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import { apiClient } from '@/api/client';
 import { API } from '@/api/endpoints';
 import { useAuthStore, selectIsAuthenticated } from '@/stores/authStore';
@@ -7,26 +8,29 @@ import { useAuthStore, selectIsAuthenticated } from '@/stores/authStore';
 const STORAGE_KEY = 'mapelead_last_streak_date';
 
 function getTodayKey(): string {
-  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  return new Date().toISOString().slice(0, 10);
 }
 
-function getLastDate(): string | null {
+async function getLastDate(): Promise<string | null> {
   try {
-    return globalThis.localStorage?.getItem(STORAGE_KEY) ?? null;
+    return await SecureStore.getItemAsync(STORAGE_KEY);
   } catch {
     return null;
   }
 }
-function setLastDate(date: string): void {
-  try { globalThis.localStorage?.setItem(STORAGE_KEY, date); } catch {}
+
+async function setLastDate(date: string): Promise<void> {
+  try {
+    await SecureStore.setItemAsync(STORAGE_KEY, date);
+  } catch {}
 }
 
 async function trackStreak() {
   const today = getTodayKey();
-  if (getLastDate() === today) return;
+  if ((await getLastDate()) === today) return;
   try {
     await apiClient.post(API.STREAK);
-    setLastDate(today);
+    await setLastDate(today);
   } catch {}
 }
 
