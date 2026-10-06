@@ -175,9 +175,11 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
                     onPress={() => setExpandedModule(expandedModule === mod.id ? null : mod.id)}
                   >
                     <Text style={styles.moduleTitle}>{mod.title}</Text>
-                    <Text style={styles.moduleChevron}>
-                      {expandedModule === mod.id ? '▲' : '▼'}
-                    </Text>
+                    <Ionicons
+                      name={expandedModule === mod.id ? 'chevron-up' : 'chevron-down'}
+                      size={16}
+                      color={Colors.gray500}
+                    />
                   </TouchableOpacity>
                   {expandedModule === mod.id && mod.lessons.map((lesson) => (
                     <TouchableOpacity
@@ -215,7 +217,7 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
               <Text style={styles.sectionTitle}>Reviews</Text>
               {(reviews?.avg_rating ?? course.avg_rating ?? 0) > 0 && (
                 <View style={styles.ratingBadge}>
-                  <Text style={styles.ratingBadgeStar}>★</Text>
+                  <Ionicons name="star" size={13} color="#F59E0B" />
                   <Text style={styles.ratingBadgeNum}>
                     {(reviews?.avg_rating ?? course.avg_rating ?? 0).toFixed(1)}
                   </Text>
@@ -242,7 +244,11 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
                     <Text style={styles.reviewerName}>{rv.reviewer?.full_name ?? 'Anonymous'}</Text>
                     <Text style={styles.reviewDate}>{formatDate(rv.created_at ?? '')}</Text>
                   </View>
-                  <Text style={styles.reviewStars}>{'★'.repeat(rv.rating)}{'☆'.repeat(5 - rv.rating)}</Text>
+                  <View style={{ flexDirection: 'row', gap: 2 }}>
+                    {[1,2,3,4,5].map(i => (
+                      <Ionicons key={i} name={i <= rv.rating ? 'star' : 'star-outline'} size={13} color="#F59E0B" />
+                    ))}
+                  </View>
                 </View>
                 {rv.title ? <Text style={styles.reviewTitle}>{rv.title}</Text> : null}
                 {rv.body  ? <Text style={styles.reviewBody}>{rv.body}</Text>   : null}
@@ -349,7 +355,11 @@ export default function CourseDetailScreen({ route, navigation }: Props) {
             <View style={styles.starRow}>
               {[1, 2, 3, 4, 5].map(n => (
                 <TouchableOpacity key={n} onPress={() => setReviewRating(n)}>
-                  <Text style={[styles.starBtn, n <= reviewRating && styles.starBtnActive]}>★</Text>
+                  <Ionicons
+                    name={n <= reviewRating ? 'star' : 'star-outline'}
+                    size={28}
+                    color={n <= reviewRating ? '#F59E0B' : Colors.gray300}
+                  />
                 </TouchableOpacity>
               ))}
             </View>

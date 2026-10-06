@@ -96,4 +96,7 @@ export const API = {
 
   // Device token (push notifications)
   DEVICE_TOKEN:          '/device-token',
+
+  // App settings (public — logo, name, tagline)
+  APP_SETTINGS:          '/app-settings',
 } as const;

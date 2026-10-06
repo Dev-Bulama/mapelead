@@ -7,6 +7,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '@/stores/authStore';
 import { extractApiError } from '@/api/client';
+import AlertModal from '@/components/common/AlertModal';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 import type { AuthStackParamList } from '@/types';
 
@@ -75,7 +76,7 @@ export default function RegisterScreen({ navigation }: Props) {
   const [showPwd,     setShowPwd]     = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [agreedTerms, setAgreedTerms] = useState(false);
-  const [error,       setError]       = useState<string | null>(null);
+  const [alertMsg,    setAlertMsg]    = useState<string | null>(null);
 
   const set = (field: keyof typeof form) => (value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -83,22 +84,21 @@ export default function RegisterScreen({ navigation }: Props) {
   const handleRegister = async () => {
     const { first_name, last_name, email, password, password_confirmation, instructor_code } = form;
     if (!first_name || !last_name || !email || !password) {
-      setError('Please fill in all required fields');
+      setAlertMsg('Please fill in all required fields');
       return;
     }
     if (password !== password_confirmation) {
-      setError('Passwords do not match');
+      setAlertMsg('Passwords do not match');
       return;
     }
     if (accountType === 'instructor' && !instructor_code.trim()) {
-      setError('Instructor ID is required for instructor registration');
+      setAlertMsg('Instructor ID is required for instructor registration');
       return;
     }
     if (!agreedTerms) {
-      setError('Please agree to the Terms & Conditions');
+      setAlertMsg('Please agree to the Terms & Conditions');
       return;
     }
-    setError(null);
     try {
       await register({
         ...form,
@@ -107,7 +107,7 @@ export default function RegisterScreen({ navigation }: Props) {
         instructor_code: accountType === 'instructor' ? instructor_code.trim() : undefined,
       });
     } catch (err: unknown) {
-      setError(extractApiError(err));
+      setAlertMsg(extractApiError(err));
     }
   };
 
@@ -148,7 +148,6 @@ export default function RegisterScreen({ navigation }: Props) {
             </TouchableOpacity>
           </View>
 
-          {error && <View style={S.errBanner}><Text style={S.errText}>{error}</Text></View>}
 
           {/* Name row */}
           <View style={S.row}>
@@ -224,11 +223,11 @@ export default function RegisterScreen({ navigation }: Props) {
           </View>
           <View style={S.socialRow}>
             <TouchableOpacity style={S.socialBtn}>
-              <Ionicons name="logo-google" size={18} color={Colors.textSecondary} />
+              <Text style={{ fontSize: 15, fontWeight: '700', color: '#4285F4', letterSpacing: -0.5 }}>G</Text>
               <Text style={S.socialLabel}>Google</Text>
             </TouchableOpacity>
             <TouchableOpacity style={S.socialBtn}>
-              <Ionicons name="logo-apple" size={18} color={Colors.textSecondary} />
+              <Ionicons name="logo-apple" size={18} color="#1a1a1a" />
               <Text style={S.socialLabel}>Apple</Text>
             </TouchableOpacity>
           </View>
@@ -243,6 +242,14 @@ export default function RegisterScreen({ navigation }: Props) {
 
         </View>
       </ScrollView>
+
+      <AlertModal
+        visible={!!alertMsg}
+        type="error"
+        title="Registration Error"
+        message={alertMsg ?? ''}
+        onClose={() => setAlertMsg(null)}
+      />
     </KeyboardAvoidingView>
   );
 }

@@ -353,8 +353,9 @@ export default function LessonViewScreen({ route, navigation }: Props) {
             <Text style={S.metaText}>{lesson.duration_minutes} min</Text>
           )}
           {lesson.progress?.is_completed && (
-            <View style={[S.badge, { backgroundColor: Colors.success }]}>
-              <Text style={[S.badgeText, { color: Colors.white }]}>✓ Completed</Text>
+            <View style={[S.badge, { backgroundColor: Colors.success, flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
+              <Ionicons name="checkmark-circle" size={13} color={Colors.white} />
+              <Text style={[S.badgeText, { color: Colors.white }]}>Completed</Text>
             </View>
           )}
         </View>

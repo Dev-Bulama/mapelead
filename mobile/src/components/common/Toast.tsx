@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Animated, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radii, Shadows } from '@/theme';
 
 export type ToastType = 'success' | 'error' | 'info';
@@ -10,10 +11,10 @@ interface ToastProps {
   onDismiss: () => void;
 }
 
-const CONFIG: Record<ToastType, { bg: string; icon: string }> = {
-  success: { bg: '#10B981', icon: '✓' },
-  error:   { bg: Colors.error, icon: '✕' },
-  info:    { bg: Colors.primary, icon: 'ℹ' },
+const CONFIG: Record<ToastType, { bg: string; icon: React.ComponentProps<typeof Ionicons>['name'] }> = {
+  success: { bg: '#10B981', icon: 'checkmark-circle' },
+  error:   { bg: Colors.error, icon: 'close-circle' },
+  info:    { bg: Colors.primary, icon: 'information-circle' },
 };
 
 export function Toast({ message, type = 'info', onDismiss }: ToastProps) {
@@ -31,10 +32,10 @@ export function Toast({ message, type = 'info', onDismiss }: ToastProps) {
 
   return (
     <Animated.View style={[S.toast, { backgroundColor: bg, opacity }]}>
-      <Text style={S.icon}>{icon}</Text>
+      <Ionicons name={icon} size={20} color="white" />
       <Text style={S.msg} numberOfLines={2}>{message}</Text>
       <TouchableOpacity onPress={onDismiss} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-        <Text style={S.close}>×</Text>
+        <Ionicons name="close" size={18} color="white" />
       </TouchableOpacity>
     </Animated.View>
   );

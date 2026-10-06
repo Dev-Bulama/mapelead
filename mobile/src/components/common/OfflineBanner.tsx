@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNetworkStatus } from '@/utils/network';
 import { Colors, Typography, Spacing } from '@/theme';
 
@@ -10,17 +11,20 @@ export default function OfflineBanner() {
 
   return (
     <View style={styles.banner}>
-      <Text style={styles.text}>⚠ No internet connection</Text>
+      <Ionicons name="warning" size={14} color={Colors.white} style={{ marginRight: 6 }} />
+      <Text style={styles.text}>No internet connection</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   banner: {
-    backgroundColor: Colors.warning,
+    backgroundColor:   Colors.warning,
     paddingVertical:   Spacing[2],
     paddingHorizontal: Spacing[4],
+    flexDirection:     'row',
     alignItems:        'center',
+    justifyContent:    'center',
   },
   text: {
     color:      Colors.white,

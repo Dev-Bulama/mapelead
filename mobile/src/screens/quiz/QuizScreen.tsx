@@ -188,9 +188,15 @@ export default function QuizScreen({ route, navigation }: Props) {
                     const isRightAnswer = correct?.correct_option_ids.includes(o.id);
                     return (
                       <View key={o.id} style={[s.reviewOpt, isRightAnswer && s.reviewOptCorrect, isMyAnswer && !isRightAnswer && s.reviewOptWrong]}>
-                        <Text style={s.reviewOptText}>
-                          {isRightAnswer ? '✓ ' : isMyAnswer ? '✗ ' : '  '}{o.option}
-                        </Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                          {isRightAnswer
+                            ? <Ionicons name="checkmark-circle" size={15} color={Colors.success} />
+                            : isMyAnswer
+                            ? <Ionicons name="close-circle" size={15} color={Colors.error} />
+                            : <View style={{ width: 15 }} />
+                          }
+                          <Text style={s.reviewOptText}>{o.option}</Text>
+                        </View>
                       </View>
                     );
                   })}
@@ -239,9 +245,16 @@ export default function QuizScreen({ route, navigation }: Props) {
                 {attemptHistory.map((a) => (
                   <View key={a.id} style={s.historyRow}>
                     <Text style={s.historyAttempt}>Attempt {a.attempt_number}</Text>
-                    <Text style={[s.historyScore, { color: a.passed ? Colors.success : Colors.error }]}>
-                      {a.score_percent.toFixed(0)}% {a.passed ? '✓' : '✗'}
-                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <Text style={[s.historyScore, { color: a.passed ? Colors.success : Colors.error }]}>
+                        {a.score_percent.toFixed(0)}%
+                      </Text>
+                      <Ionicons
+                        name={a.passed ? 'checkmark-circle' : 'close-circle'}
+                        size={14}
+                        color={a.passed ? Colors.success : Colors.error}
+                      />
+                    </View>
                   </View>
                 ))}
               </View>

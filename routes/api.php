@@ -16,8 +16,12 @@ use App\Http\Controllers\Api\V1\QuizApiController;
 use App\Http\Controllers\Api\V1\InstructorApiController;
 use App\Http\Controllers\Api\V1\Admin\InstructorCodeController;
 use App\Http\Controllers\Api\V1\CourseReviewApiController;
+use App\Http\Controllers\Api\V1\AppSettingsApiController;
 
 Route::prefix('v1')->name('api.v1.')->group(function () {
+
+    // ── Public: App settings (logo, name, tagline) ────────────────────────────
+    Route::get('/app-settings', [AppSettingsApiController::class, 'index']);
 
     // ── Public: Course discovery ───────────────────────────────────────────────
     Route::get('/courses',           [CourseApiController::class, 'index']);
@@ -140,6 +144,10 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::get('/instructor-codes',           [InstructorCodeController::class, 'index']);
             Route::post('/instructor-codes',          [InstructorCodeController::class, 'store']);
             Route::delete('/instructor-codes/{instructorCode}', [InstructorCodeController::class, 'destroy']);
+
+            // App settings
+            Route::post('/app-settings',        [AppSettingsApiController::class, 'update']);
+            Route::post('/app-settings/logo',   [AppSettingsApiController::class, 'uploadLogo']);
         });
     });
 });

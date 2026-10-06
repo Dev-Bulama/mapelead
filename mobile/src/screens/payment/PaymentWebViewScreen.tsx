@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { WebView } from 'react-native-webview';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -29,7 +30,7 @@ export default function PaymentWebViewScreen({ route, navigation }: Props) {
       qc.invalidateQueries({ queryKey: ['enrollments'] });
       setVerified(true);
       Alert.alert(
-        'Payment Successful! 🎉',
+        'Payment Successful',
         'You are now enrolled. Start learning right away.',
         [{ text: 'Start Learning', onPress: () => navigation.pop(2) }]
       );
@@ -73,7 +74,7 @@ export default function PaymentWebViewScreen({ route, navigation }: Props) {
           <Text style={s.cancelBtn}>Cancel</Text>
         </TouchableOpacity>
         <Text style={s.headerTitle}>Secure Payment</Text>
-        <View style={s.lockIcon}><Text>🔒</Text></View>
+        <View style={s.lockIcon}><Ionicons name="lock-closed" size={16} color={Colors.success} /></View>
       </View>
 
       {/* Loading overlay */}

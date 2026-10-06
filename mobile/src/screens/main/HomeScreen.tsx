@@ -107,7 +107,7 @@ function ProgressCard({ firstName, overallProgress, inProgressCount, certificate
         {/* Left: greeting + stats */}
         <View style={PC.left}>
           <Text style={PC.greeting}>{greeting},</Text>
-          <Text style={PC.name}>{firstName} 👋</Text>
+          <Text style={PC.name}>{firstName}</Text>
           <Text style={PC.sub}>Keep up the great work!</Text>
 
           <View style={PC.statsRow}>
