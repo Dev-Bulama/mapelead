@@ -101,16 +101,16 @@
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-2.5">
-                                <img src="{{ $enrollment->user->avatar_url ?? '' }}" alt=""
+                                <img src="{{ $enrollment->user?->avatar_url ?? '' }}" alt=""
                                      class="w-8 h-8 rounded-full object-cover bg-gray-200 shrink-0">
                                 <div>
-                                    <p class="text-sm font-medium text-gray-900">{{ $enrollment->user->full_name ?? '—' }}</p>
-                                    <p class="text-xs text-gray-400">{{ $enrollment->user->email ?? '' }}</p>
+                                    <p class="text-sm font-medium text-gray-900">{{ $enrollment->user?->full_name ?? '—' }}</p>
+                                    <p class="text-xs text-gray-400">{{ $enrollment->user?->email ?? '' }}</p>
                                 </div>
                             </div>
                         </td>
                         <td class="px-4 py-3">
-                            @if($enrollment->user->admission_number)
+                            @if($enrollment->user?->admission_number)
                             <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded text-gray-700">
                                 {{ $enrollment->user->admission_number }}
                             </span>
