@@ -21,6 +21,7 @@ class EnrollmentController extends Controller
                     'schedule as paid_installments' => fn($q) => $q->where('status', 'paid'),
                 ]),
             ])
+            ->has('user')
             ->orderByDesc('enrolled_at');
 
         if ($search = $request->search) {
