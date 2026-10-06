@@ -22,7 +22,10 @@ class BlogPost extends Model
     ];
 
     public function getSlugOptions(): SlugOptions {
-        return SlugOptions::create()->generateSlugsFrom('title')->saveSlugsTo('slug');
+        return SlugOptions::create()
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug')
+            ->doNotGenerateSlugsOnUpdate();
     }
 
     public function author() { return $this->belongsTo(User::class, 'user_id'); }
