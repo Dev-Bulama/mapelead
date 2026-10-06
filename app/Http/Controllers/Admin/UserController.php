@@ -48,25 +48,33 @@ class UserController extends Controller
 
     public function show(User $user)
     {
+        $this->authorizeUserAccess($user);
         $user->load(['roles', 'enrollments.course', 'payments']);
         return view('admin.users.show', compact('user'));
     }
 
     public function edit(User $user)
     {
-        $roles = Role::all();
+        $this->authorizeUserAccess($user);
+        $roles = $this->allowedRoles();
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request, User $user)
     {
+        $this->authorizeUserAccess($user);
+
         $data = $request->validate([
             'first_name'   => 'required|string|max:100',
             'last_name'    => 'required|string|max:100',
             'email'        => 'required|email|unique:users,email,' . $user->id,
             'phone'        => 'nullable|string|max:20',
             'status'       => 'required|in:active,inactive,pending,suspended',
-            'role'         => 'required|exists:roles,name',
+            'role'         => ['required', 'exists:roles,name', function ($attr, $value, $fail) {
+                if (in_array($value, ['super_admin', 'admin']) && !auth()->user()->isSuperAdmin()) {
+                    $fail('You do not have permission to assign that role.');
+                }
+            }],
             'new_password' => ['nullable', 'confirmed', PasswordRules::min(8)->mixedCase()->numbers()->symbols()],
         ]);
 
@@ -82,7 +90,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        if ($user->isSuperAdmin()) abort(403, 'Cannot delete super admin.');
+        if ($user->isAdmin()) abort(403, 'Cannot delete an admin account.');
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'User deleted!');
     }
@@ -90,8 +98,29 @@ class UserController extends Controller
     public function toggleStatus(int $id)
     {
         $user = User::findOrFail($id);
+        if ($user->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Only super admins can change an admin\'s status.');
+        }
         $user->update(['status' => $user->status === 'active' ? 'suspended' : 'active']);
         return response()->json(['status' => $user->status]);
+    }
+
+    private function authorizeUserAccess(User $user): void
+    {
+        // Non-super-admins cannot view or edit other admin/super_admin accounts
+        if ($user->isAdmin() && !auth()->user()->isSuperAdmin()) {
+            abort(403, 'Only super admins can manage admin accounts.');
+        }
+    }
+
+    private function allowedRoles(): \Illuminate\Support\Collection
+    {
+        $roles = Role::all();
+        // Regular admins cannot assign admin-tier roles
+        if (!auth()->user()->isSuperAdmin()) {
+            $roles = $roles->whereNotIn('name', ['admin', 'super_admin']);
+        }
+        return $roles;
     }
 
     public function export(Request $request): StreamedResponse
