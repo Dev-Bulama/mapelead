@@ -611,41 +611,9 @@
         {{-- ─── FOOTER ──────────────────────────────────────────── --}}
         <div id="settings-panel-footer" style="{{ $activeTab === 'footer' ? 'display:block' : 'display:none' }}">
 
-            {{-- Logo upload form (saves to general group, key=site_logo) --}}
+            {{-- Footer Logo upload (independent from header/general logo) --}}
             <form method="POST"
-                  action="{{ route('admin.settings.update', 'general') }}"
-                  enctype="multipart/form-data"
-                  class="p-6 pb-4 border-b border-gray-100 space-y-4">
-                @csrf
-                <input type="hidden" name="_tab" value="footer">
-                <h3 class="text-sm font-semibold text-gray-700">Footer Logo</h3>
-                @php $footerLogoPreview = !empty($all['general']['site_logo']) ? asset('storage/' . $all['general']['site_logo']) : ''; @endphp
-                <div x-data="imagePreview('{{ $footerLogoPreview }}')" class="flex items-start gap-6">
-                    <div class="shrink-0 w-40 h-16 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden">
-                        <template x-if="preview">
-                            <img :src="preview" class="max-w-full max-h-full object-contain p-2" alt="Logo preview">
-                        </template>
-                        <template x-if="!preview">
-                            <svg class="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        </template>
-                    </div>
-                    <div class="flex-1 space-y-2">
-                        <input type="file" name="site_logo" accept="image/*" @change="onFileChange($event)"
-                               class="block w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 transition">
-                        <p class="text-xs text-gray-400">PNG, SVG or JPG, max 2 MB. Recommended: 200×60 px.</p>
-                        @if(!empty($all['general']['site_logo']))
-                            <p class="text-xs text-gray-400">Current: <span class="text-gray-500">{{ basename($all['general']['site_logo']) }}</span></p>
-                        @endif
-                        <button type="submit" class="inline-flex items-center gap-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-medium px-4 py-1.5 rounded-lg transition-colors">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            Upload Logo
-                        </button>
-                    </div>
-                </div>
-            </form>
-
-            <form method="POST"
-                  action="{{ route('admin.settings.update', 'general') }}"
+                  action="{{ route('admin.settings.update', 'footer') }}"
                   enctype="multipart/form-data"
                   class="p-6 pb-0 space-y-6 border-b border-gray-100">
                 @csrf
@@ -653,13 +621,14 @@
 
                 <div>
                     <h3 class="text-sm font-semibold text-gray-800 mb-1">Footer Logo</h3>
-                    <p class="text-xs text-gray-500 mb-4">This logo appears in the footer of every page. Recommended size: 200×60px, PNG or SVG with transparent background.</p>
+                    <p class="text-xs text-gray-500 mb-4">This logo appears in the footer of every page. If left empty, the header logo is used as fallback. Recommended: 200×60px, PNG or SVG with transparent background.</p>
                 </div>
 
-                <div x-data="imagePreview('{{ $all['general']['site_logo'] ?? '' }}')" class="flex items-start gap-5 pb-6">
+                @php $footerLogoPreview = !empty($all['footer']['footer_logo']) ? asset('storage/' . $all['footer']['footer_logo']) : ''; @endphp
+                <div x-data="imagePreview('{{ $footerLogoPreview }}')" class="flex items-start gap-5 pb-6">
                     <div class="w-40 h-16 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
                         <template x-if="preview">
-                            <img :src="preview" class="max-w-full max-h-full object-contain p-2" alt="Logo preview">
+                            <img :src="preview" class="max-w-full max-h-full object-contain p-2" alt="Footer logo preview">
                         </template>
                         <template x-if="!preview">
                             <div class="text-center">
@@ -672,7 +641,7 @@
                     </div>
                     <div class="flex-1">
                         <input type="file"
-                               name="site_logo"
+                               name="footer_logo"
                                accept="image/*"
                                @change="onFileChange($event)"
                                class="block w-full text-sm text-gray-500
@@ -682,13 +651,13 @@
                                       file:bg-brand-50 file:text-brand-700
                                       hover:file:bg-brand-100 transition">
                         <p class="text-xs text-gray-400 mt-2">PNG, SVG or JPG, max 2MB.</p>
-                        @if(!empty($all['general']['site_logo']))
-                        <p class="text-xs text-gray-500 mt-1">Current file: <span class="font-mono">{{ basename($all['general']['site_logo']) }}</span></p>
+                        @if(!empty($all['footer']['footer_logo']))
+                        <p class="text-xs text-gray-500 mt-1">Current file: <span class="font-mono">{{ basename($all['footer']['footer_logo']) }}</span></p>
                         @endif
                         <button type="submit"
                                 class="mt-3 inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            Upload Logo
+                            Upload Footer Logo
                         </button>
                     </div>
                 </div>

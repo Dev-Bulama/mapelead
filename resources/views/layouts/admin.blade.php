@@ -445,6 +445,16 @@
                 <span>Menus</span>
             </a>
 
+            <a href="{{ route('admin.mobile-settings.index') }}"
+               class="sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium
+                      {{ request()->routeIs('admin.mobile-settings*') ? 'active bg-brand-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+                <span>Mobile App</span>
+            </a>
+
             {{-- SUPPORT --}}
             <p class="px-3 pt-4 pb-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">Support</p>
 

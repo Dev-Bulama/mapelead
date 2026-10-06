@@ -35,7 +35,7 @@
             {{-- Brand Column --}}
             <div>
                 @php
-                    $logoPath   = $general['site_logo'] ?? null;
+                    $logoPath   = $footer['footer_logo'] ?? $general['site_logo'] ?? null;
                     $logoHeight = (int) ($footer['footer_logo_height'] ?? 48);
                     $logoHeight = max(24, min(120, $logoHeight));
                 @endphp

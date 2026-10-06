@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\InstallmentController;
 use App\Http\Controllers\Admin\EmailTemplateController;
 use App\Http\Controllers\Admin\AdmissionNumberController;
 use App\Http\Controllers\Admin\CertificateSettingsController;
+use App\Http\Controllers\Admin\MobileSettingsController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\ServiceController;
@@ -354,6 +355,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/settings/menus/items/reorder', [SettingsController::class, 'reorderMenuItems'])->name('settings.menus.items.reorder');
     Route::post('/settings/integrations', [SettingsController::class, 'updateIntegrations'])->name('settings.integrations');
     Route::post('/settings/{group}', [SettingsController::class, 'update'])->name('settings.update');
+
+    // Mobile App Settings
+    Route::get('/mobile-settings', [MobileSettingsController::class, 'index'])->name('mobile-settings.index');
+    Route::post('/mobile-settings', [MobileSettingsController::class, 'update'])->name('mobile-settings.update');
 });
 
 // ─── Public Certificate Verification ──────────────────────────────────────────
