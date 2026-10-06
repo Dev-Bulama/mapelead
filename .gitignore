@@ -22,6 +22,11 @@
 /storage/pail
 # vendor is committed so cPanel deployments work without composer
 # /vendor
+
+# Laravel compiled cache files — never commit these; clear on server with artisan *:clear
+/bootstrap/cache/config.php
+/bootstrap/cache/routes*.php
+/bootstrap/cache/events.php
 _ide_helper.php
 Homestead.json
 Homestead.yaml
