@@ -164,54 +164,17 @@ class SettingsController extends Controller
 
     public function updateIntegrations(Request $request)
     {
-        // Google login toggle — stored in site_settings (not .env)
-        \App\Models\SiteSetting::set('enable_google_login', $request->input('enable_google_login', '0'));
+        $data = $request->except(['_token', '_method', '_tab']);
 
-        // Contact form settings — stored in site_settings
-        \App\Models\SiteSetting::set('contact_btn_text', $request->input('contact_btn_text', 'Send Message'));
-        \App\Models\SiteSetting::set('recaptcha_enabled', $request->input('recaptcha_enabled', '0'));
-        \App\Models\SiteSetting::set('recaptcha_site_key', $request->input('recaptcha_site_key', ''));
-        if ($request->filled('recaptcha_secret_key')) {
-            \App\Models\SiteSetting::set('recaptcha_secret_key', $request->input('recaptcha_secret_key'));
-        }
-
-        $fields = [
-            'PAYSTACK_PUBLIC_KEY'     => $request->paystack_public_key,
-            'PAYSTACK_SECRET_KEY'     => $request->paystack_secret_key,
-            'PAYSTACK_WEBHOOK_SECRET' => $request->paystack_webhook_secret,
-            'MAIL_MAILER'           => $request->mail_mailer,
-            'MAIL_HOST'             => $request->mail_host,
-            'MAIL_PORT'             => $request->mail_port,
-            'MAIL_USERNAME'         => $request->mail_username,
-            'MAIL_PASSWORD'         => $request->mail_password,
-            'MAIL_ENCRYPTION'       => $request->mail_encryption,
-            'MAIL_FROM_ADDRESS'     => $request->mail_from_address,
-            'MAIL_FROM_NAME'        => $request->mail_from_name,
-            'GOOGLE_CLIENT_ID'      => $request->google_client_id,
-            'GOOGLE_CLIENT_SECRET'  => $request->google_client_secret,
-        ];
-
-        foreach ($fields as $key => $value) {
-            if (!is_null($value) && $value !== '') {
-                $this->setEnvValue($key, $value);
+        // Password/secret fields: keep existing value when left blank
+        foreach (['paystack_secret_key', 'mail_password', 'google_client_secret', 'recaptcha_secret_key'] as $field) {
+            if (empty($data[$field])) {
+                unset($data[$field]);
             }
         }
 
-        return back()->with('success', 'Integration settings saved! Restart the server if needed.');
-    }
+        $this->settings->updateGroup('integrations', $data);
 
-    private function setEnvValue(string $key, string $value): void
-    {
-        $path = base_path('.env');
-        $content = file_get_contents($path);
-        $value = str_contains($value, ' ') ? '"' . $value . '"' : $value;
-
-        if (strpos($content, "{$key}=") !== false) {
-            $content = preg_replace("/^{$key}=.*/m", "{$key}={$value}", $content);
-        } else {
-            $content .= "\n{$key}={$value}";
-        }
-
-        file_put_contents($path, $content);
+        return back()->with('success', 'Integration settings saved successfully.');
     }
 }

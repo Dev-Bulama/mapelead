@@ -788,16 +788,6 @@
                 @csrf
                 <input type="hidden" name="_tab" value="integrations">
 
-                {{-- Warning Banner --}}
-                <div class="flex items-start gap-3 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                    <svg class="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                    </svg>
-                    <p class="text-sm text-yellow-700">
-                        <span class="font-semibold">Warning:</span> These settings write directly to your <code class="font-mono bg-yellow-100 px-1 rounded">.env</code> file. Changes take effect immediately. Keep a backup before editing.
-                    </p>
-                </div>
-
                 {{-- ── Paystack Section ────────────────────────────────── --}}
                 <div>
                     <h3 class="text-sm font-semibold text-gray-800 uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -811,7 +801,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Public Key</label>
                             <input type="text"
                                    name="paystack_public_key"
-                                   value="{{ old('paystack_public_key', env('PAYSTACK_PUBLIC_KEY', '')) }}"
+                                   value="{{ old('paystack_public_key', $all['integrations']['paystack_public_key'] ?? '') }}"
                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono
                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
                                    placeholder="pk_live_... or pk_test_...">
@@ -830,7 +820,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Webhook Secret</label>
                             <input type="text"
                                    name="paystack_webhook_secret"
-                                   value="{{ old('paystack_webhook_secret', env('PAYSTACK_WEBHOOK_SECRET', '')) }}"
+                                   value="{{ old('paystack_webhook_secret', ($all['integrations']['paystack_webhook_secret'] ?? '')) }}"
                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono
                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
                                    placeholder="Paystack webhook secret">
@@ -858,7 +848,7 @@
                                     class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                            focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white">
                                 @foreach(['log' => 'Log (local dev)', 'smtp' => 'SMTP', 'mailgun' => 'Mailgun', 'ses' => 'Amazon SES'] as $val => $label)
-                                    <option value="{{ $val }}" {{ env('MAIL_MAILER') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                                    <option value="{{ $val }}" {{ ($all['integrations']['mail_mailer'] ?? 'log') === $val ? 'selected' : '' }}>{{ $label }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -867,7 +857,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">SMTP Host</label>
                             <input type="text"
                                    name="mail_host"
-                                   value="{{ old('mail_host', env('MAIL_HOST', '')) }}"
+                                   value="{{ old('mail_host', ($all['integrations']['mail_host'] ?? '')) }}"
                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
                                    placeholder="smtp.mailgun.org">
@@ -877,7 +867,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">SMTP Port</label>
                             <input type="number"
                                    name="mail_port"
-                                   value="{{ old('mail_port', env('MAIL_PORT', '587')) }}"
+                                   value="{{ old('mail_port', ($all['integrations']['mail_port'] ?? '587')) }}"
                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
                                    placeholder="587">
@@ -889,7 +879,7 @@
                                     class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                            focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white">
                                 @foreach(['null' => 'None', 'tls' => 'TLS', 'ssl' => 'SSL'] as $val => $label)
-                                    <option value="{{ $val }}" {{ env('MAIL_ENCRYPTION') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                                    <option value="{{ $val }}" {{ ($all['integrations']['mail_encryption'] ?? 'tls') === $val ? 'selected' : '' }}>{{ $label }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -898,7 +888,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">SMTP Username</label>
                             <input type="text"
                                    name="mail_username"
-                                   value="{{ old('mail_username', env('MAIL_USERNAME', '')) }}"
+                                   value="{{ old('mail_username', ($all['integrations']['mail_username'] ?? '')) }}"
                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
                                    placeholder="SMTP username or API key">
@@ -917,7 +907,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">From Address</label>
                             <input type="email"
                                    name="mail_from_address"
-                                   value="{{ old('mail_from_address', env('MAIL_FROM_ADDRESS', '')) }}"
+                                   value="{{ old('mail_from_address', ($all['integrations']['mail_from_address'] ?? '')) }}"
                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
                                    placeholder="noreply@mapelead.org">
@@ -927,7 +917,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">From Name</label>
                             <input type="text"
                                    name="mail_from_name"
-                                   value="{{ old('mail_from_name', env('MAIL_FROM_NAME', '')) }}"
+                                   value="{{ old('mail_from_name', ($all['integrations']['mail_from_name'] ?? '')) }}"
                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
                                    placeholder="MapeLead">
@@ -971,7 +961,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Google Client ID</label>
                             <input type="text"
                                    name="google_client_id"
-                                   value="{{ old('google_client_id', env('GOOGLE_CLIENT_ID', '')) }}"
+                                   value="{{ old('google_client_id', ($all['integrations']['google_client_id'] ?? '')) }}"
                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm font-mono
                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
                                    placeholder="xxxxxxxx.apps.googleusercontent.com">

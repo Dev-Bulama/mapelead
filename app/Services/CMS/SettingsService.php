@@ -27,14 +27,12 @@ class SettingsService
     {
         foreach ($data as $key => $value) {
             if (str_starts_with($key, '_') || $key === 'group') continue;
-            SiteSetting::set($key, $value);
-        }
-        // Clear individual and group caches without tags (compatible with database cache driver)
-        Cache::forget("settings_group_{$group}");
-        // Also bust all known setting keys in this group
-        $keys = SiteSetting::where('group', $group)->pluck('key');
-        foreach ($keys as $key) {
+            SiteSetting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value, 'group' => $group]
+            );
             Cache::forget("setting_{$key}");
         }
+        Cache::forget("settings_group_{$group}");
     }
 }

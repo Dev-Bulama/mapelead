@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\SiteSetting;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,7 +15,43 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->configureFromDatabase();
         $this->configureRateLimiting();
+    }
+
+    protected function configureFromDatabase(): void
+    {
+        try {
+            $s = SiteSetting::getGroup('integrations');
+            if (empty($s)) return;
+
+            // Mail / SMTP
+            if (!empty($s['mail_mailer'])) {
+                Config::set('mail.default', $s['mail_mailer']);
+                Config::set('mail.mailers.smtp.host',       $s['mail_host']       ?? config('mail.mailers.smtp.host'));
+                Config::set('mail.mailers.smtp.port',       $s['mail_port']       ?? config('mail.mailers.smtp.port'));
+                Config::set('mail.mailers.smtp.username',   $s['mail_username']   ?? config('mail.mailers.smtp.username'));
+                Config::set('mail.mailers.smtp.password',   $s['mail_password']   ?? config('mail.mailers.smtp.password'));
+                Config::set('mail.mailers.smtp.encryption', ($s['mail_encryption'] ?? 'tls') === 'null' ? null : ($s['mail_encryption'] ?? 'tls'));
+                Config::set('mail.from.address', $s['mail_from_address'] ?? config('mail.from.address'));
+                Config::set('mail.from.name',    $s['mail_from_name']    ?? config('mail.from.name'));
+            }
+
+            // Paystack
+            if (!empty($s['paystack_public_key'])) {
+                Config::set('services.paystack.public_key',     $s['paystack_public_key']);
+                Config::set('services.paystack.secret_key',     $s['paystack_secret_key']     ?? '');
+                Config::set('services.paystack.webhook_secret', $s['paystack_webhook_secret'] ?? '');
+            }
+
+            // Google OAuth
+            if (!empty($s['google_client_id'])) {
+                Config::set('services.google.client_id',     $s['google_client_id']);
+                Config::set('services.google.client_secret', $s['google_client_secret'] ?? '');
+            }
+        } catch (\Throwable) {
+            // DB not ready (e.g. during migrations) — skip silently
+        }
     }
 
     protected function configureRateLimiting(): void
