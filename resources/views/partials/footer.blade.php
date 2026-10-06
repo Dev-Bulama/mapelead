@@ -41,7 +41,7 @@
                 @endphp
                 <div class="mb-4">
                     @if($logoPath)
-                        @php $footerSiteName = $general['site_name'] ?? 'MapeLeads'; @endphp
+                        @php $footerSiteName = $general['site_name'] ?? 'MapeLead'; @endphp
                         <img src="{{ asset('storage/' . $logoPath) }}"
                              alt="{{ $footerSiteName }}"
                              style="height: {{ $logoHeight }}px; max-width: 200px; width: auto; object-fit: contain;"
@@ -57,7 +57,7 @@
                             <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
                                 <span class="text-white font-bold text-sm">ML</span>
                             </div>
-                            <span class="text-white font-display font-bold text-xl">{{ $general['site_name'] ?? 'MapeLeads' }}</span>
+                            <span class="text-white font-display font-bold text-xl">{{ $general['site_name'] ?? 'MapeLead' }}</span>
                         </div>
                     @endif
                 </div>
@@ -106,7 +106,7 @@
                 [
                     'menu'     => $footer3,
                     'label'    => 'Company',
-                    'fallback' => [['About Us', '/about'], ['Why MapeLeads', '/why-us'], ['Hire From Us', '/hire-from-us'], ['Blog', '/blog'], ['Privacy Policy', '/privacy-policy'], ['Terms of Service', '/terms-of-service']],
+                    'fallback' => [['About Us', '/about'], ['Why MapeLead', '/why-us'], ['Hire From Us', '/hire-from-us'], ['Blog', '/blog'], ['Privacy Policy', '/privacy-policy'], ['Terms of Service', '/terms-of-service']],
                 ],
             ] as $col)
                 <div>
@@ -134,7 +134,7 @@
     {{-- Bottom Bar --}}
     <div class="border-t border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
-            <p>{{ $footer['footer_copyright'] ?? '© ' . date('Y') . ' MapeLeads. All rights reserved.' }}</p>
+            <p>{{ $footer['footer_copyright'] ?? '© ' . date('Y') . ' MapeLead. All rights reserved.' }}</p>
             <div class="flex gap-4">
                 <a href="/privacy-policy" class="hover:text-gray-300 transition-colors">Privacy Policy</a>
                 <a href="/terms-of-service" class="hover:text-gray-300 transition-colors">Terms of Service</a>

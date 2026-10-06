@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BlogManagementController extends Controller
 {
@@ -42,12 +43,17 @@ class BlogManagementController extends Controller
             'scheduled_at'     => 'nullable|date',
             'meta_title'       => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
+            'featured_image'   => 'nullable|image|max:2048',
         ]);
 
         $data['user_id']        = auth()->id();
         $data['is_featured']    = $request->boolean('is_featured');
         $data['allow_comments'] = $request->boolean('allow_comments', true);
         $data['read_time_minutes'] = max(1, (int) (str_word_count(strip_tags($data['content'])) / 200));
+
+        if ($request->hasFile('featured_image')) {
+            $data['featured_image'] = $request->file('featured_image')->store('blog', 'public');
+        }
 
         if (empty($data['category_id'])) {
             $data['category_id'] = BlogCategory::firstOrCreate(
@@ -92,11 +98,19 @@ class BlogManagementController extends Controller
             'scheduled_at'     => 'nullable|date',
             'meta_title'       => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
+            'featured_image'   => 'nullable|image|max:2048',
         ]);
 
         $data['is_featured']    = $request->boolean('is_featured');
         $data['allow_comments'] = $request->boolean('allow_comments');
         $data['read_time_minutes'] = max(1, (int) (str_word_count(strip_tags($data['content'])) / 200));
+
+        if ($request->hasFile('featured_image')) {
+            if ($post->featured_image) {
+                Storage::disk('public')->delete($post->featured_image);
+            }
+            $data['featured_image'] = $request->file('featured_image')->store('blog', 'public');
+        }
 
         if (empty($data['category_id'])) {
             $data['category_id'] = BlogCategory::firstOrCreate(

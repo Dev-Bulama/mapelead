@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', $settings['meta_title'] ?? 'MapeLeads — Industry-Leading Tech Training')
-@section('meta_description', $settings['meta_description'] ?? 'Join 10,000+ professionals transforming their careers with MapeLeads\'s industry-led tech programs.')
+@section('title', $settings['meta_title'] ?? 'MapeLead — Industry-Leading Tech Training')
+@section('meta_description', $settings['meta_description'] ?? 'Join 10,000+ professionals transforming their careers with MapeLead\'s industry-led tech programs.')
 
 @section('content')
 
@@ -333,8 +333,8 @@ function newsTicker() {
         {{-- Section Header --}}
         <div class="text-center mb-14">
             <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Programs</span>
-            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Explore Our Programs</h2>
-            <p class="text-gray-500 text-lg max-w-xl mx-auto">Choose from our curated selection of in-demand technology tracks designed to fast-track your career.</p>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{{ $settings['programs_title'] ?? 'Explore Our Programs' }}</h2>
+            <p class="text-gray-500 text-lg max-w-xl mx-auto">{{ $settings['programs_subtitle'] ?? 'Choose from our curated selection of in-demand technology tracks designed to fast-track your career.' }}</p>
         </div>
 
         @if(isset($categories) && $categories->count())
@@ -385,7 +385,7 @@ function newsTicker() {
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
             <div>
                 <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Top Picks</span>
-                <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900">Popular Courses</h2>
+                <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900">{{ $settings['courses_title'] ?? 'Popular Courses' }}</h2>
             </div>
             <a href="{{ route('courses.index') }}" class="inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 font-semibold transition-colors shrink-0">
                 View all courses
@@ -502,7 +502,7 @@ function newsTicker() {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
             <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Our Difference</span>
-            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Why 10,000+ Students Choose MapeLeads</h2>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Why 10,000+ Students Choose MapeLead</h2>
             <p class="text-gray-500 text-lg max-w-2xl mx-auto">We've built every aspect of our platform with one goal: getting you hired and growing your career faster.</p>
         </div>
 
@@ -769,8 +769,8 @@ function newsTicker() {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-14">
             <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Success Stories</span>
-            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">What Our Students Say</h2>
-            <p class="text-gray-500 text-lg max-w-xl mx-auto">Real stories from real people who transformed their careers with MapeLeads.</p>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{{ $settings['testimonials_title'] ?? 'What Our Students Say' }}</h2>
+            <p class="text-gray-500 text-lg max-w-xl mx-auto">{{ $settings['testimonials_subtitle'] ?? 'Real stories from real people who transformed their careers with MapeLead.' }}</p>
         </div>
 
         @if(isset($testimonials) && count($testimonials))
@@ -1024,7 +1024,7 @@ function newsTicker() {
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
             <div>
                 <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Insights</span>
-                <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900">Latest Insights</h2>
+                <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900">{{ $settings['blog_title'] ?? 'Latest Insights' }}</h2>
             </div>
             <a href="{{ route('blog.index') }}" class="inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 font-semibold transition-colors shrink-0">
                 View all articles
@@ -1091,8 +1091,8 @@ function newsTicker() {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-14">
             <span class="inline-block text-brand-600 font-semibold text-sm uppercase tracking-widest mb-3">Gallery</span>
-            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Life at MapeLeads</h2>
-            <p class="text-gray-500 text-lg max-w-xl mx-auto">Glimpses of our campus, training sessions, and the vibrant community you'll be part of.</p>
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{{ $settings['gallery_title'] ?? 'Life at MapeLead' }}</h2>
+            <p class="text-gray-500 text-lg max-w-xl mx-auto">{{ $settings['gallery_subtitle'] ?? 'Glimpses of our campus, training sessions, and the vibrant community you\'ll be part of.' }}</p>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             @foreach($galleryItems->take(12) as $index => $item)
@@ -1169,7 +1169,7 @@ function galleryLightbox() {
 @endif
 
 {{-- ═══════════════════════════════════════════════════════════════════
-     SCHOLARSHIPS / HIRE FROM US / WHY MAPELEADS PROMO STRIP
+     SCHOLARSHIPS / HIRE FROM US / WHY MAPELEAD PROMO STRIP
 ═══════════════════════════════════════════════════════════════════ --}}
 <section class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1191,10 +1191,10 @@ function galleryLightbox() {
                 </a>
             </div>
 
-            {{-- Why MapeLeads --}}
+            {{-- Why MapeLead --}}
             <div class="group relative bg-gradient-to-br from-brand-50 to-blue-50 border border-brand-100 rounded-2xl p-8 flex flex-col hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div class="w-14 h-14 bg-brand-100 rounded-2xl flex items-center justify-center text-2xl mb-5">🚀</div>
-                <h3 class="font-display font-bold text-gray-900 text-xl mb-3">Why Choose MapeLeads?</h3>
+                <h3 class="font-display font-bold text-gray-900 text-xl mb-3">Why Choose MapeLead?</h3>
                 <p class="text-gray-600 text-sm leading-relaxed flex-1">Expert instructors, flexible schedules, hands-on projects, and a 92% job placement rate. Discover what sets us apart from the rest.</p>
                 <a href="{{ route('why-us') }}"
                    class="mt-6 inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm self-start">
@@ -1206,7 +1206,7 @@ function galleryLightbox() {
             {{-- Hire From Us --}}
             <div class="group relative bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 rounded-2xl p-8 flex flex-col hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                 <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center text-2xl mb-5">🤝</div>
-                <h3 class="font-display font-bold text-gray-900 text-xl mb-3">Hire From MapeLeads</h3>
+                <h3 class="font-display font-bold text-gray-900 text-xl mb-3">Hire From MapeLead</h3>
                 <p class="text-gray-600 text-sm leading-relaxed flex-1">Looking for job-ready tech talent? Our graduates are trained to industry standards across development, data, design, and more.</p>
                 <a href="{{ route('hire-from-us') }}"
                    class="mt-6 inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm self-start">

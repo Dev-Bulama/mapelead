@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', isset($category) ? $category->name . ' Courses — MapeLeads' : 'All Courses — MapeLeads')
-@section('meta_description', isset($category) ? 'Browse ' . $category->name . ' courses on MapeLeads.' : 'Explore all courses on MapeLeads. Filter by category, level, type and price.')
+@section('title', isset($category) ? $category->name . ' Courses — MapeLead' : 'All Courses — MapeLead')
+@section('meta_description', isset($category) ? 'Browse ' . $category->name . ' courses on MapeLead.' : 'Explore all courses on MapeLead. Filter by category, level, type and price.')
 
 @section('content')
 

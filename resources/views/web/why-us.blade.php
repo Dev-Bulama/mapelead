@@ -1,17 +1,17 @@
 @extends('layouts.app')
-@section('title', ($content['why_title'] ?? 'Why MapeLeads') . ' — ' . \App\Models\SiteSetting::get('site_name', 'MapeLeads'))
-@section('meta_description', 'Discover why thousands of students choose MapeLeads for their tech education journey — practical training, expert instructors, and proven career outcomes.')
+@section('title', ($content['why_title'] ?? 'Why MapeLead') . ' — ' . \App\Models\SiteSetting::get('site_name', 'MapeLead'))
+@section('meta_description', 'Discover why thousands of students choose MapeLead for their tech education journey — practical training, expert instructors, and proven career outcomes.')
 
 @section('content')
 
 @php
-    $title      = $content['why_title']    ?? 'Why Choose MapeLeads?';
+    $title      = $content['why_title']    ?? 'Why Choose MapeLead?';
     $subtitle   = $content['why_subtitle'] ?? 'More than a tech school — a launchpad for your career';
-    $intro      = $content['why_intro']    ?? 'We built MapeLeads because we believe access to quality tech education shouldn\'t depend on your postcode or your pocket. Here\'s what sets us apart.';
+    $intro      = $content['why_intro']    ?? 'We built MapeLead because we believe access to quality tech education shouldn\'t depend on your postcode or your pocket. Here\'s what sets us apart.';
     $reasons    = $content['why_reasons']  ?? '';
     $ctaText    = $content['why_cta_text'] ?? 'Explore Our Courses';
     $ctaUrl     = $content['why_cta_url']  ?? '/courses';
-    $siteName   = \App\Models\SiteSetting::get('site_name', 'MapeLeads');
+    $siteName   = \App\Models\SiteSetting::get('site_name', 'MapeLead');
 @endphp
 
 {{-- Hero --}}

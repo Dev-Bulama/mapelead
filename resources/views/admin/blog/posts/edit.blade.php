@@ -13,7 +13,7 @@
     </div>
     @endif
 
-    <form action="{{ route('admin.blog.posts.update', $post) }}" method="POST" class="space-y-5">
+    <form action="{{ route('admin.blog.posts.update', $post) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
         @csrf @method('PUT')
         <div class="bg-white rounded-2xl border p-6 space-y-4">
             <div>
@@ -30,6 +30,22 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">Content <span class="text-red-500">*</span></label>
                 <textarea name="content" rows="14" required
                     class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 font-mono">{{ old('content', $post->content) }}</textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Featured Image</label>
+                @if($post->featured_image)
+                <div class="mb-2">
+                    <img src="{{ asset('storage/' . $post->featured_image) }}" alt="Current featured image"
+                         class="h-28 rounded-lg object-cover border border-gray-200">
+                    <p class="text-xs text-gray-400 mt-1">Current image. Upload a new one to replace it.</p>
+                </div>
+                @endif
+                <input type="file" name="featured_image" accept="image/*"
+                    class="block w-full text-sm text-gray-500
+                           file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0
+                           file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700
+                           hover:file:bg-brand-100 transition">
+                <p class="text-xs text-gray-400 mt-1">PNG, JPG or WebP, max 2MB. Recommended: 1200×630px.</p>
             </div>
         </div>
 

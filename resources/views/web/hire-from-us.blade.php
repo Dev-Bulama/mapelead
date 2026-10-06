@@ -1,18 +1,18 @@
 @extends('layouts.app')
-@section('title', ($content['hire_title'] ?? 'Hire From Us') . ' — ' . \App\Models\SiteSetting::get('site_name', 'MapeLeads'))
-@section('meta_description', 'Hire skilled tech professionals trained and certified by MapeLeads. Access a pipeline of job-ready graduates across software development, data, design, and more.')
+@section('title', ($content['hire_title'] ?? 'Hire From Us') . ' — ' . \App\Models\SiteSetting::get('site_name', 'MapeLead'))
+@section('meta_description', 'Hire skilled tech professionals trained and certified by MapeLead. Access a pipeline of job-ready graduates across software development, data, design, and more.')
 
 @section('content')
 
 @php
-    $title      = $content['hire_title']    ?? 'Hire From MapeLeads';
+    $title      = $content['hire_title']    ?? 'Hire From MapeLead';
     $subtitle   = $content['hire_subtitle'] ?? 'Talent-ready tech professionals, trained to industry standards';
-    $intro      = $content['hire_intro']    ?? 'Our graduates are rigorously trained across the most in-demand tech disciplines. Whether you need a developer, data analyst, UX designer, or cybersecurity specialist, MapeLeads connects you with motivated, job-ready talent.';
+    $intro      = $content['hire_intro']    ?? 'Our graduates are rigorously trained across the most in-demand tech disciplines. Whether you need a developer, data analyst, UX designer, or cybersecurity specialist, MapeLead connects you with motivated, job-ready talent.';
     $whyHire    = $content['hire_why']      ?? '';
     $howItWorks = $content['hire_how_it_works'] ?? '';
     $ctaText    = $content['hire_cta_text'] ?? 'Get in Touch';
     $ctaUrl     = $content['hire_cta_url']  ?? '/contact';
-    $siteName   = \App\Models\SiteSetting::get('site_name', 'MapeLeads');
+    $siteName   = \App\Models\SiteSetting::get('site_name', 'MapeLead');
 @endphp
 
 {{-- Hero --}}

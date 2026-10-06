@@ -83,7 +83,7 @@
                                value="{{ old('site_name', $all['general']['site_name'] ?? '') }}"
                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                       focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
-                               placeholder="MapeLeads">
+                               placeholder="MapeLead">
                     </div>
 
                     {{-- Site Tagline --}}
@@ -225,8 +225,12 @@
                                 <p class="text-xs text-gray-400 mt-1">PNG, SVG or JPG, max 2MB. Recommended: 200×60px.</p>
                                 @if(!empty($all['general']['site_logo']))
                                     <p class="text-xs text-gray-400 mt-1">
-                                        Current: <span class="text-gray-500">{{ basename($all['general']['site_logo']) }}</span>
+                                        Current file: <span class="text-gray-500">{{ basename($all['general']['site_logo']) }}</span>
                                     </p>
+                                    <p class="text-xs text-gray-400 mt-0.5">
+                                        URL: <a href="{{ asset('storage/' . $all['general']['site_logo']) }}" target="_blank" class="text-brand-600 underline break-all">{{ asset('storage/' . $all['general']['site_logo']) }}</a>
+                                    </p>
+                                    <p class="text-xs text-amber-600 mt-0.5">If the logo doesn't appear on the site, run <code class="bg-gray-100 px-1 rounded">php artisan storage:link</code> on the server.</p>
                                 @endif
                             </div>
                         </div>
@@ -362,6 +366,74 @@
                         </div>
                     </div>
 
+                    {{-- Section Headers --}}
+                    <div class="md:col-span-2 border-t border-gray-100 pt-6">
+                        <p class="text-sm font-semibold text-gray-700 mb-4">Section Headers</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Programs Section Title</label>
+                                <input type="text" name="programs_title"
+                                       value="{{ old('programs_title', $all['homepage']['programs_title'] ?? '') }}"
+                                       class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                       placeholder="Explore Our Programs">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Programs Section Subtitle</label>
+                                <input type="text" name="programs_subtitle"
+                                       value="{{ old('programs_subtitle', $all['homepage']['programs_subtitle'] ?? '') }}"
+                                       class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                       placeholder="Choose from our curated selection of in-demand technology tracks...">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Courses Section Title</label>
+                                <input type="text" name="courses_title"
+                                       value="{{ old('courses_title', $all['homepage']['courses_title'] ?? '') }}"
+                                       class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                       placeholder="Popular Courses">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Testimonials Section Title</label>
+                                <input type="text" name="testimonials_title"
+                                       value="{{ old('testimonials_title', $all['homepage']['testimonials_title'] ?? '') }}"
+                                       class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                       placeholder="What Our Students Say">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Testimonials Subtitle</label>
+                                <input type="text" name="testimonials_subtitle"
+                                       value="{{ old('testimonials_subtitle', $all['homepage']['testimonials_subtitle'] ?? '') }}"
+                                       class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                       placeholder="Real stories from real people who transformed their careers...">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Gallery Section Title</label>
+                                <input type="text" name="gallery_title"
+                                       value="{{ old('gallery_title', $all['homepage']['gallery_title'] ?? '') }}"
+                                       class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                       placeholder="Life at MapeLead">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Gallery Subtitle</label>
+                                <input type="text" name="gallery_subtitle"
+                                       value="{{ old('gallery_subtitle', $all['homepage']['gallery_subtitle'] ?? '') }}"
+                                       class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                       placeholder="Glimpses of our campus, training sessions, and the vibrant community...">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Blog Section Title</label>
+                                <input type="text" name="blog_title"
+                                       value="{{ old('blog_title', $all['homepage']['blog_title'] ?? '') }}"
+                                       class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
+                                       placeholder="Latest Insights">
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="flex justify-end pt-2 border-t border-gray-100">
@@ -406,12 +478,15 @@
                                 </svg>
                                 {{ $field['label'] }}
                             </label>
-                            <input type="url"
+                            <input type="{{ $key === 'whatsapp_number' ? 'text' : 'url' }}"
                                    name="{{ $key }}"
                                    value="{{ old($key, $all['social'][$key] ?? '') }}"
                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
                                    placeholder="{{ $field['placeholder'] }}">
+                            @if($key === 'whatsapp_number')
+                                <p class="text-xs text-gray-400 mt-1">Enter digits only, e.g. 2348012345678 (country code + number, no spaces or symbols).</p>
+                            @endif
                         </div>
                     @endforeach
 
@@ -451,7 +526,7 @@
                                maxlength="70"
                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                       focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
-                               placeholder="MapeLeads – Africa's Premier Tech Training Platform">
+                               placeholder="MapeLead – Africa's Premier Tech Training Platform">
                         <p class="text-xs text-gray-400 mt-1">Recommended: 50–60 characters. Used on pages without a specific title.</p>
                     </div>
 
@@ -662,7 +737,7 @@
                                value="{{ old('footer_copyright', $all['footer']['footer_copyright'] ?? '') }}"
                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                       focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
-                               placeholder="© 2025 MapeLeads. All rights reserved.">
+                               placeholder="© 2025 MapeLead. All rights reserved.">
                     </div>
 
                     {{-- Render remaining footer settings dynamically --}}
@@ -855,7 +930,7 @@
                                    value="{{ old('mail_from_name', env('MAIL_FROM_NAME', '')) }}"
                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                           focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"
-                                   placeholder="MapeLeads">
+                                   placeholder="MapeLead">
                         </div>
 
                     </div>
@@ -1094,14 +1169,14 @@
                     <div class="flex items-center gap-2 mb-5">
                         <div class="w-8 h-8 bg-green-100 rounded-xl flex items-center justify-center"><span class="text-lg">⭐</span></div>
                         <div>
-                            <h3 class="text-sm font-semibold text-gray-900">Why MapeLeads Page</h3>
+                            <h3 class="text-sm font-semibold text-gray-900">Why MapeLead Page</h3>
                             <p class="text-xs text-gray-400">Accessible at <a href="{{ route('why-us') }}" target="_blank" class="text-brand-600 hover:underline">/why-us</a></p>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Page Title</label>
-                            <input type="text" name="why_title" value="{{ old('why_title', $all['pages']['why_title'] ?? 'Why Choose MapeLeads?') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Why Choose MapeLeads?">
+                            <input type="text" name="why_title" value="{{ old('why_title', $all['pages']['why_title'] ?? 'Why Choose MapeLead?') }}" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Why Choose MapeLead?">
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-gray-600 mb-1">Subtitle</label>
@@ -1109,7 +1184,7 @@
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-xs font-medium text-gray-600 mb-1">Intro Paragraph</label>
-                            <textarea name="why_intro" rows="3" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="What makes MapeLeads different from other training centres...">{{ old('why_intro', $all['pages']['why_intro'] ?? '') }}</textarea>
+                            <textarea name="why_intro" rows="3" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 outline-none" placeholder="What makes MapeLead different from other training centres...">{{ old('why_intro', $all['pages']['why_intro'] ?? '') }}</textarea>
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-xs font-medium text-gray-600 mb-1">Additional Content (HTML allowed)</label>

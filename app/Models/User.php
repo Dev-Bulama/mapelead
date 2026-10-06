@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -141,6 +142,13 @@ class User extends Authenticatable implements MustVerifyEmail
             ->logOnly(['first_name', 'last_name', 'email', 'status'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges();
+    }
+
+    // ─── Email Verification ───────────────────────────────────────────────────
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmailNotification);
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────────────

@@ -10,7 +10,7 @@
     </div>
     @endif
 
-    <form action="{{ route('admin.blog.posts.store') }}" method="POST" class="space-y-5">
+    <form action="{{ route('admin.blog.posts.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
         @csrf
         <div class="bg-white rounded-2xl border p-6 space-y-4">
             <div>
@@ -29,6 +29,15 @@
                 <textarea name="content" rows="14" required
                     class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 font-mono">{{ old('content') }}</textarea>
                 <p class="text-xs text-gray-400 mt-1">HTML is supported.</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Featured Image</label>
+                <input type="file" name="featured_image" accept="image/*"
+                    class="block w-full text-sm text-gray-500
+                           file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0
+                           file:text-sm file:font-medium file:bg-brand-50 file:text-brand-700
+                           hover:file:bg-brand-100 transition">
+                <p class="text-xs text-gray-400 mt-1">PNG, JPG or WebP, max 2MB. Recommended: 1200×630px.</p>
             </div>
         </div>
 

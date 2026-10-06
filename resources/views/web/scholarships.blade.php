@@ -1,18 +1,18 @@
 @extends('layouts.app')
-@section('title', ($content['scholarships_title'] ?? 'Scholarships') . ' — ' . \App\Models\SiteSetting::get('site_name', 'MapeLeads'))
-@section('meta_description', 'Learn about scholarships and financial aid available at MapeLeads to make quality tech education accessible to everyone.')
+@section('title', ($content['scholarships_title'] ?? 'Scholarships') . ' — ' . \App\Models\SiteSetting::get('site_name', 'MapeLead'))
+@section('meta_description', 'Learn about scholarships and financial aid available at MapeLead to make quality tech education accessible to everyone.')
 
 @section('content')
 
 @php
     $title      = $content['scholarships_title']    ?? 'Scholarships & Financial Aid';
     $subtitle   = $content['scholarships_subtitle'] ?? 'Making quality tech education accessible to all';
-    $intro      = $content['scholarships_intro']    ?? 'At MapeLeads, we believe financial barriers should never stand in the way of a world-class tech education. Our scholarship programme is designed to open doors for talented, driven individuals who need a helping hand.';
+    $intro      = $content['scholarships_intro']    ?? 'At MapeLead, we believe financial barriers should never stand in the way of a world-class tech education. Our scholarship programme is designed to open doors for talented, driven individuals who need a helping hand.';
     $eligibility     = $content['scholarships_eligibility']    ?? '';
     $howToApply      = $content['scholarships_how_to_apply']   ?? '';
     $ctaText         = $content['scholarships_cta_text']       ?? 'Apply Now';
     $ctaUrl          = $content['scholarships_cta_url']        ?? '/contact';
-    $siteName        = \App\Models\SiteSetting::get('site_name', 'MapeLeads');
+    $siteName        = \App\Models\SiteSetting::get('site_name', 'MapeLead');
 @endphp
 
 {{-- Hero --}}
