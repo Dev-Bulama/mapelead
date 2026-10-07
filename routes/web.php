@@ -354,6 +354,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/settings/menus/items/{item}', [SettingsController::class, 'destroyMenuItem'])->name('settings.menus.items.destroy');
     Route::post('/settings/menus/items/reorder', [SettingsController::class, 'reorderMenuItems'])->name('settings.menus.items.reorder');
     Route::post('/settings/integrations', [SettingsController::class, 'updateIntegrations'])->name('settings.integrations');
+    Route::post('/settings/test-mail', [SettingsController::class, 'testMail'])->name('settings.test-mail');
     Route::post('/settings/{group}', [SettingsController::class, 'update'])->name('settings.update');
 
     // Mobile App Settings

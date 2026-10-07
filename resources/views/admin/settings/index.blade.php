@@ -895,6 +895,66 @@
                     </div>
                 </div>
 
+                {{-- ── SMTP Connectivity Test ──────────────────────────── --}}
+                @if(\Illuminate\Support\Facades\Route::has('admin.settings.test-mail'))
+                <div x-data="{
+                        testEmail: '',
+                        testing: false,
+                        result: null,
+                        async sendTest() {
+                            if (!this.testEmail) return;
+                            this.testing = true;
+                            this.result = null;
+                            try {
+                                const res = await fetch('{{ route('admin.settings.test-mail') }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                        'Accept': 'application/json',
+                                    },
+                                    body: JSON.stringify({ email: this.testEmail }),
+                                });
+                                const data = await res.json();
+                                this.result = { success: data.success, message: data.message };
+                            } catch(e) {
+                                this.result = { success: false, message: 'Request failed: ' + e.message };
+                            }
+                            this.testing = false;
+                        }
+                     }"
+                     class="bg-blue-50 border border-blue-100 rounded-xl p-5">
+                    <h4 class="text-sm font-semibold text-blue-800 mb-1 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        Test SMTP Connection
+                    </h4>
+                    <p class="text-xs text-blue-600 mb-4">Send a test email using the saved SMTP settings above to verify they are working.</p>
+                    <div class="flex gap-3 items-start flex-wrap">
+                        <input type="email" x-model="testEmail"
+                               placeholder="Enter recipient email..."
+                               class="border border-blue-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none flex-1 min-w-[220px] bg-white">
+                        <button type="button" @click="sendTest()"
+                                :disabled="testing || !testEmail"
+                                class="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2 shrink-0">
+                            <svg x-show="testing" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            <span x-text="testing ? 'Sending…' : 'Send Test Email'"></span>
+                        </button>
+                    </div>
+                    <div x-show="result" x-cloak class="mt-3">
+                        <div :class="result?.success ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-800'"
+                             class="rounded-lg px-4 py-3 text-sm flex items-start gap-2">
+                            <svg x-show="result?.success" class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <svg x-show="!result?.success" class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <span x-text="result?.message"></span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-blue-500 mt-3">
+                        Note: If emails are queued (QUEUE_CONNECTION=database), they won't send until a queue worker processes them.
+                        Change <code class="bg-blue-100 px-1 rounded">QUEUE_CONNECTION=sync</code> in your <code class="bg-blue-100 px-1 rounded">.env</code> on the server to send emails immediately.
+                    </p>
+                </div>
+                @endif
+
                 <div class="border-t border-gray-100"></div>
 
                 {{-- ── Google OAuth Section ───────────────────────────── --}}

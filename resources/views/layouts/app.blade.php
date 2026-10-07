@@ -97,9 +97,88 @@
         {!! $script->code !!}
     @endforeach
 
-    {{-- Announcement Bar --}}
-    @php $announcement = \App\Models\Announcement::where('is_active', true)->where(fn($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>', now()))->first(); @endphp
+    {{-- Announcements --}}
+    @php
+        $announcement = \App\Models\Announcement::where('is_active', true)
+            ->where(fn($q) => $q->whereNull('starts_at')->orWhere('starts_at', '<=', now()))
+            ->where(fn($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>', now()))
+            ->first();
+    @endphp
     @if($announcement)
+        @php $announcementKey = 'dismissed_announcement_' . $announcement->id; @endphp
+
+        @if($announcement->type === 'popup')
+        {{-- Popup Modal --}}
+        <div x-data="{
+                show: !localStorage.getItem('{{ $announcementKey }}')
+             }"
+             x-show="show" x-cloak
+             class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+             style="background: rgba(0,0,0,0.55);">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative"
+                 style="border-top: 4px solid {{ $announcement->bg_color }};">
+                @if($announcement->is_dismissible)
+                <button @click="show = false; localStorage.setItem('{{ $announcementKey }}', '1')"
+                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+                @endif
+                @if($announcement->title)
+                <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $announcement->title }}</h3>
+                @endif
+                <p class="text-gray-700 leading-relaxed">{{ $announcement->message }}</p>
+                @if($announcement->url)
+                <div class="mt-5 flex gap-3 justify-end">
+                    <a href="{{ $announcement->url }}"
+                       class="px-5 py-2 rounded-lg text-sm font-semibold text-white"
+                       style="background-color: {{ $announcement->bg_color }}">
+                        {{ $announcement->url_text ?? 'Learn more' }}
+                    </a>
+                    @if($announcement->is_dismissible)
+                    <button @click="show = false; localStorage.setItem('{{ $announcementKey }}', '1')"
+                            class="px-5 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">
+                        Dismiss
+                    </button>
+                    @endif
+                </div>
+                @elseif($announcement->is_dismissible)
+                <div class="mt-5 text-right">
+                    <button @click="show = false; localStorage.setItem('{{ $announcementKey }}', '1')"
+                            class="px-5 py-2 rounded-lg text-sm font-semibold text-white"
+                            style="background-color: {{ $announcement->bg_color }}">
+                        Got it
+                    </button>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        @elseif($announcement->type === 'ticker')
+        {{-- Scrolling Ticker --}}
+        <div x-data="{ show: true }" x-show="show" x-cloak
+             style="background-color: {{ $announcement->bg_color }}; color: {{ $announcement->text_color }};"
+             class="py-2 text-sm font-medium relative overflow-hidden">
+            <div class="flex items-center gap-4 animate-marquee whitespace-nowrap">
+                @for($i = 0; $i < 3; $i++)
+                <span>
+                    {{ $announcement->message }}
+                    @if($announcement->url)
+                        &nbsp;—&nbsp;<a href="{{ $announcement->url }}" class="underline font-semibold">{{ $announcement->url_text ?? 'Learn more' }}</a>
+                    @endif
+                    &nbsp;&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;&nbsp;
+                </span>
+                @endfor
+            </div>
+            @if($announcement->is_dismissible)
+            <button @click="show = false"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 z-10 bg-black/10 rounded-full w-6 h-6 flex items-center justify-center text-xs">✕</button>
+            @endif
+        </div>
+        <style>
+            @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-33.333%); } }
+            .animate-marquee { animation: marquee 18s linear infinite; }
+        </style>
+
+        @else
+        {{-- Default: Bar --}}
         <div x-data="{ show: true }" x-show="show" x-cloak
              style="background-color: {{ $announcement->bg_color }}; color: {{ $announcement->text_color }};"
              class="text-center py-2 px-4 text-sm font-medium relative">
@@ -111,6 +190,7 @@
                 <button @click="show = false" class="absolute right-4 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100">✕</button>
             @endif
         </div>
+        @endif
     @endif
 
     {{-- Navigation --}}

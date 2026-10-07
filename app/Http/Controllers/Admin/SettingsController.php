@@ -177,4 +177,44 @@ class SettingsController extends Controller
 
         return back()->with('success', 'Integration settings saved successfully.');
     }
+
+    public function testMail(Request $request)
+    {
+        $request->validate(['email' => 'required|email|max:255']);
+
+        // Apply current DB mail settings to runtime config
+        try {
+            $s = \App\Models\SiteSetting::getGroup('integrations');
+            if (!empty($s['mail_mailer'])) {
+                \Illuminate\Support\Facades\Config::set('mail.default', $s['mail_mailer']);
+                \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.host',       $s['mail_host']       ?? config('mail.mailers.smtp.host'));
+                \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.port',       (int)($s['mail_port'] ?? 587));
+                \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.username',   $s['mail_username']   ?? config('mail.mailers.smtp.username'));
+                \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.password',   $s['mail_password']   ?? config('mail.mailers.smtp.password'));
+                \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.encryption', ($s['mail_encryption'] ?? 'tls') === 'null' ? null : ($s['mail_encryption'] ?? 'tls'));
+                \Illuminate\Support\Facades\Config::set('mail.from.address', $s['mail_from_address'] ?? config('mail.from.address'));
+                \Illuminate\Support\Facades\Config::set('mail.from.name',    $s['mail_from_name']    ?? config('mail.from.name'));
+            }
+        } catch (\Throwable) {}
+
+        // Purge cached mailer so it rebuilds with the updated config
+        try { app('mail.manager')->forgetMailers(); } catch (\Throwable) {}
+
+        try {
+            \Illuminate\Support\Facades\Mail::mailer(config('mail.default', 'smtp'))
+                ->raw(
+                    "This is a test email from " . config('app.name') . ".\n\n" .
+                    "Your SMTP configuration is working correctly.\n\n" .
+                    "Sent at: " . now()->toDateTimeString(),
+                    function ($msg) use ($request) {
+                        $msg->to($request->email)
+                            ->subject('Test Email — SMTP Configuration');
+                    }
+                );
+
+            return response()->json(['success' => true, 'message' => 'Test email sent to ' . $request->email . '. Please check your inbox.']);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+    }
 }
