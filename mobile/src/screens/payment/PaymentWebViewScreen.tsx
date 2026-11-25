@@ -13,9 +13,8 @@ import type { RootStackParamList } from '@/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PaymentWebView'>;
 
-// Paystack redirects to this URL pattern on success / cancel
-const SUCCESS_PATTERN = /paystack\.com\/checkout\/confirm/i;
-const CANCEL_PATTERN  = /paystack\.com\/checkout\/cancel/i;
+// After payment Paystack redirects to our callback_url: /enroll/callback/{reference}
+const SUCCESS_PATTERN = /mapelead\.org\/enroll\/callback\//i;
 
 export default function PaymentWebViewScreen({ route, navigation }: Props) {
   const { url, reference } = route.params;
@@ -50,14 +49,6 @@ export default function PaymentWebViewScreen({ route, navigation }: Props) {
     if (SUCCESS_PATTERN.test(navUrl) && !verified) {
       setLoading(true);
       verify();
-      return;
-    }
-
-    if (CANCEL_PATTERN.test(navUrl)) {
-      Alert.alert('Payment cancelled', 'Your payment was not completed.', [
-        { text: 'Try again', onPress: () => webRef.current?.reload() },
-        { text: 'Go back', style: 'cancel', onPress: () => navigation.goBack() },
-      ]);
     }
   };
 

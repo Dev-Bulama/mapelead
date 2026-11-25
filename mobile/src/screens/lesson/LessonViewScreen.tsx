@@ -319,10 +319,10 @@ export default function LessonViewScreen({ route, navigation }: Props) {
         </TouchableOpacity>
         <View style={S.headerActions}>
           <TouchableOpacity onPress={() => setShowNotes(v => !v)} style={S.headerIconBtn}>
-            <Ionicons name={showNotes ? 'document-text' : 'document-text-outline'} size={21} color={Colors.white} />
+            <Ionicons name={showNotes ? 'document-text' : 'document-text-outline'} size={21} color={Colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => toggleBookmark()} style={S.headerIconBtn}>
-            <Ionicons name={lesson.is_bookmarked ? 'bookmark' : 'bookmark-outline'} size={21} color={Colors.white} />
+            <Ionicons name={lesson.is_bookmarked ? 'bookmark' : 'bookmark-outline'} size={21} color={Colors.primary} />
           </TouchableOpacity>
         </View>
       </View>
