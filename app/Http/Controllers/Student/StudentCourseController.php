@@ -112,12 +112,39 @@ class StudentCourseController extends Controller
         return view('student.checkout', compact('course', 'batches', 'prices', 'installmentOptions'));
     }
 
+    public function checkCoupon(Request $request)
+    {
+        $request->validate(['code' => 'required|string', 'amount' => 'required|numeric|min:0']);
+
+        $coupon = \App\Models\Coupon::where('code', strtoupper(trim($request->code)))->first();
+
+        if (!$coupon || !$coupon->isValid()) {
+            return response()->json(['valid' => false, 'message' => 'Invalid or expired coupon code.']);
+        }
+        if ($coupon->minimum_order && $request->amount < $coupon->minimum_order) {
+            return response()->json(['valid' => false, 'message' => 'Minimum order of ₦' . number_format($coupon->minimum_order) . ' required for this coupon.']);
+        }
+
+        $discount = $coupon->calculateDiscount((float) $request->amount);
+        return response()->json([
+            'valid'    => true,
+            'code'     => $coupon->code,
+            'discount' => $discount,
+            'final'    => max(0, $request->amount - $discount),
+            'label'    => $coupon->type === 'percentage'
+                ? $coupon->value . '% off'
+                : '₦' . number_format($discount) . ' off',
+            'message'  => $coupon->description ?? ($coupon->type === 'percentage' ? $coupon->value . '% discount applied' : '₦' . number_format($discount) . ' discount applied'),
+        ]);
+    }
+
     public function initPayment(string $slug, Request $request)
     {
         $request->validate([
             'payment_type'      => 'required|in:full,installment',
             'training_type'     => 'required|in:online,physical_monthly,physical_quarterly',
             'batch_id'          => 'nullable|exists:batches,id',
+            'coupon_code'       => 'nullable|string|max:50',
             'down_payment'      => 'required_if:payment_type,installment|nullable|numeric|min:1000',
             'installment_count' => 'required_if:payment_type,installment|nullable|integer|min:2|max:10',
             'period_days'       => 'required_if:payment_type,installment|nullable|integer|min:1|max:30',
@@ -126,6 +153,19 @@ class StudentCourseController extends Controller
 
         $course = Course::published()->where('slug', $slug)->firstOrFail();
         $modePrice = $course->getPriceForMode($request->training_type);
+
+        // Apply coupon discount
+        $discount = 0;
+        $couponId = null;
+        if ($request->coupon_code && !$course->is_free) {
+            $coupon = \App\Models\Coupon::where('code', strtoupper(trim($request->coupon_code)))->first();
+            if ($coupon && $coupon->isValid() && (!$coupon->minimum_order || $modePrice >= $coupon->minimum_order)) {
+                $discount = $coupon->calculateDiscount($modePrice);
+                $couponId = $coupon->id;
+                $coupon->increment('used_count');
+            }
+        }
+        $finalPrice = max(0, $modePrice - $discount);
 
         if ($course->is_free) {
             $enrollment = $this->enrollmentService->enroll(auth()->user(), $course, [
@@ -142,7 +182,9 @@ class StudentCourseController extends Controller
         $enrollment = $this->enrollmentService->enroll(auth()->user(), $course, [
             'payment_type'  => $request->payment_type,
             'training_type' => $request->training_type,
-            'amount'        => $modePrice,
+            'amount'        => $finalPrice,
+            'coupon_id'     => $couponId,
+            'discount'      => $discount,
         ]);
 
         if ($request->batch_id) {
@@ -154,7 +196,7 @@ class StudentCourseController extends Controller
         // For installment, create plan first then pay down payment
         if ($request->payment_type === 'installment') {
             $this->installmentService->createPlan($enrollment, [
-                'total_amount'      => $modePrice,
+                'total_amount'      => $finalPrice,
                 'down_payment'      => $request->down_payment,
                 'installment_count' => $request->installment_count,
                 'period_days'       => $request->period_days,
@@ -164,7 +206,7 @@ class StudentCourseController extends Controller
 
             $paymentAmount = $request->down_payment;
         } else {
-            $paymentAmount = $modePrice;
+            $paymentAmount = $finalPrice;
         }
 
         try {

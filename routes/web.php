@@ -163,6 +163,7 @@ Route::middleware(['auth', 'verified'])->prefix('dashboard')->name('student.')->
 // ─── Enrollment & Payment ─────────────────────────────────────────────────────
 
 Route::middleware(['auth'])->prefix('enroll')->name('enroll.')->group(function () {
+    Route::post('/coupon/check', [StudentCourseController::class, 'checkCoupon'])->name('coupon.check');
     Route::get('/{slug}', [StudentCourseController::class, 'checkout'])->name('checkout');
     Route::post('/{slug}', [StudentCourseController::class, 'initPayment'])->name('payment.init');
     Route::get('/callback/{reference}', [StudentCourseController::class, 'paymentCallback'])->name('payment.callback');
