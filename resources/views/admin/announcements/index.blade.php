@@ -61,11 +61,11 @@
                     <div class="flex items-center justify-between mb-1">
                         <label class="block text-sm font-medium text-gray-700">Popup HTML Body</label>
                         <div class="flex gap-1">
-                            <button type="button" onclick="insertHtml('new_body_html','<strong>Bold</strong>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">B</button>
-                            <button type="button" onclick="insertHtml('new_body_html','<em>Italic</em>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50"><em>I</em></button>
-                            <button type="button" onclick="insertHtml('new_body_html','<a href=\"#\">Link Text</a>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">Link</button>
-                            <button type="button" onclick="insertHtml('new_body_html','<p style=\"text-align:center;\"><a href=\"#\" style=\"display:inline-block;padding:10px 24px;background:#1e3adb;color:#fff;border-radius:8px;font-weight:600;text-decoration:none;font-size:14px;\">Click Here</a></p>')" class="px-2 py-0.5 bg-white border border-blue-200 text-blue-700 rounded text-xs hover:bg-blue-50">+ Button</button>
-                            <button type="button" onclick="insertHtml('new_body_html','<hr style=\"border:none;border-top:1px solid #e5e7eb;margin:16px 0;\">')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">— Divider</button>
+                            <button type="button" onclick="insertSnippet('new_body_html','bold')" class="px-2 py-0.5 bg-white border rounded text-xs font-bold text-gray-600 hover:bg-gray-50">B</button>
+                            <button type="button" onclick="insertSnippet('new_body_html','italic')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50"><em>I</em></button>
+                            <button type="button" onclick="insertSnippet('new_body_html','link')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">Link</button>
+                            <button type="button" onclick="insertSnippet('new_body_html','button')" class="px-2 py-0.5 bg-white border border-blue-200 text-blue-700 rounded text-xs hover:bg-blue-50">+ Button</button>
+                            <button type="button" onclick="insertSnippet('new_body_html','divider')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">— Divider</button>
                         </div>
                     </div>
                     <textarea id="new_body_html" name="body_html" rows="8"
@@ -234,11 +234,11 @@
                                 <div class="flex items-center justify-between mb-1">
                                     <label class="block text-sm font-medium text-gray-700">HTML Body</label>
                                     <div class="flex gap-1">
-                                        <button type="button" onclick="insertHtml('edit_body_{{ $ann->id }}','<strong>Bold</strong>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">B</button>
-                                        <button type="button" onclick="insertHtml('edit_body_{{ $ann->id }}','<em>Italic</em>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50"><em>I</em></button>
-                                        <button type="button" onclick="insertHtml('edit_body_{{ $ann->id }}','<a href=\"#\">Link Text</a>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">Link</button>
-                                        <button type="button" onclick="insertHtml('edit_body_{{ $ann->id }}','<p style=\"text-align:center;\"><a href=\"#\" style=\"display:inline-block;padding:10px 24px;background:#1e3adb;color:#fff;border-radius:8px;font-weight:600;text-decoration:none;font-size:14px;\">Click Here</a></p>')" class="px-2 py-0.5 bg-white border border-blue-200 text-blue-700 rounded text-xs hover:bg-blue-50">+ Button</button>
-                                        <button type="button" onclick="insertHtml('edit_body_{{ $ann->id }}','<hr style=\"border:none;border-top:1px solid #e5e7eb;margin:16px 0;\">')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">— Divider</button>
+                                        <button type="button" onclick="insertSnippet('edit_body_{{ $ann->id }}','bold')" class="px-2 py-0.5 bg-white border rounded text-xs font-bold text-gray-600 hover:bg-gray-50">B</button>
+                                        <button type="button" onclick="insertSnippet('edit_body_{{ $ann->id }}','italic')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50"><em>I</em></button>
+                                        <button type="button" onclick="insertSnippet('edit_body_{{ $ann->id }}','link')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">Link</button>
+                                        <button type="button" onclick="insertSnippet('edit_body_{{ $ann->id }}','button')" class="px-2 py-0.5 bg-white border border-blue-200 text-blue-700 rounded text-xs hover:bg-blue-50">+ Button</button>
+                                        <button type="button" onclick="insertSnippet('edit_body_{{ $ann->id }}','divider')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">— Divider</button>
                                     </div>
                                 </div>
                                 <textarea id="edit_body_{{ $ann->id }}" name="body_html" rows="8"
@@ -329,9 +329,18 @@ function annForm() {
     return { type: 'ticker' };
 }
 
-function insertHtml(textareaId, snippet) {
+const POPUP_SNIPPETS = {
+    bold:    '<strong>Bold text</strong>',
+    italic:  '<em>Italic text</em>',
+    link:    '<a href="#">Link Text</a>',
+    button:  '<p style="text-align:center;"><a href="#" style="display:inline-block;padding:10px 24px;background:#1e3adb;color:#fff;border-radius:8px;font-weight:600;text-decoration:none;font-size:14px;">Click Here</a></p>',
+    divider: '<hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0;">',
+};
+
+function insertSnippet(textareaId, key) {
     const ta = document.getElementById(textareaId);
     if (!ta) return;
+    const snippet = POPUP_SNIPPETS[key] || '';
     const start = ta.selectionStart;
     const end = ta.selectionEnd;
     ta.value = ta.value.substring(0, start) + snippet + ta.value.substring(end);
