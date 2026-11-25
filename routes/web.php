@@ -14,6 +14,8 @@ use App\Http\Controllers\Student\StudentProfileController;
 use App\Http\Controllers\Student\TicketController;
 use App\Http\Controllers\Instructor\InstructorDashboardController;
 use App\Http\Controllers\Instructor\InstructorCourseController;
+use App\Http\Controllers\Instructor\InstructorContentController;
+use App\Http\Controllers\Instructor\InstructorProfileController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CourseManagementController;
@@ -179,6 +181,20 @@ Route::middleware(['auth', 'verified', 'role:instructor|admin|super_admin'])->pr
     Route::get('/courses/{id}/analytics', [InstructorDashboardController::class, 'courseAnalytics'])->name('course.analytics');
     Route::get('/students', [InstructorDashboardController::class, 'students'])->name('students');
     Route::get('/earnings', [InstructorDashboardController::class, 'earnings'])->name('earnings');
+
+    // Curriculum management (modules & lessons within own courses)
+    Route::post('/courses/{course}/modules', [InstructorContentController::class, 'storeModule'])->name('courses.modules.store');
+    Route::put('/courses/{course}/modules/{module}', [InstructorContentController::class, 'updateModule'])->name('courses.modules.update');
+    Route::delete('/courses/{course}/modules/{module}', [InstructorContentController::class, 'destroyModule'])->name('courses.modules.destroy');
+
+    Route::post('/courses/{course}/modules/{module}/lessons', [InstructorContentController::class, 'storeLesson'])->name('courses.modules.lessons.store');
+    Route::put('/courses/{course}/lessons/{lesson}', [InstructorContentController::class, 'updateLesson'])->name('courses.lessons.update');
+    Route::delete('/courses/{course}/lessons/{lesson}', [InstructorContentController::class, 'destroyLesson'])->name('courses.lessons.destroy');
+
+    // Instructor profile
+    Route::get('/profile', [InstructorProfileController::class, 'index'])->name('profile');
+    Route::post('/profile', [InstructorProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/password', [InstructorProfileController::class, 'updatePassword'])->name('profile.password');
 });
 
 // ─── Admin Dashboard Routes ────────────────────────────────────────────────────

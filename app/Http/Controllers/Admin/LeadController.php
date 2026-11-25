@@ -76,19 +76,24 @@ class LeadController extends Controller
             'reply' => 'required|string|max:5000',
         ]);
 
-        \Mail::send([], [], function ($message) use ($contact, $data) {
-            $message->to($contact->email, $contact->name)
-                    ->replyTo(config('mail.from.address'), config('mail.from.name'))
-                    ->subject('Re: ' . ($contact->subject ?? 'Your Message'))
-                    ->html(
-                        '<div style="font-family:sans-serif;max-width:600px;margin:0 auto">'
-                        . '<p>Hi ' . e($contact->name) . ',</p>'
-                        . '<div>' . nl2br(e($data['reply'])) . '</div>'
-                        . '<hr style="margin:24px 0;border:none;border-top:1px solid #e5e7eb">'
-                        . '<p style="color:#6b7280;font-size:13px">This is a reply to your message: <em>' . e($contact->subject ?? '') . '</em></p>'
-                        . '</div>'
-                    );
-        });
+        try {
+            \Mail::send([], [], function ($message) use ($contact, $data) {
+                $message->to($contact->email, $contact->name)
+                        ->replyTo(config('mail.from.address'), config('mail.from.name'))
+                        ->subject('Re: ' . ($contact->subject ?? 'Your Message'))
+                        ->html(
+                            '<div style="font-family:sans-serif;max-width:600px;margin:0 auto">'
+                            . '<p>Hi ' . e($contact->name) . ',</p>'
+                            . '<div>' . nl2br(e($data['reply'])) . '</div>'
+                            . '<hr style="margin:24px 0;border:none;border-top:1px solid #e5e7eb">'
+                            . '<p style="color:#6b7280;font-size:13px">This is a reply to your message: <em>' . e($contact->subject ?? '') . '</em></p>'
+                            . '</div>'
+                        );
+            });
+        } catch (\Exception $e) {
+            \Log::error('Contact reply mail failed: ' . $e->getMessage());
+            return back()->withErrors(['reply' => 'Failed to send reply: ' . $e->getMessage()]);
+        }
 
         $contact->update([
             'admin_reply' => $data['reply'],

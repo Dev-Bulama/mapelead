@@ -29,10 +29,12 @@ class AppServiceProvider extends ServiceProvider
             if (!empty($s['mail_mailer'])) {
                 Config::set('mail.default', $s['mail_mailer']);
                 Config::set('mail.mailers.smtp.host',       $s['mail_host']       ?? config('mail.mailers.smtp.host'));
-                Config::set('mail.mailers.smtp.port',       $s['mail_port']       ?? config('mail.mailers.smtp.port'));
-                Config::set('mail.mailers.smtp.username',   $s['mail_username']   ?? config('mail.mailers.smtp.username'));
-                Config::set('mail.mailers.smtp.password',   $s['mail_password']   ?? config('mail.mailers.smtp.password'));
-                Config::set('mail.mailers.smtp.encryption', ($s['mail_encryption'] ?? 'tls') === 'null' ? null : ($s['mail_encryption'] ?? 'tls'));
+                Config::set('mail.mailers.smtp.port',     (int) ($s['mail_port'] ?? config('mail.mailers.smtp.port')));
+                Config::set('mail.mailers.smtp.username', $s['mail_username'] ?? config('mail.mailers.smtp.username'));
+                Config::set('mail.mailers.smtp.password', $s['mail_password'] ?? config('mail.mailers.smtp.password'));
+                // Laravel 11 Symfony Mailer uses 'scheme', not 'encryption'
+                $scheme = ($s['mail_encryption'] ?? 'tls') === 'null' ? null : ($s['mail_encryption'] ?? 'tls');
+                Config::set('mail.mailers.smtp.scheme', $scheme);
                 Config::set('mail.from.address', $s['mail_from_address'] ?? config('mail.from.address'));
                 Config::set('mail.from.name',    $s['mail_from_name']    ?? config('mail.from.name'));
             }

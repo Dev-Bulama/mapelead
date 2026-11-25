@@ -11,8 +11,20 @@
     $enrollmentCount = $course->enrollments()->count();
 @endphp
 
-<div class="space-y-6">
+<div class="space-y-6"
+     x-data="{
+        addModuleOpen: false,
+        editModuleOpen: false,
+        editModule: {},
+        addLessonOpen: false,
+        addLessonModuleId: null,
+        addLessonModuleTitle: '',
+        editLessonOpen: false,
+        editLesson: {},
+        editLessonModuleId: null,
+     }">
 
+    {{-- Header --}}
     <div class="flex flex-wrap items-center gap-3">
         <a href="{{ route('instructor.courses.index') }}" class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -40,6 +52,8 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {{-- Left sidebar --}}
         <div class="space-y-4">
             <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                 @if($course->thumbnail)
@@ -77,8 +91,8 @@
                         </span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Enrolled</span>
-                        <span class="font-medium text-gray-900">{{ $enrollmentCount }} students</span>
+                        <span class="text-gray-500">Students</span>
+                        <span class="font-medium text-gray-900">{{ $enrollmentCount }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-500">Created</span>
@@ -91,15 +105,15 @@
                 <h3 class="text-sm font-semibold text-gray-900 mb-3">Course Stats</h3>
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Total Modules</span>
+                        <span class="text-gray-500">Modules</span>
                         <span class="font-medium text-gray-900">{{ $modules->count() }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Total Lessons</span>
+                        <span class="text-gray-500">Lessons</span>
                         <span class="font-medium text-gray-900">{{ $totalLessons }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-500">Total Duration</span>
+                        <span class="text-gray-500">Duration</span>
                         <span class="font-medium text-gray-900">
                             @if($totalDuration >= 60)
                                 {{ floor($totalDuration / 60) }}h {{ $totalDuration % 60 }}m
@@ -108,19 +122,22 @@
                             @endif
                         </span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Students</span>
-                        <span class="font-medium text-gray-900">{{ $enrollmentCount }}</span>
-                    </div>
                 </div>
             </div>
         </div>
 
+        {{-- Curriculum management --}}
         <div class="lg:col-span-2 space-y-4">
             <div class="bg-white rounded-2xl border border-gray-100 p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-base font-semibold text-gray-900">Curriculum</h3>
-                    <p class="text-xs text-gray-400 bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5">Manage curriculum in Admin Panel</p>
+                    <button @click="addModuleOpen = true"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-medium rounded-lg transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Add Module
+                    </button>
                 </div>
 
                 @if($modules->isEmpty())
@@ -128,30 +145,47 @@
                     <svg class="mx-auto h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <p class="mt-3 text-sm text-gray-500">No curriculum added yet.</p>
+                    <p class="mt-3 text-sm text-gray-500">No modules yet. Click <strong>Add Module</strong> to get started.</p>
                 </div>
                 @else
-                <div class="space-y-3" x-data="{ open: {} }">
+                <div class="space-y-3">
                     @foreach($modules as $index => $module)
-                    <div class="border border-gray-100 rounded-xl overflow-hidden">
-                        <button type="button"
-                            @click="open[{{ $index }}] = !open[{{ $index }}]"
-                            class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors text-left">
-                            <div class="flex items-center gap-3">
+                    <div class="border border-gray-100 rounded-xl overflow-hidden" x-data="{ open: {{ $index === 0 ? 'true' : 'false' }} }">
+                        {{-- Module header --}}
+                        <div class="flex items-center px-4 py-3 bg-gray-50">
+                            <button type="button" @click="open = !open"
+                                class="flex items-center gap-3 flex-1 text-left min-w-0">
                                 <span class="flex-shrink-0 w-6 h-6 bg-brand-100 text-brand-600 rounded-full flex items-center justify-center text-xs font-bold">{{ $index + 1 }}</span>
-                                <span class="font-medium text-gray-900 text-sm">{{ $module->title }}</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="text-xs text-gray-500">{{ $module->lessons->count() }} lesson{{ $module->lessons->count() !== 1 ? 's' : '' }}</span>
-                                <svg class="w-4 h-4 text-gray-400 transition-transform" :class="open[{{ $index }}] ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <span class="font-medium text-gray-900 text-sm truncate">{{ $module->title }}</span>
+                                <span class="text-xs text-gray-400 flex-shrink-0">{{ $module->lessons->count() }} lesson{{ $module->lessons->count() !== 1 ? 's' : '' }}</span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ml-auto" :class="open ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
+                            </button>
+                            <div class="flex items-center gap-1 ml-3 flex-shrink-0">
+                                <button type="button"
+                                    @click="editModule = { id: {{ $module->id }}, title: '{{ addslashes($module->title) }}', description: '{{ addslashes($module->description ?? '') }}', sort_order: {{ $module->sort_order }}, is_free_preview: {{ $module->is_free_preview ? 'true' : 'false' }} }; editModuleOpen = true"
+                                    class="p-1.5 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                </button>
+                                <form method="POST" action="{{ route('instructor.courses.modules.destroy', [$course->id, $module->id]) }}"
+                                      onsubmit="return confirm('Delete this module and all its lessons?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
-                        </button>
+                        </div>
 
-                        <div x-show="open[{{ $index }}]" x-collapse class="divide-y divide-gray-50">
+                        {{-- Lessons list --}}
+                        <div x-show="open" x-collapse class="divide-y divide-gray-50">
                             @forelse($module->lessons->sortBy('sort_order') as $lesson)
-                            <div class="flex items-center gap-3 px-4 py-3">
+                            <div class="flex items-center gap-3 px-4 py-2.5">
                                 <div class="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center
                                     {{ $lesson->type === 'video' ? 'bg-blue-50' : ($lesson->type === 'quiz' ? 'bg-orange-50' : 'bg-gray-50') }}">
                                     @if($lesson->type === 'video')
@@ -172,18 +206,57 @@
                                     <p class="text-sm text-gray-800 truncate">{{ $lesson->title }}</p>
                                 </div>
                                 <div class="flex items-center gap-2 flex-shrink-0">
-                                    @if($lesson->is_free)
+                                    @if($lesson->is_free_preview)
                                         <span class="text-xs bg-green-50 text-green-600 border border-green-100 px-1.5 py-0.5 rounded">Free</span>
                                     @endif
                                     @if($lesson->duration_minutes)
                                         <span class="text-xs text-gray-400">{{ $lesson->duration_minutes }}m</span>
                                     @endif
                                     <span class="text-xs text-gray-400 capitalize">{{ $lesson->type }}</span>
+                                    <button type="button"
+                                        @click="editLesson = {
+                                            id: {{ $lesson->id }},
+                                            title: '{{ addslashes($lesson->title) }}',
+                                            type: '{{ $lesson->type }}',
+                                            video_url: '{{ addslashes($lesson->video_url ?? '') }}',
+                                            video_provider: '{{ $lesson->video_provider ?? '' }}',
+                                            duration_minutes: '{{ $lesson->duration_minutes ?? '' }}',
+                                            content: '{{ addslashes(\Illuminate\Support\Str::limit($lesson->content ?? '', 500)) }}',
+                                            sort_order: {{ $lesson->sort_order }},
+                                            is_free_preview: {{ $lesson->is_free_preview ? 'true' : 'false' }},
+                                            is_published: {{ $lesson->is_published ? 'true' : 'false' }}
+                                        }; editLessonModuleId = {{ $module->id }}; editLessonOpen = true"
+                                        class="p-1 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors">
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                    </button>
+                                    <form method="POST" action="{{ route('instructor.courses.lessons.destroy', [$course->id, $lesson->id]) }}"
+                                          onsubmit="return confirm('Delete this lesson?')" class="inline">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                             @empty
-                            <div class="px-4 py-3 text-sm text-gray-400 italic">No lessons in this module.</div>
+                            <div class="px-4 py-3 text-sm text-gray-400 italic">No lessons yet.</div>
                             @endforelse
+
+                            {{-- Add lesson row --}}
+                            <div class="px-4 py-2.5">
+                                <button type="button"
+                                    @click="addLessonModuleId = {{ $module->id }}; addLessonModuleTitle = '{{ addslashes($module->title) }}'; addLessonOpen = true"
+                                    class="inline-flex items-center gap-1.5 text-xs text-brand-600 hover:text-brand-700 font-medium">
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                    Add Lesson
+                                </button>
+                            </div>
                         </div>
                     </div>
                     @endforeach
@@ -197,6 +270,265 @@
                 <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ $course->description }}</p>
             </div>
             @endif
+        </div>
+    </div>
+
+    {{-- ══ ADD MODULE MODAL ═══════════════════════════════════════════════════ --}}
+    <div x-show="addModuleOpen" x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         style="background:rgba(0,0,0,0.4);">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
+             @click.outside="addModuleOpen = false">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base font-semibold text-gray-900">Add Module</h3>
+                <button @click="addModuleOpen = false" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
+            <form method="POST" action="{{ route('instructor.courses.modules.store', $course->id) }}" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Module Title <span class="text-red-500">*</span></label>
+                    <input type="text" name="title" required
+                        class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        placeholder="e.g. Introduction to the Course">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <textarea name="description" rows="2"
+                        class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+                        placeholder="Optional overview of this module..."></textarea>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <input type="hidden" name="is_free_preview" value="0">
+                    <input type="checkbox" name="is_free_preview" value="1" class="rounded border-gray-300 text-brand-600">
+                    <span class="text-sm text-gray-700">Mark as free preview</span>
+                </label>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" @click="addModuleOpen = false"
+                        class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl transition-colors">Add Module</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- ══ EDIT MODULE MODAL ══════════════════════════════════════════════════ --}}
+    <div x-show="editModuleOpen" x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         style="background:rgba(0,0,0,0.4);">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6"
+             @click.outside="editModuleOpen = false">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base font-semibold text-gray-900">Edit Module</h3>
+                <button @click="editModuleOpen = false" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
+            <template x-if="editModule.id">
+                <form method="POST" :action="`{{ url('instructor/courses/' . $course->id . '/modules') }}/${editModule.id}`" class="space-y-4">
+                    @csrf @method('PUT')
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Module Title <span class="text-red-500">*</span></label>
+                        <input type="text" name="title" :value="editModule.title" required
+                            class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea name="description" rows="2" :value="editModule.description"
+                            class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+                        <input type="number" name="sort_order" :value="editModule.sort_order" min="0"
+                            class="w-28 px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <label class="flex items-center gap-2 cursor-pointer select-none">
+                        <input type="hidden" name="is_free_preview" value="0">
+                        <input type="checkbox" name="is_free_preview" value="1" :checked="editModule.is_free_preview" class="rounded border-gray-300 text-brand-600">
+                        <span class="text-sm text-gray-700">Free preview</span>
+                    </label>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" @click="editModuleOpen = false"
+                            class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl transition-colors">Save</button>
+                    </div>
+                </form>
+            </template>
+        </div>
+    </div>
+
+    {{-- ══ ADD LESSON MODAL ═══════════════════════════════════════════════════ --}}
+    <div x-show="addLessonOpen" x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+         style="background:rgba(0,0,0,0.4);">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 my-4"
+             @click.outside="addLessonOpen = false">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900">Add Lesson</h3>
+                    <p class="text-xs text-gray-400 mt-0.5" x-text="'Module: ' + addLessonModuleTitle"></p>
+                </div>
+                <button @click="addLessonOpen = false" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
+            <template x-if="addLessonModuleId">
+                <form method="POST" :action="`{{ url('instructor/courses/' . $course->id . '/modules') }}/${addLessonModuleId}/lessons`" class="space-y-4">
+                    @csrf
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Lesson Title <span class="text-red-500">*</span></label>
+                        <input type="text" name="title" required
+                            class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                            placeholder="e.g. Welcome & Course Overview">
+                    </div>
+                    <div x-data="{ lessonType: 'video' }">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Type <span class="text-red-500">*</span></label>
+                        <select name="type" x-model="lessonType"
+                            class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="video">Video</option>
+                            <option value="text">Text / Article</option>
+                            <option value="quiz">Quiz</option>
+                            <option value="assignment">Assignment</option>
+                            <option value="live">Live Session</option>
+                        </select>
+
+                        <div x-show="lessonType === 'video'" class="mt-3 space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Video URL</label>
+                                <input type="url" name="video_url"
+                                    class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                                    placeholder="https://www.youtube.com/watch?v=...">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Provider</label>
+                                <select name="video_provider"
+                                    class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                    <option value="">Select provider</option>
+                                    <option value="youtube">YouTube</option>
+                                    <option value="vimeo">Vimeo</option>
+                                    <option value="bunny">Bunny.net</option>
+                                    <option value="wistia">Wistia</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div x-show="lessonType !== 'video'" class="mt-3">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                            <textarea name="content" rows="4"
+                                class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+                                placeholder="Lesson content, instructions, or description..."></textarea>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
+                        <input type="number" name="duration_minutes" min="1"
+                            class="w-28 px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                            placeholder="15">
+                    </div>
+                    <div class="flex gap-5">
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <input type="hidden" name="is_free_preview" value="0">
+                            <input type="checkbox" name="is_free_preview" value="1" class="rounded border-gray-300 text-brand-600">
+                            <span class="text-sm text-gray-700">Free preview</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <input type="hidden" name="is_published" value="0">
+                            <input type="checkbox" name="is_published" value="1" checked class="rounded border-gray-300 text-brand-600">
+                            <span class="text-sm text-gray-700">Published</span>
+                        </label>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" @click="addLessonOpen = false"
+                            class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl transition-colors">Add Lesson</button>
+                    </div>
+                </form>
+            </template>
+        </div>
+    </div>
+
+    {{-- ══ EDIT LESSON MODAL ══════════════════════════════════════════════════ --}}
+    <div x-show="editLessonOpen" x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+         style="background:rgba(0,0,0,0.4);">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 my-4"
+             @click.outside="editLessonOpen = false">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base font-semibold text-gray-900">Edit Lesson</h3>
+                <button @click="editLessonOpen = false" class="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
+            <template x-if="editLesson.id">
+                <form method="POST" :action="`{{ url('instructor/courses/' . $course->id . '/lessons') }}/${editLesson.id}`" class="space-y-4">
+                    @csrf @method('PUT')
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Lesson Title <span class="text-red-500">*</span></label>
+                        <input type="text" name="title" :value="editLesson.title" required
+                            class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                        <select name="type" :value="editLesson.type"
+                            class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="video" :selected="editLesson.type === 'video'">Video</option>
+                            <option value="text" :selected="editLesson.type === 'text'">Text / Article</option>
+                            <option value="quiz" :selected="editLesson.type === 'quiz'">Quiz</option>
+                            <option value="assignment" :selected="editLesson.type === 'assignment'">Assignment</option>
+                            <option value="live" :selected="editLesson.type === 'live'">Live Session</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Video URL</label>
+                        <input type="url" name="video_url" :value="editLesson.video_url"
+                            class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Video Provider</label>
+                        <select name="video_provider"
+                            class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="">None</option>
+                            <option value="youtube" :selected="editLesson.video_provider === 'youtube'">YouTube</option>
+                            <option value="vimeo" :selected="editLesson.video_provider === 'vimeo'">Vimeo</option>
+                            <option value="bunny" :selected="editLesson.video_provider === 'bunny'">Bunny.net</option>
+                            <option value="wistia" :selected="editLesson.video_provider === 'wistia'">Wistia</option>
+                            <option value="other" :selected="editLesson.video_provider === 'other'">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                        <textarea name="content" rows="3" x-model="editLesson.content"
+                            class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Duration (min)</label>
+                            <input type="number" name="duration_minutes" :value="editLesson.duration_minutes" min="1"
+                                class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
+                            <input type="number" name="sort_order" :value="editLesson.sort_order" min="0"
+                                class="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        </div>
+                    </div>
+                    <div class="flex gap-5">
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <input type="hidden" name="is_free_preview" value="0">
+                            <input type="checkbox" name="is_free_preview" value="1" :checked="editLesson.is_free_preview" class="rounded border-gray-300 text-brand-600">
+                            <span class="text-sm text-gray-700">Free preview</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer select-none">
+                            <input type="hidden" name="is_published" value="0">
+                            <input type="checkbox" name="is_published" value="1" :checked="editLesson.is_published" class="rounded border-gray-300 text-brand-600">
+                            <span class="text-sm text-gray-700">Published</span>
+                        </label>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" @click="editLessonOpen = false"
+                            class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
+                        <button type="submit"
+                            class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl transition-colors">Save Lesson</button>
+                    </div>
+                </form>
+            </template>
         </div>
     </div>
 

@@ -3,6 +3,7 @@ namespace App\Services\CMS;
 
 use App\Models\EmailTemplate;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Mail\Message;
 
@@ -23,7 +24,8 @@ class EmailTemplateService
 
             $template->update(['last_used_at' => now()]);
             return true;
-        } catch (\Exception) {
+        } catch (\Exception $e) {
+            Log::error("EmailTemplateService: failed to send [{$slug}] to {$recipient->email}: " . $e->getMessage());
             return false;
         }
     }
