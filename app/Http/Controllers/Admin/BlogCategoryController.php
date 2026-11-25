@@ -30,7 +30,7 @@ class BlogCategoryController extends Controller
             'color'            => 'nullable|string|max:20',
             'parent_id'        => 'nullable|exists:blog_categories,id',
             'sort_order'       => 'nullable|integer|min:0',
-            'is_active'        => 'boolean',
+            'is_active'        => 'nullable|boolean',
             'meta_title'       => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
         ]);
@@ -44,8 +44,7 @@ class BlogCategoryController extends Controller
 
     public function show(BlogCategory $category)
     {
-        $category->load(['posts' => fn($q) => $q->latest()->limit(20)]);
-        return view('admin.blog.categories.show', compact('category'));
+        return redirect()->route('admin.blog.categories.edit', $category);
     }
 
     public function edit(BlogCategory $category)
@@ -65,7 +64,7 @@ class BlogCategoryController extends Controller
             'color'            => 'nullable|string|max:20',
             'parent_id'        => 'nullable|exists:blog_categories,id',
             'sort_order'       => 'nullable|integer|min:0',
-            'is_active'        => 'boolean',
+            'is_active'        => 'nullable|boolean',
             'meta_title'       => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
         ]);
