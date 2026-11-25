@@ -32,9 +32,11 @@ class AppServiceProvider extends ServiceProvider
                 Config::set('mail.mailers.smtp.port',     (int) ($s['mail_port'] ?? config('mail.mailers.smtp.port')));
                 Config::set('mail.mailers.smtp.username', $s['mail_username'] ?? config('mail.mailers.smtp.username'));
                 Config::set('mail.mailers.smtp.password', $s['mail_password'] ?? config('mail.mailers.smtp.password'));
-                // Laravel 11 Symfony Mailer uses 'scheme', not 'encryption'
-                $scheme = ($s['mail_encryption'] ?? 'tls') === 'null' ? null : ($s['mail_encryption'] ?? 'tls');
-                Config::set('mail.mailers.smtp.scheme', $scheme);
+                // Laravel 11 Symfony Mailer uses 'scheme' not 'encryption'; translate legacy values
+                $rawScheme = $s['mail_encryption'] ?? 'smtp';
+                if ($rawScheme === 'tls') $rawScheme = 'smtp';
+                if ($rawScheme === 'ssl') $rawScheme = 'smtps';
+                Config::set('mail.mailers.smtp.scheme', $rawScheme === 'null' ? null : $rawScheme);
                 Config::set('mail.from.address', $s['mail_from_address'] ?? config('mail.from.address'));
                 Config::set('mail.from.name',    $s['mail_from_name']    ?? config('mail.from.name'));
             }

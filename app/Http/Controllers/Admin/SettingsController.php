@@ -191,7 +191,11 @@ class SettingsController extends Controller
                 \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.port',       (int)($s['mail_port'] ?? 587));
                 \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.username',   $s['mail_username']   ?? config('mail.mailers.smtp.username'));
                 \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.password',   $s['mail_password']   ?? config('mail.mailers.smtp.password'));
-                $scheme = ($s['mail_encryption'] ?? 'tls') === 'null' ? null : ($s['mail_encryption'] ?? 'tls');
+                $rawScheme = $s['mail_encryption'] ?? 'smtp';
+                // Translate legacy SwiftMailer values to Symfony Mailer schemes
+                if ($rawScheme === 'tls') $rawScheme = 'smtp';
+                if ($rawScheme === 'ssl') $rawScheme = 'smtps';
+                $scheme = $rawScheme === 'null' ? null : $rawScheme;
                 \Illuminate\Support\Facades\Config::set('mail.mailers.smtp.scheme', $scheme);
                 \Illuminate\Support\Facades\Config::set('mail.from.address', $s['mail_from_address'] ?? config('mail.from.address'));
                 \Illuminate\Support\Facades\Config::set('mail.from.name',    $s['mail_from_name']    ?? config('mail.from.name'));

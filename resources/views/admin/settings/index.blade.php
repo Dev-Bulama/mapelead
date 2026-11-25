@@ -847,8 +847,14 @@
                             <select name="mail_encryption"
                                     class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                                            focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white">
-                                @foreach(['null' => 'None', 'tls' => 'TLS', 'ssl' => 'SSL'] as $val => $label)
-                                    <option value="{{ $val }}" {{ ($all['integrations']['mail_encryption'] ?? 'tls') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                                @foreach(['null' => 'None', 'smtp' => 'TLS (Port 587)', 'smtps' => 'SSL (Port 465)'] as $val => $label)
+                                    @php
+                                        $saved = $all['integrations']['mail_encryption'] ?? 'smtp';
+                                        // Migrate legacy 'tls'/'ssl' values stored before Symfony Mailer
+                                        if ($saved === 'tls') $saved = 'smtp';
+                                        if ($saved === 'ssl') $saved = 'smtps';
+                                    @endphp
+                                    <option value="{{ $val }}" {{ $saved === $val ? 'selected' : '' }}>{{ $label }}</option>
                                 @endforeach
                             </select>
                         </div>
