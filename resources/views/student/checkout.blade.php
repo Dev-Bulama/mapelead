@@ -163,7 +163,8 @@
                                 class="border-2 rounded-xl p-4 transition-all hover:border-brand-300 h-full">
                                 <p class="text-sm font-bold text-gray-900 mb-1">Full Payment</p>
                                 <p class="text-xs text-gray-500 mb-2">Pay once, instant access</p>
-                                <p class="text-xl font-bold text-brand-700">₦<span x-text="modePrice.toLocaleString()"></span></p>
+                                <p class="text-xl font-bold text-brand-700">₦<span x-text="finalPrice.toLocaleString()"></span></p>
+                                <p x-show="couponData" class="text-xs text-green-600 line-through">₦<span x-text="modePrice.toLocaleString()"></span></p>
                             </div>
                         </label>
                         <label class="cursor-pointer">
@@ -201,8 +202,8 @@
                                             <p class="text-xs text-gray-400">≈ per payment</p>
                                             <p class="text-sm font-bold text-brand-700">
                                                 ₦<span x-text="(selectedOptionIndex === {{ $idx }} && downPayment > 0)
-                                                    ? Math.ceil((modePrice - downPayment) / {{ $opt['count'] }}).toLocaleString()
-                                                    : Math.ceil(modePrice / {{ $opt['count'] }}).toLocaleString()">
+                                                    ? Math.ceil((finalPrice - downPayment) / {{ $opt['count'] }}).toLocaleString()
+                                                    : Math.ceil(finalPrice / {{ $opt['count'] }}).toLocaleString()">
                                                 </span>
                                             </p>
                                             <p x-show="selectedOptionIndex === {{ $idx }} && downPayment > 0"
@@ -229,7 +230,7 @@
                                 class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
                                 placeholder="e.g. 20000">
                             <p class="text-xs text-gray-400 mt-1">
-                                Remaining after down payment: <strong class="text-red-600">₦<span x-text="Math.max(0, modePrice - downPayment).toLocaleString()"></span></strong>
+                                Remaining after down payment: <strong class="text-red-600">₦<span x-text="Math.max(0, finalPrice - downPayment).toLocaleString()"></span></strong>
                             </p>
                         </div>
 
@@ -258,7 +259,7 @@
                                 <p>Pay <strong>₦<span x-text="downPayment.toLocaleString()"></span></strong> today as down payment.</p>
                                 <p x-show="currentOption">
                                     Then <strong x-text="currentOption ? currentOption.count : ''"></strong> payments of
-                                    ≈ <strong>₦<span x-text="currentOption && downPayment < modePrice ? Math.ceil((modePrice - downPayment) / currentOption.count).toLocaleString() : '0'"></span></strong>
+                                    ≈ <strong>₦<span x-text="currentOption && downPayment < finalPrice ? Math.ceil((finalPrice - downPayment) / currentOption.count).toLocaleString() : '0'"></span></strong>
                                     each, spaced <strong x-text="currentOption ? currentOption.period_days : ''"></strong> days apart.
                                 </p>
                                 <p x-show="currentOption" class="text-blue-700 font-semibold">
@@ -296,16 +297,16 @@
                             </button>
 
                             <div x-show="couponOpen" x-transition class="mt-2 space-y-2">
-                                <div class="flex gap-2">
+                                <div class="space-y-1.5">
                                     <input type="text" x-model="couponInput"
                                         @keydown.enter.prevent="applyCoupon()"
-                                        placeholder="Enter code"
-                                        class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-xs uppercase focus:ring-2 focus:ring-brand-500 focus:outline-none tracking-widest">
+                                        placeholder="Enter coupon code"
+                                        class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm uppercase focus:ring-2 focus:ring-brand-500 focus:outline-none tracking-widest">
                                     <button type="button" @click="applyCoupon()"
                                         :disabled="couponLoading || !couponInput.trim()"
-                                        class="bg-brand-600 text-white px-3 py-2 rounded-lg text-xs font-semibold hover:bg-brand-700 disabled:opacity-50">
-                                        <span x-show="!couponLoading">Apply</span>
-                                        <span x-show="couponLoading">…</span>
+                                        class="w-full bg-brand-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-700 disabled:opacity-50 transition-colors">
+                                        <span x-show="!couponLoading">Apply Coupon</span>
+                                        <span x-show="couponLoading">Checking…</span>
                                     </button>
                                 </div>
                                 <p x-show="couponError" x-text="couponError" class="text-xs text-red-600"></p>
