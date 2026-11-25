@@ -41,7 +41,16 @@ class EmailTemplateController extends \App\Http\Controllers\Controller
 
     public function edit(EmailTemplate $emailTemplate)
     {
-        return view('admin.cms.email-templates.edit', compact('emailTemplate'));
+        try {
+            $s       = \App\Models\SiteSetting::getGroup('general');
+            $appName = $s['site_name']  ?? config('app.name');
+            $logo    = !empty($s['site_logo']) ? asset('storage/' . $s['site_logo']) : null;
+        } catch (\Throwable) {
+            $appName = config('app.name');
+            $logo    = null;
+        }
+
+        return view('admin.cms.email-templates.edit', compact('emailTemplate', 'appName', 'logo'));
     }
 
     public function update(Request $request, EmailTemplate $emailTemplate)

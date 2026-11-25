@@ -2,6 +2,7 @@
 namespace App\Services\CMS;
 
 use App\Models\EmailTemplate;
+use App\Models\SiteSetting;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -9,6 +10,29 @@ use Illuminate\Mail\Message;
 
 class EmailTemplateService
 {
+    private function branding(): array
+    {
+        try {
+            $s = SiteSetting::getGroup('general');
+            return [
+                'app_name'      => $s['site_name']    ?? config('app.name'),
+                'logo_url'      => !empty($s['site_logo']) ? asset('storage/' . $s['site_logo']) : null,
+                'support_email' => $s['contact_email'] ?? config('mail.from.address'),
+            ];
+        } catch (\Throwable) {
+            return ['app_name' => config('app.name'), 'logo_url' => null, 'support_email' => null];
+        }
+    }
+
+    private function wrap(string $bodyHtml, string $subject = ''): string
+    {
+        $brand = $this->branding();
+        return view('emails.base', array_merge($brand, [
+            'subject'      => $subject,
+            'body_content' => $bodyHtml,
+        ]))->render();
+    }
+
     public function send(string $slug, User $recipient, array $variables = []): bool
     {
         $template = EmailTemplate::findBySlug($slug);
@@ -16,9 +40,10 @@ class EmailTemplateService
 
         $subject = $template->renderSubject($variables);
         $body    = $template->render($variables);
+        $html    = $this->wrap($body, $subject);
 
         try {
-            Mail::html($body, function (Message $message) use ($recipient, $subject) {
+            Mail::html($html, function (Message $message) use ($recipient, $subject) {
                 $message->to($recipient->email, $recipient->full_name)->subject($subject);
             });
 
@@ -35,9 +60,12 @@ class EmailTemplateService
         $template = EmailTemplate::findBySlug($slug);
         if (!$template) return null;
 
+        $subject = $template->renderSubject($variables);
+        $body    = $template->render($variables);
+
         return [
-            'subject' => $template->renderSubject($variables),
-            'body'    => $template->render($variables),
+            'subject' => $subject,
+            'body'    => $this->wrap($body, $subject),
         ];
     }
 }

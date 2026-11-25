@@ -97,100 +97,100 @@
         {!! $script->code !!}
     @endforeach
 
-    {{-- Announcements --}}
+    {{-- Announcements: popup and banner/ticker shown independently --}}
     @php
-        $announcement = \App\Models\Announcement::where('is_active', true)
+        $activeAnn = fn($q) => $q->where('is_active', true)
             ->where(fn($q) => $q->whereNull('starts_at')->orWhere('starts_at', '<=', now()))
-            ->where(fn($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>', now()))
-            ->first();
+            ->where(fn($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>', now()));
+        $popupAnn  = \App\Models\Announcement::where('type', 'popup')->tap($activeAnn)->first();
+        $bannerAnn = \App\Models\Announcement::whereIn('type', ['bar', 'ticker'])->tap($activeAnn)->first();
     @endphp
-    @if($announcement)
-        @php $announcementKey = 'dismissed_announcement_' . $announcement->id; @endphp
 
-        @if($announcement->type === 'popup')
-        {{-- Popup Modal --}}
-        <div x-data="{
-                show: !localStorage.getItem('{{ $announcementKey }}')
-             }"
-             x-show="show" x-cloak
-             class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-             style="background: rgba(0,0,0,0.55);">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative"
-                 style="border-top: 4px solid {{ $announcement->bg_color }};">
-                @if($announcement->is_dismissible)
-                <button @click="show = false; localStorage.setItem('{{ $announcementKey }}', '1')"
-                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
-                @endif
-                @if($announcement->title)
-                <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $announcement->title }}</h3>
-                @endif
-                <p class="text-gray-700 leading-relaxed">{{ $announcement->message }}</p>
-                @if($announcement->url)
-                <div class="mt-5 flex gap-3 justify-end">
-                    <a href="{{ $announcement->url }}"
-                       class="px-5 py-2 rounded-lg text-sm font-semibold text-white"
-                       style="background-color: {{ $announcement->bg_color }}">
-                        {{ $announcement->url_text ?? 'Learn more' }}
-                    </a>
-                    @if($announcement->is_dismissible)
-                    <button @click="show = false; localStorage.setItem('{{ $announcementKey }}', '1')"
-                            class="px-5 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">
-                        Dismiss
-                    </button>
-                    @endif
-                </div>
-                @elseif($announcement->is_dismissible)
-                <div class="mt-5 text-right">
-                    <button @click="show = false; localStorage.setItem('{{ $announcementKey }}', '1')"
-                            class="px-5 py-2 rounded-lg text-sm font-semibold text-white"
-                            style="background-color: {{ $announcement->bg_color }}">
-                        Got it
-                    </button>
-                </div>
+    @if($popupAnn)
+    {{-- Popup Modal --}}
+    @php $popupKey = 'dismissed_announcement_' . $popupAnn->id; @endphp
+    <div x-data="{ show: !localStorage.getItem('{{ $popupKey }}') }"
+         x-show="show" x-cloak
+         class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+         style="background: rgba(0,0,0,0.55);">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative"
+             style="border-top: 4px solid {{ $popupAnn->bg_color }};">
+            @if($popupAnn->is_dismissible)
+            <button @click="show = false; localStorage.setItem('{{ $popupKey }}', '1')"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            @endif
+            @if($popupAnn->title)
+            <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $popupAnn->title }}</h3>
+            @endif
+            <p class="text-gray-700 leading-relaxed">{{ $popupAnn->message }}</p>
+            @if($popupAnn->url)
+            <div class="mt-5 flex gap-3 justify-end">
+                <a href="{{ $popupAnn->url }}"
+                   class="px-5 py-2 rounded-lg text-sm font-semibold text-white"
+                   style="background-color: {{ $popupAnn->bg_color }}">
+                    {{ $popupAnn->url_text ?? 'Learn more' }}
+                </a>
+                @if($popupAnn->is_dismissible)
+                <button @click="show = false; localStorage.setItem('{{ $popupKey }}', '1')"
+                        class="px-5 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">
+                    Dismiss
+                </button>
                 @endif
             </div>
-        </div>
-
-        @elseif($announcement->type === 'ticker')
-        {{-- Scrolling Ticker --}}
-        <div x-data="{ show: true }" x-show="show" x-cloak
-             style="background-color: {{ $announcement->bg_color }}; color: {{ $announcement->text_color }};"
-             class="py-2 text-sm font-medium relative overflow-hidden">
-            <div class="flex items-center gap-4 animate-marquee whitespace-nowrap">
-                @for($i = 0; $i < 3; $i++)
-                <span>
-                    {{ $announcement->message }}
-                    @if($announcement->url)
-                        &nbsp;—&nbsp;<a href="{{ $announcement->url }}" class="underline font-semibold">{{ $announcement->url_text ?? 'Learn more' }}</a>
-                    @endif
-                    &nbsp;&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;&nbsp;
-                </span>
-                @endfor
+            @elseif($popupAnn->is_dismissible)
+            <div class="mt-5 text-right">
+                <button @click="show = false; localStorage.setItem('{{ $popupKey }}', '1')"
+                        class="px-5 py-2 rounded-lg text-sm font-semibold text-white"
+                        style="background-color: {{ $popupAnn->bg_color }}">
+                    Got it
+                </button>
             </div>
-            @if($announcement->is_dismissible)
-            <button @click="show = false"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 z-10 bg-black/10 rounded-full w-6 h-6 flex items-center justify-center text-xs">✕</button>
             @endif
         </div>
-        <style>
-            @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-33.333%); } }
-            .animate-marquee { animation: marquee 18s linear infinite; }
-        </style>
+    </div>
+    @endif
 
-        @else
-        {{-- Default: Bar --}}
-        <div x-data="{ show: true }" x-show="show" x-cloak
-             style="background-color: {{ $announcement->bg_color }}; color: {{ $announcement->text_color }};"
-             class="text-center py-2 px-4 text-sm font-medium relative">
-            {{ $announcement->message }}
-            @if($announcement->url)
-                <a href="{{ $announcement->url }}" class="underline ml-1">{{ $announcement->url_text ?? 'Learn more' }}</a>
-            @endif
-            @if($announcement->is_dismissible)
-                <button @click="show = false" class="absolute right-4 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100">✕</button>
-            @endif
+    @if($bannerAnn)
+    @php $bannerKey = 'dismissed_announcement_' . $bannerAnn->id; @endphp
+    @if($bannerAnn->type === 'ticker')
+    {{-- Scrolling Ticker --}}
+    <div x-data="{ show: true }" x-show="show" x-cloak
+         style="background-color: {{ $bannerAnn->bg_color }}; color: {{ $bannerAnn->text_color }};"
+         class="py-2 text-sm font-medium relative overflow-hidden">
+        <div class="flex items-center gap-4 animate-marquee whitespace-nowrap">
+            @for($i = 0; $i < 3; $i++)
+            <span>
+                {{ $bannerAnn->message }}
+                @if($bannerAnn->url)
+                    &nbsp;—&nbsp;<a href="{{ $bannerAnn->url }}" class="underline font-semibold">{{ $bannerAnn->url_text ?? 'Learn more' }}</a>
+                @endif
+                &nbsp;&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;&nbsp;
+            </span>
+            @endfor
         </div>
+        @if($bannerAnn->is_dismissible)
+        <button @click="show = false"
+                class="absolute right-4 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 z-10 bg-black/10 rounded-full w-6 h-6 flex items-center justify-center text-xs">✕</button>
         @endif
+    </div>
+    <style>
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-33.333%); } }
+        .animate-marquee { animation: marquee 18s linear infinite; }
+    </style>
+    @else
+    {{-- Bar --}}
+    <div x-data="{ show: true }" x-show="show" x-cloak
+         style="background-color: {{ $bannerAnn->bg_color }}; color: {{ $bannerAnn->text_color }};"
+         class="text-center py-2 px-4 text-sm font-medium relative">
+        {{ $bannerAnn->message }}
+        @if($bannerAnn->url)
+            <a href="{{ $bannerAnn->url }}" class="underline ml-1">{{ $bannerAnn->url_text ?? 'Learn more' }}</a>
+        @endif
+        @if($bannerAnn->is_dismissible)
+            <button @click="show = false" class="absolute right-4 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100">✕</button>
+        @endif
+    </div>
+    @endif
     @endif
 
     {{-- Navigation --}}
