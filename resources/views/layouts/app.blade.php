@@ -108,44 +108,93 @@
 
     @if($popupAnn)
     {{-- Popup Modal --}}
-    @php $popupKey = 'dismissed_announcement_' . $popupAnn->id; @endphp
+    @php
+        $popupKey = 'dismissed_announcement_' . $popupAnn->id;
+        $hasRichContent = !empty($popupAnn->body_html) || !empty($popupAnn->media_url);
+        $popupMaxWidth = $hasRichContent ? 'max-w-2xl' : 'max-w-md';
+        // Convert YouTube URL to embed URL
+        $embedUrl = null;
+        if ($popupAnn->media_type === 'youtube' && $popupAnn->media_url) {
+            preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/', $popupAnn->media_url, $m);
+            $embedUrl = !empty($m[1]) ? 'https://www.youtube.com/embed/' . $m[1] : null;
+        }
+    @endphp
     <div x-data="{ show: !localStorage.getItem('{{ $popupKey }}') }"
          x-show="show" x-cloak
          class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
          style="background: rgba(0,0,0,0.55);">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 relative"
-             style="border-top: 4px solid {{ $popupAnn->bg_color }};">
+        <div class="bg-white rounded-2xl shadow-2xl {{ $popupMaxWidth }} w-full relative overflow-hidden"
+             style="border-top: 4px solid {{ $popupAnn->bg_color }}; max-height: 90vh; overflow-y: auto;">
+
             @if($popupAnn->is_dismissible)
             <button @click="show = false; localStorage.setItem('{{ $popupKey }}', '1')"
-                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+                    class="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">&times;</button>
             @endif
-            @if($popupAnn->title)
-            <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $popupAnn->title }}</h3>
+
+            {{-- Media: image --}}
+            @if($popupAnn->media_type === 'image' && $popupAnn->media_url)
+            <div class="w-full">
+                <img src="{{ $popupAnn->media_url }}" alt="{{ $popupAnn->title ?? 'Announcement' }}"
+                     class="w-full object-cover" style="max-height: 320px;">
+            </div>
             @endif
-            <p class="text-gray-700 leading-relaxed">{{ $popupAnn->message }}</p>
-            @if($popupAnn->url)
-            <div class="mt-5 flex gap-3 justify-end">
-                <a href="{{ $popupAnn->url }}"
-                   class="px-5 py-2 rounded-lg text-sm font-semibold text-white"
-                   style="background-color: {{ $popupAnn->bg_color }}">
-                    {{ $popupAnn->url_text ?? 'Learn more' }}
-                </a>
-                @if($popupAnn->is_dismissible)
-                <button @click="show = false; localStorage.setItem('{{ $popupKey }}', '1')"
-                        class="px-5 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">
-                    Dismiss
-                </button>
+
+            {{-- Media: video (uploaded) --}}
+            @if($popupAnn->media_type === 'video' && $popupAnn->media_url)
+            <div class="w-full bg-black">
+                <video controls class="w-full" style="max-height: 320px;">
+                    <source src="{{ $popupAnn->media_url }}">
+                </video>
+            </div>
+            @endif
+
+            {{-- Media: YouTube embed --}}
+            @if($popupAnn->media_type === 'youtube' && $embedUrl)
+            <div class="w-full relative" style="padding-bottom: 56.25%;">
+                <iframe src="{{ $embedUrl }}" class="absolute inset-0 w-full h-full"
+                        frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+            @endif
+
+            <div class="p-8">
+                @if($popupAnn->title)
+                <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $popupAnn->title }}</h3>
+                @endif
+
+                {{-- Rich HTML body takes priority over plain message --}}
+                @if($popupAnn->body_html)
+                <div class="text-gray-700 leading-relaxed prose prose-sm max-w-none">
+                    {!! $popupAnn->body_html !!}
+                </div>
+                @elseif($popupAnn->message)
+                <p class="text-gray-700 leading-relaxed">{{ $popupAnn->message }}</p>
+                @endif
+
+                @if($popupAnn->url)
+                <div class="mt-5 flex gap-3 justify-end">
+                    <a href="{{ $popupAnn->url }}"
+                       class="px-5 py-2 rounded-lg text-sm font-semibold text-white"
+                       style="background-color: {{ $popupAnn->bg_color }}">
+                        {{ $popupAnn->url_text ?? 'Learn more' }}
+                    </a>
+                    @if($popupAnn->is_dismissible)
+                    <button @click="show = false; localStorage.setItem('{{ $popupKey }}', '1')"
+                            class="px-5 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100">
+                        Dismiss
+                    </button>
+                    @endif
+                </div>
+                @elseif($popupAnn->is_dismissible)
+                <div class="mt-5 text-right">
+                    <button @click="show = false; localStorage.setItem('{{ $popupKey }}', '1')"
+                            class="px-5 py-2 rounded-lg text-sm font-semibold text-white"
+                            style="background-color: {{ $popupAnn->bg_color }}">
+                        Got it
+                    </button>
+                </div>
                 @endif
             </div>
-            @elseif($popupAnn->is_dismissible)
-            <div class="mt-5 text-right">
-                <button @click="show = false; localStorage.setItem('{{ $popupKey }}', '1')"
-                        class="px-5 py-2 rounded-lg text-sm font-semibold text-white"
-                        style="background-color: {{ $popupAnn->bg_color }}">
-                    Got it
-                </button>
-            </div>
-            @endif
         </div>
     </div>
     @endif

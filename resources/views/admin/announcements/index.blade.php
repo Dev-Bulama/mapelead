@@ -25,14 +25,15 @@
     @endif
 
     {{-- Add Form --}}
-    <div x-show="showForm" x-cloak class="bg-white rounded-2xl border p-6 space-y-4">
-        <h3 class="font-semibold text-gray-900 border-b pb-3">Create Announcement</h3>
-        <form action="{{ route('admin.announcements.store') }}" method="POST" class="space-y-4">
+    <div x-show="showForm" x-cloak class="bg-white rounded-2xl border p-6">
+        <h3 class="font-semibold text-gray-900 border-b pb-3 mb-5">Create Announcement</h3>
+        <form action="{{ route('admin.announcements.store') }}" method="POST" enctype="multipart/form-data"
+              x-data="annForm()" class="space-y-4">
             @csrf
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Type <span class="text-red-500">*</span></label>
-                    <select name="type" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
+                    <select name="type" x-model="type" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
                         <option value="ticker">News Ticker (scrolling bar)</option>
                         <option value="bar">Banner Bar (fixed top)</option>
                         <option value="popup">Popup</option>
@@ -43,9 +44,67 @@
                     <input type="text" name="title" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="e.g. New Batch Starting!">
                 </div>
                 <div class="col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Message <span class="text-red-500">*</span></label>
-                    <textarea name="message" rows="2" required class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="Announcement text..."></textarea>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <span x-show="type !== 'popup'">Message <span class="text-red-500">*</span></span>
+                        <span x-show="type === 'popup'">Short Message (shown as subtitle, optional)</span>
+                    </label>
+                    <textarea name="message" rows="2" :required="type !== 'popup'" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="Announcement text..."></textarea>
                 </div>
+            </div>
+
+            {{-- Popup-only: HTML body editor + media --}}
+            <div x-show="type === 'popup'" class="border border-purple-200 rounded-xl bg-purple-50 p-4 space-y-4">
+                <p class="text-xs font-semibold text-purple-700 uppercase tracking-wider">Popup Rich Content</p>
+
+                {{-- HTML Body editor --}}
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-sm font-medium text-gray-700">Popup HTML Body</label>
+                        <div class="flex gap-1">
+                            <button type="button" onclick="insertHtml('new_body_html','<strong>Bold</strong>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">B</button>
+                            <button type="button" onclick="insertHtml('new_body_html','<em>Italic</em>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50"><em>I</em></button>
+                            <button type="button" onclick="insertHtml('new_body_html','<a href=\"#\">Link Text</a>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">Link</button>
+                            <button type="button" onclick="insertHtml('new_body_html','<p style=\"text-align:center;\"><a href=\"#\" style=\"display:inline-block;padding:10px 24px;background:#1e3adb;color:#fff;border-radius:8px;font-weight:600;text-decoration:none;font-size:14px;\">Click Here</a></p>')" class="px-2 py-0.5 bg-white border border-blue-200 text-blue-700 rounded text-xs hover:bg-blue-50">+ Button</button>
+                            <button type="button" onclick="insertHtml('new_body_html','<hr style=\"border:none;border-top:1px solid #e5e7eb;margin:16px 0;\">')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">— Divider</button>
+                        </div>
+                    </div>
+                    <textarea id="new_body_html" name="body_html" rows="8"
+                        class="w-full border rounded-xl px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-brand-500"
+                        placeholder="<p>Write your popup HTML content here...</p>&#10;<p>You can use full HTML including <strong>bold</strong>, links, images, etc.</p>"></textarea>
+                    <p class="text-xs text-gray-400 mt-1">Write full HTML. This is rendered inside the popup modal body.</p>
+                </div>
+
+                {{-- Media upload --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Media (optional)</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" x-data="{ mediaChoice: 'none' }">
+                        <label class="flex items-center gap-2 text-sm cursor-pointer">
+                            <input type="radio" name="media_type_choice" x-model="mediaChoice" value="none"> No Media
+                        </label>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer">
+                            <input type="radio" name="media_type_choice" x-model="mediaChoice" value="file"> Upload Image/Video
+                        </label>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer">
+                            <input type="radio" name="media_type_choice" x-model="mediaChoice" value="youtube"> YouTube/Video URL
+                        </label>
+
+                        <div x-show="mediaChoice === 'file'" x-cloak class="col-span-3">
+                            <input type="file" name="media_file" accept="image/*,video/mp4,video/webm"
+                                class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
+                            <p class="text-xs text-gray-400 mt-1">Images: JPG, PNG, GIF, WebP (max 50MB). Videos: MP4, WebM (max 50MB).</p>
+                        </div>
+
+                        <div x-show="mediaChoice === 'youtube'" x-cloak class="col-span-3">
+                            <input type="url" name="media_youtube" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500"
+                                placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/...">
+                            <p class="text-xs text-gray-400 mt-1">Paste a YouTube or direct video URL.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Common fields --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Link URL</label>
                     <input type="url" name="url" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="https://...">
@@ -100,7 +159,7 @@
         </div>
         <div class="bg-purple-50 border border-purple-100 rounded-xl p-4 text-sm">
             <div class="font-semibold text-purple-700 mb-1">Popup</div>
-            <p class="text-purple-600 text-xs">Modal dialog shown to visitors. Best for important time-sensitive offers or required acknowledgements.</p>
+            <p class="text-purple-600 text-xs">Modal dialog shown to visitors. Supports full HTML content, image flyers, and embedded videos.</p>
         </div>
     </div>
 
@@ -113,7 +172,7 @@
     @else
     <div class="space-y-3">
         @foreach($announcements as $ann)
-        <div class="bg-white rounded-2xl border p-5 flex items-start gap-4" x-data="{ editing: false }">
+        <div class="bg-white rounded-2xl border p-5 flex items-start gap-4" x-data="{ editing: false, editType: '{{ $ann->type }}', editMedia: '{{ $ann->media_type ? ($ann->media_url ? ($ann->media_type === 'youtube' ? 'youtube' : 'keep') : 'none') : 'none' }}' }">
             <div class="w-2 h-12 rounded-full flex-shrink-0 mt-1" style="background-color: {{ $ann->bg_color ?? '#14215B' }}"></div>
             <div class="flex-1 min-w-0">
                 <div x-show="!editing">
@@ -132,7 +191,15 @@
                         <h3 class="font-semibold text-gray-900 text-sm">{{ $ann->title }}</h3>
                         @endif
                     </div>
+                    @if($ann->message)
                     <p class="text-sm text-gray-600 break-words">{{ $ann->message }}</p>
+                    @endif
+                    @if($ann->body_html)
+                    <p class="text-xs text-purple-600 mt-1">✦ Has rich HTML content</p>
+                    @endif
+                    @if($ann->media_url)
+                    <p class="text-xs text-indigo-600 mt-0.5">✦ Has media ({{ $ann->media_type }})</p>
+                    @endif
                     @if($ann->url)
                     <a href="{{ $ann->url }}" target="_blank" class="text-xs text-brand-600 hover:underline mt-1 inline-block">{{ $ann->url_text ?? $ann->url }}</a>
                     @endif
@@ -143,18 +210,82 @@
                     </p>
                 </div>
 
-                <div x-show="editing" x-cloak class="space-y-3">
-                    <form action="{{ route('admin.announcements.update', $ann) }}" method="POST" class="space-y-3">
+                <div x-show="editing" x-cloak>
+                    <form action="{{ route('admin.announcements.update', $ann) }}" method="POST"
+                          enctype="multipart/form-data" class="space-y-3">
                         @csrf @method('PUT')
+
                         <div class="grid grid-cols-2 gap-3">
-                            <select name="type" class="border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
+                            <select name="type" x-model="editType" class="border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">
                                 <option value="ticker" {{ $ann->type === 'ticker' ? 'selected' : '' }}>News Ticker</option>
                                 <option value="bar" {{ $ann->type === 'bar' ? 'selected' : '' }}>Banner Bar</option>
                                 <option value="popup" {{ $ann->type === 'popup' ? 'selected' : '' }}>Popup</option>
                             </select>
                             <input type="text" name="title" value="{{ $ann->title }}" class="border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="Title">
                         </div>
-                        <textarea name="message" rows="2" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500">{{ $ann->message }}</textarea>
+
+                        <textarea name="message" rows="2" class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="Short message (required for bar/ticker)">{{ $ann->message }}</textarea>
+
+                        {{-- Popup rich content --}}
+                        <div x-show="editType === 'popup'" class="border border-purple-200 rounded-xl bg-purple-50 p-4 space-y-4">
+                            <p class="text-xs font-semibold text-purple-700 uppercase tracking-wider">Popup Rich Content</p>
+
+                            <div>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="block text-sm font-medium text-gray-700">HTML Body</label>
+                                    <div class="flex gap-1">
+                                        <button type="button" onclick="insertHtml('edit_body_{{ $ann->id }}','<strong>Bold</strong>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">B</button>
+                                        <button type="button" onclick="insertHtml('edit_body_{{ $ann->id }}','<em>Italic</em>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50"><em>I</em></button>
+                                        <button type="button" onclick="insertHtml('edit_body_{{ $ann->id }}','<a href=\"#\">Link Text</a>')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">Link</button>
+                                        <button type="button" onclick="insertHtml('edit_body_{{ $ann->id }}','<p style=\"text-align:center;\"><a href=\"#\" style=\"display:inline-block;padding:10px 24px;background:#1e3adb;color:#fff;border-radius:8px;font-weight:600;text-decoration:none;font-size:14px;\">Click Here</a></p>')" class="px-2 py-0.5 bg-white border border-blue-200 text-blue-700 rounded text-xs hover:bg-blue-50">+ Button</button>
+                                        <button type="button" onclick="insertHtml('edit_body_{{ $ann->id }}','<hr style=\"border:none;border-top:1px solid #e5e7eb;margin:16px 0;\">')" class="px-2 py-0.5 bg-white border rounded text-xs text-gray-600 hover:bg-gray-50">— Divider</button>
+                                    </div>
+                                </div>
+                                <textarea id="edit_body_{{ $ann->id }}" name="body_html" rows="8"
+                                    class="w-full border rounded-xl px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-brand-500"
+                                    placeholder="<p>Write your popup HTML content here...</p>">{{ $ann->body_html }}</textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Media</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                                    <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                        <input type="radio" name="media_type" x-model="editMedia" value="none"> Remove media
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                        <input type="radio" name="media_type" x-model="editMedia" value="keep"> Keep existing
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                        <input type="radio" name="media_type" x-model="editMedia" value="file"> Upload new file
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                        <input type="radio" name="media_type" x-model="editMedia" value="youtube"> YouTube URL
+                                    </label>
+
+                                    @if($ann->media_url)
+                                    <div x-show="editMedia === 'keep'" class="col-span-4 text-xs text-gray-500">
+                                        Current: <span class="font-medium">{{ $ann->media_type }}</span> —
+                                        @if($ann->media_type === 'youtube')
+                                            {{ Str::limit($ann->media_url, 60) }}
+                                        @else
+                                            <a href="{{ $ann->media_url }}" target="_blank" class="text-brand-600 underline">View file</a>
+                                        @endif
+                                    </div>
+                                    @endif
+
+                                    <div x-show="editMedia === 'file'" class="col-span-4">
+                                        <input type="file" name="media_file" accept="image/*,video/mp4,video/webm"
+                                            class="w-full border rounded-xl px-3 py-2 text-sm">
+                                    </div>
+                                    <div x-show="editMedia === 'youtube'" class="col-span-4">
+                                        <input type="url" name="media_youtube" value="{{ $ann->media_type === 'youtube' ? $ann->media_url : '' }}"
+                                            class="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500"
+                                            placeholder="https://www.youtube.com/watch?v=...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-3">
                             <input type="url" name="url" value="{{ $ann->url }}" class="border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="Link URL">
                             <input type="text" name="url_text" value="{{ $ann->url_text }}" class="border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500" placeholder="Link Text">
@@ -192,4 +323,20 @@
     </div>
     @endif
 </div>
+
+<script>
+function annForm() {
+    return { type: 'ticker' };
+}
+
+function insertHtml(textareaId, snippet) {
+    const ta = document.getElementById(textareaId);
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    ta.value = ta.value.substring(0, start) + snippet + ta.value.substring(end);
+    ta.focus();
+    ta.setSelectionRange(start + snippet.length, start + snippet.length);
+}
+</script>
 @endsection
