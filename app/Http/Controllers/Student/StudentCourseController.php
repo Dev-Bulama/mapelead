@@ -215,12 +215,10 @@ class StudentCourseController extends Controller
                 'payment_type' => $request->payment_type,
             ]);
 
-            // If Paystack is configured, redirect to payment page
-            if (isset($payment['authorization_url']) && str_contains($payment['authorization_url'], 'paystack.co')) {
+            if (isset($payment['authorization_url'])) {
                 return redirect($payment['authorization_url']);
             }
 
-            // Dev mode: show payment page
             return view('student.payment', compact('course', 'enrollment', 'payment'));
 
         } catch (\Exception $e) {

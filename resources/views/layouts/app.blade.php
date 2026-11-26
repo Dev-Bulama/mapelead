@@ -203,8 +203,8 @@
     @php $bannerKey = 'dismissed_announcement_' . $bannerAnn->id; @endphp
     @if($bannerAnn->type === 'ticker')
     {{-- Scrolling Ticker --}}
-    <div x-data="{ show: true }" x-show="show" x-cloak
-         style="background-color: {{ $bannerAnn->bg_color }}; color: {{ $bannerAnn->text_color }};"
+    <div x-data="{ show: true }" x-show="show"
+         style="background-color: {{ $bannerAnn->bg_color ?? '#14215B' }}; color: {{ $bannerAnn->text_color ?? '#ffffff' }};"
          class="py-2 text-sm font-medium relative overflow-hidden">
         <div class="flex items-center gap-4 animate-marquee whitespace-nowrap">
             @for($i = 0; $i < 3; $i++)
@@ -228,8 +228,8 @@
     </style>
     @else
     {{-- Bar --}}
-    <div x-data="{ show: true }" x-show="show" x-cloak
-         style="background-color: {{ $bannerAnn->bg_color }}; color: {{ $bannerAnn->text_color }};"
+    <div x-data="{ show: true }" x-show="show"
+         style="background-color: {{ $bannerAnn->bg_color ?? '#14215B' }}; color: {{ $bannerAnn->text_color ?? '#ffffff' }};"
          class="text-center py-2 px-4 text-sm font-medium relative">
         {{ $bannerAnn->message }}
         @if($bannerAnn->url)

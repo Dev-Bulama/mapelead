@@ -115,10 +115,22 @@
 
         {{-- Flash Messages --}}
         @if(session('success'))
-            <div x-data="{show:true}" x-show="show" x-cloak x-init="setTimeout(()=>show=false,4000)"
+            <div x-data="{show:true}" x-show="show" x-cloak x-init="setTimeout(()=>show=false,5000)"
                  class="mx-4 mt-4 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm flex items-center justify-between">
-                {{ session('success') }}
-                <button @click="show=false" class="text-green-500">✕</button>
+                <span>{{ session('success') }}</span>
+                <button @click="show=false" class="text-green-500 ml-3 shrink-0">✕</button>
+            </div>
+        @endif
+        @if(session('error'))
+            <div x-data="{show:true}" x-show="show" x-cloak
+                 class="mx-4 mt-4 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm flex items-center justify-between">
+                <span>{{ session('error') }}</span>
+                <button @click="show=false" class="text-red-500 ml-3 shrink-0">✕</button>
+            </div>
+        @endif
+        @if($errors->any())
+            <div class="mx-4 mt-4 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+                @foreach($errors->all() as $e)<p>• {{ $e }}</p>@endforeach
             </div>
         @endif
 
