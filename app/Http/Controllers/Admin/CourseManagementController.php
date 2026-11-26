@@ -90,8 +90,12 @@ class CourseManagementController extends Controller
 
     public function show(Course $course)
     {
-        $course->load(['instructor.user', 'category', 'modules.lessons', 'enrollments', 'courseInstructors.instructor.user']);
-        return view('admin.courses.show', compact('course'));
+        $course->load(['instructor.user', 'category', 'modules.lessons', 'enrollments.user', 'courseInstructors.instructor.user']);
+        $reviews = \App\Models\CourseReview::where('course_id', $course->id)
+            ->with('user')
+            ->latest()
+            ->get();
+        return view('admin.courses.show', compact('course', 'reviews'));
     }
 
     public function edit(Course $course)
@@ -150,6 +154,7 @@ class CourseManagementController extends Controller
             'brochure'            => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'duration_hours'      => 'nullable|integer',
             'duration_weeks'      => 'nullable|integer',
+            'total_students'      => 'nullable|integer|min:0',
             'language'            => 'nullable|string|max:50',
             'promo_video'         => 'nullable|url|max:500',
             'promo_video_file'    => 'nullable|file|mimetypes:video/mp4,video/webm,video/ogg|max:204800',

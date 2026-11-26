@@ -218,5 +218,70 @@
         </div>
     </div>
 
+    {{-- Reviews --}}
+    @if(isset($reviews) && $reviews->isNotEmpty())
+    <div class="bg-white rounded-2xl border border-gray-200">
+        <div class="p-5 border-b border-gray-100 flex items-center justify-between flex-wrap gap-4">
+            <div>
+                <h3 class="font-semibold text-gray-900">Reviews &amp; Ratings</h3>
+                @php $avg = $reviews->avg('rating'); $total = $reviews->count(); @endphp
+                <div class="flex items-center gap-2 mt-1">
+                    <div class="flex">
+                        @for($i=1;$i<=5;$i++)
+                        <svg class="w-4 h-4 {{ $i <= round($avg) ? 'text-yellow-400' : 'text-gray-200' }}" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        @endfor
+                    </div>
+                    <span class="text-sm font-semibold text-gray-900">{{ number_format($avg, 1) }}</span>
+                    <span class="text-xs text-gray-500">({{ $total }} {{ Str::plural('review', $total) }})</span>
+                </div>
+            </div>
+            @php $starCounts = []; for($s=5;$s>=1;$s--) $starCounts[$s] = $reviews->where('rating', $s)->count(); @endphp
+            <div class="space-y-1 w-48">
+                @for($s=5;$s>=1;$s--)
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="w-3 text-gray-500">{{ $s }}</span>
+                    <svg class="w-3 h-3 text-yellow-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    <div class="flex-1 bg-gray-100 rounded-full h-1.5">
+                        <div class="bg-yellow-400 h-1.5 rounded-full" style="width: {{ $total ? round(($starCounts[$s]/$total)*100) : 0 }}%"></div>
+                    </div>
+                    <span class="text-gray-500 w-4 text-right">{{ $starCounts[$s] }}</span>
+                </div>
+                @endfor
+            </div>
+        </div>
+        <div class="divide-y divide-gray-50">
+            @foreach($reviews as $review)
+            <div class="px-5 py-4 flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold text-sm flex items-center justify-center shrink-0">
+                    {{ strtoupper(substr($review->user?->full_name ?? '?', 0, 1)) }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-medium text-sm text-gray-900">{{ $review->user?->full_name ?? 'Unknown' }}</span>
+                        <div class="flex">
+                            @for($i=1;$i<=5;$i++)
+                            <svg class="w-3.5 h-3.5 {{ $i <= $review->rating ? 'text-yellow-400' : 'text-gray-200' }}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            @endfor
+                        </div>
+                        @if(!$review->is_approved)
+                        <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">Pending</span>
+                        @endif
+                        <span class="text-xs text-gray-400 ml-auto">{{ $review->created_at->diffForHumans() }}</span>
+                    </div>
+                    @if($review->title)
+                    <p class="text-sm font-medium text-gray-800 mt-0.5">{{ $review->title }}</p>
+                    @endif
+                    @if($review->body)
+                    <p class="text-sm text-gray-600 mt-0.5">{{ $review->body }}</p>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
 </div>
 @endsection
