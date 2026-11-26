@@ -282,6 +282,19 @@
     </style>
 </head>
 <body>
+@if($settings->custom_html)
+{!! str_replace(
+    ['{{student_name}}', '{{course_name}}', '{{certificate_number}}', '{{issued_date}}', '{{course_duration}}'],
+    [
+        $certificate->user->full_name,
+        $certificate->course->title,
+        $certificate->certificate_number,
+        $certificate->issued_at->format('F d, Y'),
+        $certificate->course->duration_hours ? $certificate->course->duration_hours . ' hours' : 'N/A'
+    ],
+    $settings->custom_html
+) !!}
+@else
 <div class="outer-border"></div>
 <div class="inner-border"></div>
 
@@ -358,5 +371,6 @@
     </div>
 
 </div>
+@endif
 </body>
 </html>

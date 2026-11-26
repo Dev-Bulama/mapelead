@@ -59,6 +59,47 @@
             </div>
         </div>
 
+        <div class="bg-white rounded-xl border p-6 mb-4" x-data="{ useCustom: {{ $settings->custom_html ? 'true' : 'false' }} }">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-semibold text-gray-900">Custom HTML Design</h2>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" x-model="useCustom" class="rounded text-brand-600">
+                    <span class="text-sm text-gray-700">Use custom HTML template</span>
+                </label>
+            </div>
+            <div x-show="useCustom" class="space-y-3">
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800">
+                    <strong>When enabled, the custom HTML completely replaces the default certificate layout.</strong><br>
+                    Available placeholders: <code>&#123;&#123;student_name&#125;&#125;</code>, <code>&#123;&#123;course_name&#125;&#125;</code>, <code>&#123;&#123;certificate_number&#125;&#125;</code>, <code>&#123;&#123;issued_date&#125;&#125;</code>, <code>&#123;&#123;course_duration&#125;&#125;</code>.<br>
+                    Include your own <code>&lt;style&gt;</code> tags. The HTML is rendered by the DomPDF engine. Keep layout: 297mm &times; 210mm for landscape.
+                </div>
+                <div class="flex gap-1 mb-1 flex-wrap">
+                    @foreach(['{{student_name}}','{{course_name}}','{{certificate_number}}','{{issued_date}}','{{course_duration}}'] as $ph)
+                    <button type="button" onclick="certInsert('{{ $ph }}')"
+                        class="px-2 py-0.5 bg-blue-50 border border-blue-200 text-blue-700 rounded text-xs font-mono hover:bg-blue-100">{{ $ph }}</button>
+                    @endforeach
+                </div>
+                <textarea id="cert_html_editor" name="custom_html" rows="20"
+                    class="w-full border rounded-lg px-3 py-2 text-sm font-mono focus:ring-2 focus:ring-brand-500"
+                    placeholder="<style>&#10;body { margin:0; }&#10;.cert { width:297mm; height:210mm; }&#10;</style>&#10;<div class=&quot;cert&quot;>...</div>">{{ old('custom_html', $settings->custom_html) }}</textarea>
+            </div>
+            <div x-show="!useCustom" class="text-sm text-gray-500">
+                <input type="hidden" name="custom_html" value="">
+                The default certificate layout will be used. Enable custom HTML to design your own.
+            </div>
+        </div>
+
+        <script>
+        function certInsert(text) {
+            const ta = document.getElementById('cert_html_editor');
+            if (!ta) return;
+            const s = ta.selectionStart, e = ta.selectionEnd;
+            ta.value = ta.value.substring(0, s) + text + ta.value.substring(e);
+            ta.focus();
+            ta.setSelectionRange(s + text.length, s + text.length);
+        }
+        </script>
+
         <div class="bg-white rounded-xl border p-6 mb-4">
             <h2 class="font-semibold text-gray-900 mb-4">Design & Colors</h2>
             <div class="grid grid-cols-3 gap-4 mb-4">

@@ -39,6 +39,7 @@ class CertificateSettingsController extends \App\Http\Controllers\Controller
             'primary_color'     => 'nullable',
             'text_color'        => 'nullable',
             'layout'            => 'nullable|in:landscape,portrait',
+            'custom_html'       => 'nullable|string',
             'qr_enabled'        => 'boolean',
         ]);
 
