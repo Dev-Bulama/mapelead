@@ -40,7 +40,7 @@ class StudentCourseController extends Controller
         }
 
         // Payment must be paid or part_paid to access
-        if (!in_array($enrollment->payment_status, ['paid', 'part_paid'])) {
+        if (!in_array($enrollment->payment_status, ['paid', 'partial'])) {
             return redirect()->route('enroll.checkout', $slug)
                 ->with('error', 'Please complete payment to access this course.');
         }
@@ -145,7 +145,7 @@ class StudentCourseController extends Controller
             'training_type'     => 'required|in:online,physical_monthly,physical_quarterly',
             'batch_id'          => 'nullable|exists:batches,id',
             'coupon_code'       => 'nullable|string|max:50',
-            'down_payment'      => 'required_if:payment_type,installment|nullable|numeric|min:1000',
+            'down_payment'      => $request->payment_type === 'installment' ? 'required|numeric|min:1000' : 'nullable|numeric',
             'installment_count' => 'required_if:payment_type,installment|nullable|integer|min:2|max:10',
             'period_days'       => 'required_if:payment_type,installment|nullable|integer|min:1|max:30',
             'first_due_date'    => 'required_if:payment_type,installment|nullable|date|after:today',
